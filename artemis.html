@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아폴로 vs 아르테미스 — 달로, 그리고 그 너머로</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --navy: #050d1a;
+  --navy2: #0a1628;
+  --teal: #00c9a7;
+  --teal2: #00a88a;
+  --amber: #f4a400;
+  --coral: #e85d30;
+  --blue: #378add;
+  --white: #f0f4ff;
+  --gray: #8899bb;
+  --card: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── 슬라이드 컨테이너 ── */
+.deck { width:100vw; height:100vh; position:relative; }
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 72px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+.slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+/* ── 별 배경 ── */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle var(--d,3s) infinite alternate;
+}
+@keyframes twinkle {
+  from { opacity: var(--a1, 0.2); }
+  to   { opacity: var(--a2, 0.8); }
+}
+
+/* ── 네비게이션 ── */
+.nav {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 100;
+  background: rgba(5,13,26,0.85);
+  padding: 10px 22px;
+  border-radius: 40px;
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(10px);
+}
+.nav button {
+  background: none;
+  border: 1px solid var(--card-border);
+  color: var(--white);
+  padding: 7px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.nav button:hover { background: var(--card); border-color: var(--teal); color: var(--teal); }
+.slide-counter {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--gray);
+  min-width: 52px;
+  text-align: center;
+}
+.dot-nav { display:flex; gap:6px; }
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--card-border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dot.active { background: var(--teal); transform: scale(1.3); }
+
+/* ── 공통 타이포 ── */
+.slide-label {
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 14px;
+  font-family: 'Space Mono', monospace;
+}
+h1 { font-size: clamp(38px,5vw,64px); font-weight: 900; line-height: 1.1; }
+h2 { font-size: clamp(26px,3.5vw,42px); font-weight: 700; line-height: 1.2; }
+h3 { font-size: clamp(18px,2.5vw,26px); font-weight: 700; }
+p, li { font-size: clamp(14px,1.6vw,18px); font-weight: 300; line-height: 1.7; color: #c8d4ee; }
+
+.accent { color: var(--teal); }
+.amber  { color: var(--amber); }
+.coral  { color: var(--coral); }
+.blue   { color: var(--blue); }
+
+/* ── 카드 ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 24px 28px;
+  backdrop-filter: blur(4px);
+}
+.card.teal   { border-color: rgba(0,201,167,0.4); }
+.card.amber  { border-color: rgba(244,164,0,0.4); }
+.card.coral  { border-color: rgba(232,93,48,0.4); }
+.card.blue   { border-color: rgba(55,138,221,0.4); }
+
+/* ── 구분선 ── */
+.divider {
+  width: 60px; height: 3px;
+  background: var(--teal);
+  margin: 16px 0;
+  border-radius: 2px;
+}
+
+/* ══════════════════════════════════════
+   SLIDE 1: 표지
+══════════════════════════════════════ */
+#s1 { text-align: center; }
+#s1 .big-circle {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,201,167,0.15);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  animation: spinSlow 40s linear infinite;
+}
+#s1 .big-circle2 {
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,201,167,0.08);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  animation: spinSlow 25s linear infinite reverse;
+}
+@keyframes spinSlow { to { transform: translate(-50%,-50%) rotate(360deg); } }
+#s1 h1 { font-size: clamp(50px,7vw,90px); position: relative; z-index:2; }
+#s1 h1 em { font-style:normal; color: var(--teal); }
+#s1 .subtitle { font-size: clamp(16px,2vw,22px); color: var(--gray); margin-top: 16px; letter-spacing: 2px; }
+#s1 .tag {
+  display: inline-block;
+  margin-top: 32px;
+  padding: 8px 20px;
+  border: 1px solid var(--teal);
+  border-radius: 30px;
+  font-size: 13px;
+  color: var(--teal);
+  letter-spacing: 2px;
+}
+
+/* ══════════════════════════════════════
+   SLIDE 2: 아폴로 vs 아르테미스 비교
+══════════════════════════════════════ */
+#s2 { justify-content: flex-start; padding-top: 60px; }
+#s2 .compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  gap: 0;
+  width: 100%;
+  max-width: 960px;
+  margin-top: 20px;
+}
+#s2 .col-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.col-amber { background: rgba(244,164,0,0.12); border: 1px solid rgba(244,164,0,0.3); }
+.col-teal  { background: rgba(0,201,167,0.08); border: 1px solid rgba(0,201,167,0.3); }
+.col-header h3 { font-size: 20px; margin-top: 6px; }
+#s2 .vs-col { display:flex; flex-direction:column; align-items:center; }
+#s2 .vs-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--gray);
+  margin-top: 18px;
+  margin-bottom: 12px;
+}
+.compare-row {
+  display: contents;
+}
+.compare-cell {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--card-border);
+  font-size: 14px;
+}
+.compare-category {
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border-bottom: 1px solid var(--card-border);
+}
+.compare-cell .label { font-size: 11px; color: var(--gray); margin-bottom: 3px; letter-spacing:1px; }
+.compare-cell .value { font-weight: 500; font-size: 15px; }
+
+/* ══════════════════════════════════════
+   SLIDE 3: 왜 이제야? 3가지 이유
+══════════════════════════════════════ */
+#s3 .reason-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 960px;
+  margin-top: 28px;
+}
+#s3 .reason-card {
+  border-radius: 20px;
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+#s3 .reason-card:hover { transform: translateY(-6px); }
+#s3 .reason-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+#s3 .reason-card h3 { font-size: 18px; margin-bottom: 10px; }
+#s3 .reason-card p { font-size: 13px; line-height: 1.7; }
+#s3 .r1 { background: linear-gradient(135deg, rgba(0,201,167,0.15), rgba(0,201,167,0.05)); border: 1px solid rgba(0,201,167,0.3); }
+#s3 .r2 { background: linear-gradient(135deg, rgba(244,164,0,0.15), rgba(244,164,0,0.05)); border: 1px solid rgba(244,164,0,0.3); }
+#s3 .r3 { background: linear-gradient(135deg, rgba(232,93,48,0.15), rgba(232,93,48,0.05)); border: 1px solid rgba(232,93,48,0.3); }
+
+/* ══════════════════════════════════════
+   SLIDE 4: 달에 가는 방법 (애니메이션)
+══════════════════════════════════════ */
+#s4 { padding: 30px 60px; justify-content: flex-start; }
+#s4 .orbit-wrap {
+  width: 100%;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  margin-top: 16px;
+}
+#orbit-canvas {
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--card-border);
+}
+#s4 .orbit-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.step-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  transition: all 0.4s;
+}
+.step-item.highlight { background: rgba(0,201,167,0.1); border-color: rgba(0,201,167,0.5); }
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--teal);
+  color: var(--navy);
+}
+.step-item h4 { font-size: 14px; margin-bottom: 3px; }
+.step-item p { font-size: 12px; color: var(--gray); line-height: 1.5; }
+
+#orbit-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--card-border);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+#orbit-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--teal);
+  border-radius: 2px;
+  transition: width 0.1s;
+}
+
+/* ══════════════════════════════════════
+   SLIDE 5: 아르테미스 로드맵
+══════════════════════════════════════ */
+#s5 { justify-content: flex-start; padding-top: 56px; }
+#s5 .timeline {
+  width: 100%;
+  max-width: 960px;
+  margin-top: 28px;
+  position: relative;
+}
+#s5 .timeline-line {
+  position: absolute;
+  top: 36px;
+  left: 40px;
+  right: 40px;
+  height: 2px;
+  background: linear-gradient(to right, var(--amber), var(--teal), var(--teal), var(--coral));
+  border-radius: 1px;
+}
+#s5 .timeline-items {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.timeline-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.tl-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: var(--navy);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+.tl-dot.amber { border-color: var(--amber); background: var(--amber); }
+.tl-dot.teal  { border-color: var(--teal);  background: var(--teal); }
+.tl-dot.coral { border-color: var(--coral); background: var(--coral); }
+.tl-dot.future { border-color: var(--gray); background: var(--navy); }
+.tl-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+  width: 100%;
+  min-height: 90px;
+}
+.tl-year { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gray); margin-bottom: 4px; }
+.tl-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+.tl-desc  { font-size: 11px; color: var(--gray); line-height: 1.4; }
+.tl-badge {
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 5px;
+}
+.badge-done   { background: rgba(0,201,167,0.2); color: var(--teal); }
+.badge-soon   { background: rgba(244,164,0,0.2); color: var(--amber); }
+.badge-future { background: rgba(136,153,187,0.2); color: var(--gray); }
+
+#s5 .final-goal {
+  width: 100%;
+  max-width: 960px;
+  margin-top: 24px;
+  padding: 18px 28px;
+  border-radius: 12px;
+  background: linear-gradient(to right, rgba(232,93,48,0.1), rgba(244,164,0,0.1));
+  border: 1px solid rgba(232,93,48,0.3);
+  text-align: center;
+}
+#s5 .final-goal h3 { font-size: 18px; margin-bottom: 6px; }
+#s5 .final-goal p  { font-size: 13px; color: var(--gray); }
+
+/* ══════════════════════════════════════
+   SLIDE 6: 한국의 참여
+══════════════════════════════════════ */
+#s6 .kr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 28px;
+}
+#s6 .kr-card {
+  border-radius: 16px;
+  padding: 26px 24px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+}
+#s6 .kr-card .icon { font-size: 36px; margin-bottom: 12px; }
+#s6 .kr-card h3 { font-size: 17px; margin-bottom: 8px; }
+#s6 .kr-card p  { font-size: 13px; color: var(--gray); line-height: 1.6; }
+#s6 .kr-card.highlight { border-color: rgba(0,201,167,0.4); }
+#s6 .bottom-note {
+  margin-top: 24px;
+  padding: 14px 24px;
+  border-radius: 10px;
+  background: rgba(0,201,167,0.06);
+  border: 1px solid rgba(0,201,167,0.2);
+  font-size: 14px;
+  color: var(--gray);
+  text-align: center;
+  max-width: 900px;
+  width: 100%;
+}
+
+/* ══════════════════════════════════════
+   SLIDE 7: 마무리
+══════════════════════════════════════ */
+#s7 { text-align: center; }
+#s7 h1 { font-size: clamp(36px,5vw,68px); }
+#s7 .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 18px;
+  max-width: 900px;
+  margin: 30px auto 0;
+}
+#s7 .sum-card {
+  padding: 22px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+  background: var(--card);
+}
+#s7 .sum-card .big { font-size: 36px; margin-bottom: 10px; }
+#s7 .sum-card h4 { font-size: 15px; margin-bottom: 6px; }
+#s7 .sum-card p  { font-size: 12px; color: var(--gray); line-height: 1.5; }
+#s7 .quote {
+  max-width: 700px;
+  margin: 28px auto 0;
+  font-size: 16px;
+  color: var(--gray);
+  font-style: italic;
+  line-height: 1.8;
+}
+</style>
+</head>
+<body>
+
+<!-- 별 배경 -->
+<div class="stars" id="stars"></div>
+
+<div class="deck">
+
+  <!-- ══ SLIDE 1: 표지 ══ -->
+  <div class="slide active" id="s1">
+    <div class="big-circle"></div>
+    <div class="big-circle2"></div>
+    <div class="slide-label">우주 탐사 이야기</div>
+    <h1>아폴로, 그리고<br><em>아르테미스</em></h1>
+    <p class="subtitle">달로 — 그리고 그 너머로</p>
+    <span class="tag">5학년 사회 · 우주와 자연재해</span>
+  </div>
+
+  <!-- ══ SLIDE 2: 아폴로 vs 아르테미스 ══ -->
+  <div class="slide" id="s2">
+    <div class="slide-label">두 계획을 비교해봐요</div>
+    <h2>아폴로 <span style="color:var(--gray)">vs</span> 아르테미스</h2>
+    <div class="compare-grid" style="max-width:900px;width:100%;margin-top:22px;display:grid;grid-template-columns:1fr 50px 1fr;gap:0;">
+      <!-- 헤더 -->
+      <div class="col-header col-amber">
+        <span style="font-size:32px">🚀</span>
+        <h3 class="amber">아폴로 계획</h3>
+        <span style="font-size:12px;color:var(--gray)">1961 – 1972년</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:14px;color:var(--gray);">VS</div>
+      <div class="col-header col-teal">
+        <span style="font-size:32px">🌙</span>
+        <h3 class="accent">아르테미스 계획</h3>
+        <span style="font-size:12px;color:var(--gray)">2017년 – 현재</span>
+      </div>
+      <!-- 행들 -->
+      <div class="compare-cell"><div class="label">🎯 목적</div><div class="value amber">소련보다 먼저 달에 착륙!</div><div style="font-size:12px;color:var(--gray)">냉전 경쟁 · 정치적 목표</div></div>
+      <div class="compare-category">🎯</div>
+      <div class="compare-cell"><div class="label">🎯 목적</div><div class="value accent">달 기지 건설 → 화성으로!</div><div style="font-size:12px;color:var(--gray)">장기 탐사 · 자원 개발</div></div>
+
+      <div class="compare-cell"><div class="label">📍 착륙 장소</div><div class="value">달 적도 근처</div><div style="font-size:12px;color:var(--gray)">평평하고 가기 쉬운 곳</div></div>
+      <div class="compare-category">📍</div>
+      <div class="compare-cell"><div class="label">📍 착륙 장소</div><div class="value accent">달 남극!</div><div style="font-size:12px;color:var(--gray)">물 얼음이 숨겨진 곳</div></div>
+
+      <div class="compare-cell"><div class="label">🌍 참여</div><div class="value">미국 혼자</div><div style="font-size:12px;color:var(--gray)">NASA만 담당</div></div>
+      <div class="compare-category">🌍</div>
+      <div class="compare-cell"><div class="label">🌍 참여</div><div class="value accent">52개 나라 + 민간 기업</div><div style="font-size:12px;color:var(--gray)">한국, 일본, 유럽 등</div></div>
+
+      <div class="compare-cell"><div class="label">🔭 다음 목표</div><div class="value">임무 종료 · 끝</div><div style="font-size:12px;color:var(--gray)">이겼으니 만족</div></div>
+      <div class="compare-category">🔭</div>
+      <div class="compare-cell"><div class="label">🔭 다음 목표</div><div class="value coral">화성 유인 탐사!</div><div style="font-size:12px;color:var(--gray)">달은 중간 기착지</div></div>
+    </div>
+    <p style="margin-top:16px;font-size:12px;color:var(--gray)">이름도 남매! — 아폴로(태양신)의 쌍둥이 누나가 바로 아르테미스(달의 여신)</p>
+  </div>
+
+  <!-- ══ SLIDE 3: 왜 이제야? ══ -->
+  <div class="slide" id="s3">
+    <div class="slide-label">궁금증 해결</div>
+    <h2>왜 <span class="accent">50년</span>이나 지나서 다시 가는 걸까?</h2>
+    <div class="reason-grid">
+      <div class="reason-card r1">
+        <span class="reason-icon">💧</span>
+        <h3 class="accent">달에 물이 있어요!</h3>
+        <p>달 남극의 깊은 그늘에 얼음 물이 숨어 있다는 게 확인됐어요. 물을 분해하면 수소 + 산소 → 로켓 연료가 돼요!</p>
+      </div>
+      <div class="reason-card r2">
+        <span class="reason-icon">💰</span>
+        <h3 class="amber">비용이 확 줄었어요!</h3>
+        <p>스페이스X 같은 민간 기업들이 로켓 발사 비용을 아폴로 시대의 1/10 이하로 낮췄어요. 이제 경제적으로 가능해졌어요.</p>
+      </div>
+      <div class="reason-card r3">
+        <span class="reason-icon">🔴</span>
+        <h3 class="coral">화성이 진짜 목표!</h3>
+        <p>달을 중간 기착지로 삼아 화성 유인 탐사를 준비하는 거예요. 달에서 연료를 만들어 화성으로 출발하는 계획이에요.</p>
+      </div>
+    </div>
+    <div style="margin-top:24px;padding:16px 28px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--card-border);max-width:780px;text-align:center;">
+      <p style="font-size:14px;color:var(--gray)">거기에 중국도 2030년대 달 착륙을 준비하면서, 또 한번 <span style="color:var(--white)">우주 경쟁</span>이 시작됐어요!</p>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 4: 달에 가는 방법 (애니메이션) ══ -->
+  <div class="slide" id="s4">
+    <div style="width:100%;max-width:1000px;">
+      <div class="slide-label">물리와 우주의 만남</div>
+      <h2>달에 가는 방법 — <span class="accent">왜 빙 돌아서 갈까?</span></h2>
+      <div class="orbit-wrap" style="margin-top:16px;">
+        <canvas id="orbit-canvas" width="460" height="340"></canvas>
+        <div class="orbit-info">
+          <div class="step-item" id="step0">
+            <div class="step-num">1</div>
+            <div><h4>지구 저궤도(LEO) 진입</h4><p>로켓이 지구를 빙빙 돌면서 속도를 높여요. 고도 약 400km — 국제우주정거장(ISS)도 여기 있어요!</p></div>
+          </div>
+          <div class="step-item" id="step1">
+            <div class="step-num" style="background:var(--amber);color:var(--navy)">2</div>
+            <div><h4>엔진 추가 점화! (TLI)</h4><p>속도를 팍 올려서 달 방향으로 방향을 바꿔요. 이 순간부터 거대한 타원 궤도를 그리며 날아가요. (약 3일)</p></div>
+          </div>
+          <div class="step-item" id="step2">
+            <div class="step-num" style="background:var(--gray);color:var(--white)">3</div>
+            <div><h4>달 궤도 진입 (LOI)</h4><p>달 중력에 붙잡히면서 속도를 줄여 달 주변을 돌아요. 여기서 착륙선을 분리해 내려가요!</p></div>
+          </div>
+          <div style="padding:12px 16px;border-radius:12px;background:rgba(0,201,167,0.06);border:1px solid rgba(0,201,167,0.2);">
+            <p style="font-size:12px;color:var(--gray)">★ 직선으로 가면 연료가 <span style="color:var(--coral)">100배 이상</span> 더 필요해요. 타원 궤도를 이용하면 지구의 중력을 "발판"으로 삼아 훨씬 효율적으로 갈 수 있어요!</p>
+          </div>
+          <div id="orbit-progress"><div id="orbit-bar"></div></div>
+          <div style="display:flex;gap:10px;">
+            <button onclick="restartOrbit()" style="flex:1;padding:9px;border:1px solid var(--teal);background:rgba(0,201,167,0.1);color:var(--teal);border-radius:8px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;">↺ 다시 보기</button>
+            <button onclick="toggleOrbit()" id="orbit-toggle" style="flex:1;padding:9px;border:1px solid var(--card-border);background:var(--card);color:var(--white);border-radius:8px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;">⏸ 일시정지</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 5: 아르테미스 로드맵 ══ -->
+  <div class="slide" id="s5">
+    <div class="slide-label">과거 → 현재 → 미래</div>
+    <h2>아르테미스 <span class="accent">로드맵</span></h2>
+    <div class="timeline" style="max-width:960px;width:100%;margin-top:28px;">
+      <div class="timeline-line"></div>
+      <div class="timeline-items">
+        <div class="timeline-item">
+          <div class="tl-dot amber"></div>
+          <div class="tl-card">
+            <div class="tl-year">1969–1972</div>
+            <div class="tl-title amber">🚀 아폴로</div>
+            <div class="tl-desc">인류 최초 달 착륙. 12명의 우주인이 달을 걸었어요.</div>
+            <span class="tl-badge badge-done">완료</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot teal"></div>
+          <div class="tl-card">
+            <div class="tl-year">2022</div>
+            <div class="tl-title accent">아르테미스 1호</div>
+            <div class="tl-desc">무인 시험 비행. 로켓과 우주선 성능 검증.</div>
+            <span class="tl-badge badge-done">완료</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot teal"></div>
+          <div class="tl-card">
+            <div class="tl-year">2026. 4</div>
+            <div class="tl-title accent">아르테미스 2호</div>
+            <div class="tl-desc">유인 달 근접 비행. 4명 탑승. 54년 만의 유인 심우주 비행!</div>
+            <span class="tl-badge badge-done">발사 완료!</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot coral"></div>
+          <div class="tl-card">
+            <div class="tl-year">2027~</div>
+            <div class="tl-title coral">아르테미스 3호</div>
+            <div class="tl-desc">달 남극 착륙! 52년 만에 인간이 다시 달을 걸어요.</div>
+            <span class="tl-badge badge-soon">예정</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot future"></div>
+          <div class="tl-card">
+            <div class="tl-year">2028~</div>
+            <div class="tl-title" style="color:var(--gray)">루나 게이트웨이</div>
+            <div class="tl-desc">달 궤도 우주정거장 건설. 달 기지의 관문!</div>
+            <span class="tl-badge badge-future">계획</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot future"></div>
+          <div class="tl-card">
+            <div class="tl-year">2030년대~</div>
+            <div class="tl-title coral">🔴 화성!</div>
+            <div class="tl-desc">달을 발판 삼아 인류 최초 화성 유인 탐사!</div>
+            <span class="tl-badge badge-future">미래 목표</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="final-goal">
+      <h3>🇰🇷 한국도 참여 중! </h3>
+      <p>다누리호가 달 남극 착륙 후보지 촬영 · 아르테미스 2호에 K-RadCube 큐브위성 탑재 · 아르테미스 협정 서명국</p>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 6: 한국의 참여 ══ -->
+  <div class="slide" id="s6">
+    <div class="slide-label">우리나라 이야기</div>
+    <h2>🇰🇷 한국의 우주 탐사 참여</h2>
+    <div class="kr-grid">
+      <div class="kr-card highlight">
+        <div class="icon">🛰</div>
+        <h3 class="accent">다누리호 (2022)</h3>
+        <p>한국 최초의 달 궤도선! 달 남극의 영구음영 지역을 촬영해서 아르테미스 착륙 후보지를 골랐어요. NASA의 섀도우캠도 함께 실려 갔어요.</p>
+      </div>
+      <div class="kr-card">
+        <div class="icon">📡</div>
+        <h3 class="amber">K-RadCube (2026)</h3>
+        <p>아르테미스 2호에 함께 실려 발사된 한국의 작은 위성! 우주 방사선이 인체에 어떤 영향을 미치는지 연구해요. 우주항공청과 나라스페이스가 만들었어요.</p>
+      </div>
+      <div class="kr-card">
+        <div class="icon">📝</div>
+        <h3>아르테미스 협정 서명</h3>
+        <p>우주 탐사의 규칙을 정하는 국제 협정에 한국도 서명했어요. 달과 우주의 자원을 어떻게 나누고 사용할지 52개 나라가 함께 약속해요.</p>
+      </div>
+      <div class="kr-card">
+        <div class="icon">🚀</div>
+        <h3>앞으로의 계획</h3>
+        <p>한국형 달 착륙선을 2032년경 발사하는 것이 목표예요. 누리호 발사 성공을 발판 삼아 독자적인 달 탐사 능력을 키워가고 있어요!</p>
+      </div>
+    </div>
+    <div class="bottom-note">
+      일본도 2024년 SLIM 달 착륙선을 55m 오차로 정밀 착륙시켜 전 세계를 놀라게 했어요 — 아시아의 우주 탐사가 활발해지고 있어요!
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 7: 마무리 ══ -->
+  <div class="slide" id="s7">
+    <div class="slide-label">오늘 배운 것 정리</div>
+    <h1>달 너머,<br><em>화성</em>을 향해</h1>
+    <div class="summary-grid">
+      <div class="sum-card">
+        <div class="big">🌍</div>
+        <h4 class="accent">지구를 알아야</h4>
+        <p>자연재해는 지구·우주적 원인에서 와요. 우주를 알면 지구도 더 잘 이해할 수 있어요.</p>
+      </div>
+      <div class="sum-card">
+        <div class="big">🌙</div>
+        <h4 class="amber">달은 시작점</h4>
+        <p>아르테미스의 목표는 달 자체가 아니라, 달을 발판 삼아 더 먼 우주로 나아가는 것이에요.</p>
+      </div>
+      <div class="sum-card">
+        <div class="big">🔴</div>
+        <h4 class="coral">화성이 목적지</h4>
+        <p>여러분이 어른이 될 때쯤, 인류는 처음으로 화성에 발을 내딛을지도 몰라요!</p>
+      </div>
+    </div>
+    <p class="quote">"우주는 어렵습니다. 하지만 그래서 더 도전할 가치가 있어요."<br>— 빌 넬슨, NASA 국장</p>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- 네비게이션 -->
+<div class="nav">
+  <button onclick="prevSlide()">◀ 이전</button>
+  <div class="dot-nav" id="dots"></div>
+  <span class="slide-counter" id="counter">1 / 7</span>
+  <button onclick="nextSlide()">다음 ▶</button>
+</div>
+
+<script>
+/* ── 별 생성 ── */
+const starsEl = document.getElementById('stars');
+for (let i=0; i<120; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random()*2.5+0.5;
+  s.style.cssText = `
+    width:${size}px;height:${size}px;
+    left:${Math.random()*100}%;top:${Math.random()*100}%;
+    --d:${2+Math.random()*4}s;
+    --a1:${0.1+Math.random()*0.3};
+    --a2:${0.5+Math.random()*0.5};
+    animation-delay:${Math.random()*5}s;
+  `;
+  starsEl.appendChild(s);
+}
+
+/* ── 슬라이드 네비게이션 ── */
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+const dotsWrap = document.getElementById('dots');
+slides.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' active':'');
+  d.onclick = () => goTo(i);
+  dotsWrap.appendChild(d);
+});
+function goTo(n) {
+  slides[cur].classList.remove('active');
+  dotsWrap.children[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(n, slides.length-1));
+  slides[cur].classList.add('active');
+  dotsWrap.children[cur].classList.add('active');
+  document.getElementById('counter').textContent = `${cur+1} / ${slides.length}`;
+  if (cur === 3) { setTimeout(startOrbit, 400); }
+}
+function nextSlide() { goTo(cur+1); }
+function prevSlide() { goTo(cur-1); }
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') nextSlide();
+  if (e.key==='ArrowLeft') prevSlide();
+});
+
+/* ══════════════════════════════════════
+   달 궤도 애니메이션 (Canvas)
+══════════════════════════════════════ */
+const cvs = document.getElementById('orbit-canvas');
+const ctx = cvs.getContext('2d');
+const W = cvs.width, H = cvs.height;
+
+// 좌표 설정
+const earth = { x: 105, y: H/2, r: 38 };
+const moon  = { x: W-70, y: 90, r: 26 };
+
+// 트랜스루나 궤도 (큰 타원 베지어)
+// 지구 저궤도 반경
+const LEO_R = 60;
+
+// 애니메이션 상태
+let raf = null;
+let orbitT = 0;     // 0~1 : 전체 애니메이션 진행
+let phase = 0;      // 0=LEO, 1=TLI비행, 2=달궤도
+let leoAngle = 0;
+let orbitPaused = false;
+let trailPoints = [];
+
+const TOTAL_DUR = 380; // 총 프레임
+const LEO_END   = 60;  // LEO 구간 프레임
+const TLI_END   = 300; // TLI 비행 종료
+const LOI_END   = TOTAL_DUR;
+
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+// 타원 경로 위의 점 계산 (베지어 근사)
+function tliPoint(t) {
+  // 지구 저궤도 출발점
+  const sx = earth.x + LEO_R * Math.cos(Math.PI*0.75);
+  const sy = earth.y + LEO_R * Math.sin(Math.PI*0.75);
+  // 달 도착점
+  const ex = moon.x;
+  const ey = moon.y + moon.r + 10;
+  // 제어점 (위로 크게 호를 그리도록)
+  const cx1 = earth.x + 60;
+  const cy1 = -80;
+  const cx2 = moon.x - 60;
+  const cy2 = ey - 80;
+  // 3차 베지어
+  const u = 1-t;
+  return {
+    x: u*u*u*sx + 3*u*u*t*cx1 + 3*u*t*t*cx2 + t*t*t*ex,
+    y: u*u*u*sy + 3*u*u*t*cy1 + 3*u*t*t*cy2 + t*t*t*ey,
+  };
+}
+
+// 달 궤도 위의 점
+function moonOrbitPoint(angle) {
+  return {
+    x: moon.x + 55 * Math.cos(angle),
+    y: moon.y + 55 * Math.sin(angle),
+  };
+}
+
+function drawScene(shipX, shipY, frame) {
+  ctx.clearRect(0,0,W,H);
+
+  // ── 배경 별 ──
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  const bgStars = [[30,20],[80,60],[200,30],[350,50],[420,20],[80,180],[320,160],[450,150],[60,280],[380,290],[440,310],[170,300]];
+  bgStars.forEach(([sx,sy]) => {
+    ctx.beginPath();
+    ctx.arc(sx,sy,1,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  // ── 지구 저궤도 (점선) ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(earth.x, earth.y, LEO_R, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(55,138,221,0.45)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5,4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // LEO 라벨
+  ctx.fillStyle = 'rgba(55,138,221,0.8)';
+  ctx.font = '10px Space Mono, monospace';
+  ctx.fillText('저궤도 (LEO)', earth.x - LEO_R - 2, earth.y - LEO_R + 14);
+
+  // ── TLI 경로 (실선, 진행에 따라 그리기) ──
+  if (frame > LEO_END) {
+    const tProgress = Math.min((frame - LEO_END)/(TLI_END - LEO_END), 1);
+    ctx.beginPath();
+    const steps = Math.floor(tProgress * 80);
+    const p0 = tliPoint(0);
+    ctx.moveTo(p0.x, p0.y);
+    for (let i=1; i<=steps; i++) {
+      const pt = tliPoint(i/80);
+      ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.strokeStyle = 'rgba(244,164,0,0.7)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // TLI 라벨
+    if (tProgress > 0.2) {
+      ctx.fillStyle = 'rgba(244,164,0,0.9)';
+      ctx.font = '10px Noto Sans KR, sans-serif';
+      ctx.fillText('트랜스루나 궤도 →', earth.x + 55, 20);
+    }
+  }
+
+  // ── 달 궤도 (점선) ──
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(moon.x, moon.y, 55, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(0,201,167,0.35)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4,4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // 직선 경로 (불가능 표시)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(earth.x + earth.r + 4, earth.y - 10);
+  ctx.lineTo(moon.x - moon.r - 6, moon.y + 20);
+  ctx.strokeStyle = 'rgba(232,93,48,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([8,5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+  // X 표시
+  ctx.fillStyle = 'rgba(232,93,48,0.6)';
+  ctx.font = 'bold 14px Arial';
+  ctx.fillText('✕', earth.x + (moon.x-earth.x)*0.5 - 5, earth.y - 22);
+  ctx.font = '9px Noto Sans KR, sans-serif';
+  ctx.fillStyle = 'rgba(232,93,48,0.7)';
+  ctx.fillText('직선은 연료 부족!', earth.x + (moon.x-earth.x)*0.5 - 32, earth.y - 10);
+
+  // ── 지구 ──
+  const earthGrad = ctx.createRadialGradient(earth.x-10,earth.y-12,4,earth.x,earth.y,earth.r);
+  earthGrad.addColorStop(0,'#5A90C8');
+  earthGrad.addColorStop(0.6,'#2A5A96');
+  earthGrad.addColorStop(1,'#1A3A66');
+  ctx.beginPath();
+  ctx.arc(earth.x, earth.y, earth.r, 0, Math.PI*2);
+  ctx.fillStyle = earthGrad;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120,180,255,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // 대륙
+  ctx.fillStyle = 'rgba(74,154,90,0.8)';
+  ctx.beginPath(); ctx.ellipse(earth.x-8, earth.y-8, 11,8, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(earth.x+10, earth.y+6, 8,12, 0.2, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#c0d4f5';
+  ctx.font = '11px Noto Sans KR, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('지구', earth.x, earth.y + earth.r + 14);
+  ctx.textAlign = 'left';
+
+  // ── 달 ──
+  const moonGrad = ctx.createRadialGradient(moon.x-8,moon.y-8,3,moon.x,moon.y,moon.r);
+  moonGrad.addColorStop(0,'#E0D8C8');
+  moonGrad.addColorStop(0.6,'#B8B0A0');
+  moonGrad.addColorStop(1,'#908880');
+  ctx.beginPath();
+  ctx.arc(moon.x, moon.y, moon.r, 0, Math.PI*2);
+  ctx.fillStyle = moonGrad;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(200,192,180,0.5)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  // 크레이터
+  [[moon.x-7,moon.y-5,4],[moon.x+8,moon.y+6,3],[moon.x-2,moon.y+9,2.5],[moon.x+10,moon.y-8,3.5]].forEach(([cx,cy,cr])=>{
+    ctx.beginPath(); ctx.arc(cx,cy,cr,0,Math.PI*2);
+    ctx.strokeStyle='rgba(120,112,100,0.5)'; ctx.lineWidth=0.8; ctx.stroke();
+  });
+  // 달 남극 표시
+  ctx.beginPath();
+  ctx.arc(moon.x, moon.y+moon.r-3, 4, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(0,201,167,0.8)';
+  ctx.fill();
+  ctx.fillStyle = '#c0d4f5';
+  ctx.font = '11px Noto Sans KR, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('달', moon.x, moon.y - moon.r - 8);
+  ctx.fillStyle = 'rgba(0,201,167,0.9)';
+  ctx.font = '9px Noto Sans KR, sans-serif';
+  ctx.fillText('남극 (목표!)', moon.x, moon.y + moon.r + 14);
+  ctx.textAlign = 'left';
+
+  // ── 우주선 ──
+  ctx.save();
+  ctx.translate(shipX, shipY);
+  // 불꽃 (LEO 이탈 순간)
+  if (frame === LEO_END + 1 || (frame > LEO_END && frame < LEO_END + 25)) {
+    const flameAlpha = Math.max(0, 1 - (frame - LEO_END)/25);
+    ctx.fillStyle = `rgba(244,164,0,${flameAlpha})`;
+    ctx.beginPath(); ctx.ellipse(-10, 0, 12, 5, 0.3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = `rgba(232,93,48,${flameAlpha*0.7})`;
+    ctx.beginPath(); ctx.ellipse(-14, 0, 8, 3, 0.3, 0, Math.PI*2); ctx.fill();
+  }
+  // 본체
+  ctx.fillStyle = '#e8f0ff';
+  ctx.beginPath(); ctx.ellipse(0, 0, 8, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(55,138,221,0.8)';
+  ctx.beginPath(); ctx.ellipse(3, 0, 5, 3, 0, 0, Math.PI*2); ctx.fill();
+  // 태양광 패널
+  ctx.fillStyle = 'rgba(55,138,221,0.7)';
+  ctx.fillRect(-4, -8, 8, 3);
+  ctx.fillRect(-4, 5, 8, 3);
+  ctx.restore();
+}
+
+function stepHighlight(phase) {
+  ['step0','step1','step2'].forEach((id,i) => {
+    document.getElementById(id).classList.toggle('highlight', i===phase);
+  });
+}
+
+let orbitFrame = 0;
+function startOrbit() {
+  if (raf) cancelAnimationFrame(raf);
+  orbitFrame = 0;
+  trailPoints = [];
+  orbitPaused = false;
+  document.getElementById('orbit-toggle').textContent = '⏸ 일시정지';
+  animate();
+}
+
+function animate() {
+  if (orbitPaused) return;
+  orbitFrame++;
+
+  const f = orbitFrame;
+  let sx, sy;
+
+  if (f <= LEO_END) {
+    // LEO 구간
+    const a = (f / LEO_END) * Math.PI * 2.5 + Math.PI * 0.75;
+    sx = earth.x + LEO_R * Math.cos(a);
+    sy = earth.y + LEO_R * Math.sin(a);
+    stepHighlight(0);
+  } else if (f <= TLI_END) {
+    // TLI 비행
+    const t = (f - LEO_END) / (TLI_END - LEO_END);
+    const pt = tliPoint(t);
+    sx = pt.x; sy = pt.y;
+    stepHighlight(1);
+  } else {
+    // 달 궤도
+    const t = (f - TLI_END) / (LOI_END - TLI_END);
+    const angle = Math.PI * 0.5 + t * Math.PI * 2.5;
+    const pt = moonOrbitPoint(angle);
+    sx = pt.x; sy = pt.y;
+    stepHighlight(2);
+  }
+
+  drawScene(sx, sy, f);
+
+  // 진행바
+  const pct = Math.min(f / TOTAL_DUR * 100, 100);
+  document.getElementById('orbit-bar').style.width = pct + '%';
+
+  if (f < TOTAL_DUR) {
+    raf = requestAnimationFrame(animate);
+  } else {
+    stepHighlight(-1);
+  }
+}
+
+function restartOrbit() { startOrbit(); }
+function toggleOrbit() {
+  orbitPaused = !orbitPaused;
+  document.getElementById('orbit-toggle').textContent = orbitPaused ? '▶ 계속' : '⏸ 일시정지';
+  if (!orbitPaused) animate();
+}
+
+// 초기 정적 화면
+drawScene(earth.x + LEO_R * Math.cos(Math.PI*0.75), earth.y + LEO_R * Math.sin(Math.PI*0.75), 0);
+</script>
+
+</body>
+</html>
