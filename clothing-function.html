@@ -1,0 +1,197 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#app{padding:1rem 0;max-width:640px;margin:0 auto;font-family:var(--font-sans)}
+.header{text-align:center;margin-bottom:1.5rem}
+.header h2{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.header p{font-size:13px;color:var(--color-text-secondary)}
+.pbar{background:var(--color-background-secondary);border-radius:99px;height:6px;margin-bottom:1.5rem;overflow:hidden}
+.pfill{height:100%;border-radius:99px;background:#378ADD;transition:width .4s ease}
+.srow{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem}
+.badge{font-size:12px;padding:4px 12px;border-radius:99px;font-weight:500}
+.bq{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.bo{background:#EAF3DE;color:#3B6D11}
+.bx{background:#FCEBEB;color:#A32D2D}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.5rem 1.25rem;margin-bottom:1rem}
+.qsvg{text-align:center;margin-bottom:1rem;line-height:1}
+.qtext{font-size:17px;font-weight:500;color:var(--color-text-primary);text-align:center;margin-bottom:.5rem;line-height:1.5}
+.qhint{font-size:13px;color:var(--color-text-secondary);text-align:center;margin-bottom:1.5rem}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bc{padding:14px 8px;border-radius:var(--border-radius-md);border:1.5px solid;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;width:100%}
+.bp{border-color:#378ADD;color:#185FA5}
+.bp:hover{background:#E6F1FB}
+.be{border-color:#D85A30;color:#993C1D}
+.be:hover{background:#FAECE7}
+.correct{background:#EAF3DE!important;border-color:#639922!important;color:#3B6D11!important}
+.wrong{background:#FCEBEB!important;border-color:#A32D2D!important;color:#A32D2D!important}
+.fb{margin-top:1rem;padding:12px 16px;border-radius:var(--border-radius-md);font-size:14px;line-height:1.6;display:none}
+.fbo{background:#EAF3DE;color:#27500A}
+.fbx{background:#FCEBEB;color:#791F1F}
+.bnext{width:100%;margin-top:1rem;padding:12px;border-radius:var(--border-radius-md);border:.5px solid var(--color-border-secondary);background:transparent;font-size:15px;font-weight:500;color:var(--color-text-primary);cursor:pointer;display:none}
+.bnext:hover{background:var(--color-background-secondary)}
+.rcrd{text-align:center;padding:2rem 1rem}
+.rscore{font-size:40px;font-weight:500;color:var(--color-text-primary);margin-bottom:.5rem}
+.rmsg{font-size:15px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.met{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem}
+.mlb{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.mval{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.retry{padding:12px 28px;border-radius:var(--border-radius-md);border:1.5px solid #378ADD;color:#185FA5;background:transparent;font-size:15px;font-weight:500;cursor:pointer}
+.retry:hover{background:#E6F1FB}
+</style>
+
+<div id="app">
+  <div class="header">
+    <h2>옷의 기능 분류 퀴즈</h2>
+    <p>각 옷이나 상황이 어떤 기능인지 골라 봐요</p>
+  </div>
+  <div class="pbar"><div class="pfill" id="prog" style="width:0%"></div></div>
+  <div class="srow">
+    <span class="badge bq" id="qnum">1 / 25</span>
+    <span class="badge bo" id="sco">맞음 0</span>
+    <span class="badge bx" id="scx">틀림 0</span>
+  </div>
+  <div class="card" id="qcard"></div>
+</div>
+
+<script>
+const hanbok = `<svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="36" cy="14" rx="10" ry="11" fill="#FDDBB4"/>
+  <path d="M26 23 Q20 28 18 50 Q18 56 36 57 Q54 56 54 50 Q52 28 46 23 Q42 19 36 19 Q30 19 26 23Z" fill="#E8365D"/>
+  <path d="M26 23 Q24 28 24 36 L36 32 L48 36 Q48 28 46 23 Q42 19 36 19 Q30 19 26 23Z" fill="#F5A7B8"/>
+  <path d="M22 28 Q14 34 12 52 Q18 57 26 54 Q24 44 26 36 Q24 32 22 28Z" fill="#E8365D"/>
+  <path d="M50 28 Q58 34 60 52 Q54 57 46 54 Q48 44 46 36 Q48 32 50 28Z" fill="#E8365D"/>
+  <path d="M26 54 Q28 64 36 67 Q44 64 46 54 Q42 58 36 58 Q30 58 26 54Z" fill="#3B82C4"/>
+  <line x1="36" y1="19" x2="36" y2="32" stroke="#C0254A" stroke-width="1.5"/>
+  <path d="M28 26 Q30 24 33 25 L36 32 L39 25 Q42 24 44 26" stroke="#C0254A" stroke-width="1" fill="none"/>
+  <ellipse cx="27" cy="52" rx="5" ry="4" fill="#FDDBB4"/>
+  <ellipse cx="45" cy="52" rx="5" ry="4" fill="#FDDBB4"/>
+</svg>`;
+
+const svgs = {
+  hanbok: hanbok,
+  glove: `<svg width="72" height="72" viewBox="0 0 72 72"><path d="M20 48 Q16 44 16 36 L18 24 Q18 20 22 20 Q25 20 26 23 L27 30 L28 22 Q28 18 32 18 Q36 18 36 22 L36 30 L37 23 Q37 19 41 19 Q45 19 45 23 L45 30 L46 25 Q46 21 50 21 Q54 21 54 26 L52 38 Q52 44 56 46 L56 52 Q52 58 36 58 Q22 58 20 52Z" fill="#EF9F27" stroke="#BA7517" stroke-width="1"/></svg>`,
+  swimmer: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="14" rx="9" ry="10" fill="#FDDBB4"/><path d="M24 24 Q20 30 20 50 L52 50 Q52 30 48 24 Q44 20 36 20 Q28 20 24 24Z" fill="#378ADD"/><path d="M24 24 L28 42 L36 38 L44 42 L48 24" fill="#185FA5"/><rect x="20" y="50" width="32" height="6" rx="3" fill="#378ADD"/></svg>`,
+  uniform: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="13" rx="9" ry="10" fill="#FDDBB4"/><path d="M24 23 Q18 30 18 54 L54 54 Q54 30 48 23 Q44 19 36 19 Q28 19 24 23Z" fill="#E24B4A"/><path d="M24 23 L28 40 L36 36 L44 40 L48 23" fill="#C0254A"/><rect x="30" y="30" width="12" height="5" rx="2" fill="white"/><text x="36" y="35" text-anchor="middle" font-size="5" font-weight="bold" fill="#E24B4A">7</text></svg>`,
+  coat: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="13" rx="9" ry="10" fill="#FDDBB4"/><path d="M22 23 Q14 32 14 58 L58 58 Q58 32 50 23 Q46 19 36 19 Q26 19 22 23Z" fill="#3C3489"/><path d="M22 23 Q24 32 28 44 L36 40 L44 44 Q48 32 50 23" fill="#534AB7"/><rect x="32" y="24" width="8" height="24" rx="1" fill="#534AB7"/></svg>`,
+  dress: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M28 22 Q24 26 26 34 L18 58 L54 58 L46 34 Q48 26 44 22 Q40 18 36 18 Q32 18 28 22Z" fill="#ED93B1"/><path d="M28 22 L30 34 L36 30 L42 34 L44 22" fill="#D4537E"/><circle cx="28" cy="40" r="2" fill="#D4537E"/><circle cx="44" cy="40" r="2" fill="#D4537E"/></svg>`,
+  gown: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M22 22 Q16 30 16 58 L56 58 Q56 30 50 22 Q46 18 36 18 Q26 18 22 22Z" fill="#F0F0F0" stroke="#CCCCCC" stroke-width="1"/><path d="M32 22 L32 52 M40 22 L40 52" stroke="#CCCCCC" stroke-width="1"/><rect x="30" y="28" width="12" height="6" rx="1" fill="#B5D4F4"/></svg>`,
+  sunglass: `<svg width="72" height="72" viewBox="0 0 72 72"><rect x="12" y="28" width="20" height="16" rx="8" fill="#2C2C2A" stroke="#444441" stroke-width="1.5"/><rect x="40" y="28" width="20" height="16" rx="8" fill="#2C2C2A" stroke="#444441" stroke-width="1.5"/><line x1="32" y1="36" x2="40" y2="36" stroke="#444441" stroke-width="2"/><line x1="8" y1="36" x2="12" y2="36" stroke="#444441" stroke-width="2"/><line x1="60" y1="36" x2="64" y2="36" stroke="#444441" stroke-width="2"/></svg>`,
+  cap: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="34" rx="22" ry="14" fill="#E24B4A"/><path d="M14 34 Q36 48 58 34" fill="#C0254A"/><ellipse cx="36" cy="34" rx="22" ry="8" fill="#E24B4A"/><path d="M10 40 Q24 50 36 46" stroke="#C0254A" stroke-width="3" fill="none"/></svg>`,
+  scrubs: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M22 22 Q16 30 16 54 L56 54 Q56 30 50 22 Q46 18 36 18 Q26 18 22 22Z" fill="#5DCAA5"/><path d="M22 22 L26 38 L36 34 L46 38 L50 22" fill="#1D9E75"/><rect x="28" y="30" width="6" height="8" rx="1" fill="#1D9E75"/></svg>`,
+  scarf: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="16" rx="9" ry="10" fill="#FDDBB4"/><path d="M22 26 Q20 32 22 36 Q28 40 36 38 Q44 40 50 36 Q52 32 50 26" stroke="#7F77DD" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M30 36 Q32 52 28 62" stroke="#7F77DD" stroke-width="6" fill="none" stroke-linecap="round"/></svg>`,
+  tshirt: `<svg width="72" height="72" viewBox="0 0 72 72"><path d="M22 16 L12 26 L22 32 L24 56 L48 56 L50 32 L60 26 L50 16 Q46 12 36 12 Q26 12 22 16Z" fill="#EF9F27"/><path d="M22 16 Q26 22 36 22 Q46 22 50 16" stroke="#BA7517" stroke-width="1" fill="none"/><text x="36" y="42" text-anchor="middle" font-size="11" font-weight="bold" fill="#633806">BTS</text></svg>`,
+  vest: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M24 22 Q18 30 18 54 L54 54 Q54 30 48 22 Q44 18 36 18 Q28 18 24 22Z" fill="#EF9F27"/><path d="M30 22 L30 54 M42 22 L42 54" stroke="#BA7517" stroke-width="5"/></svg>`,
+  socks: `<svg width="72" height="72" viewBox="0 0 72 72"><path d="M22 14 L22 44 Q22 52 16 56 Q12 60 16 64 Q28 68 36 60 Q44 52 40 44 L40 14Z" fill="#AFA9EC" stroke="#7F77DD" stroke-width="1"/><rect x="22" y="14" width="18" height="8" rx="2" fill="#7F77DD"/></svg>`,
+  mortarboard: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="30" rx="20" ry="8" fill="#2C2C2A"/><polygon points="36,12 62,28 36,34 10,28" fill="#444441"/><rect x="34" y="12" width="4" height="18" fill="#2C2C2A"/><line x1="54" y1="28" x2="58" y2="42" stroke="#EF9F27" stroke-width="2"/><circle cx="58" cy="44" r="3" fill="#EF9F27"/></svg>`,
+  shorts: `<svg width="72" height="72" viewBox="0 0 72 72"><path d="M16 16 L16 48 Q16 52 24 52 L32 52 L36 36 L40 52 L48 52 Q56 52 56 48 L56 16Z" fill="#378ADD"/><line x1="36" y1="16" x2="36" y2="52" stroke="#185FA5" stroke-width="2"/><rect x="16" y="16" width="40" height="6" rx="2" fill="#185FA5"/></svg>`,
+  police: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M22 22 Q16 30 16 58 L56 58 Q56 30 50 22 Q46 18 36 18 Q26 18 22 22Z" fill="#185FA5"/><path d="M22 22 L26 40 L36 36 L46 40 L50 22" fill="#0C447C"/><circle cx="36" cy="30" r="5" fill="#EF9F27"/><text x="36" y="33" text-anchor="middle" font-size="6" font-weight="bold" fill="#633806">★</text></svg>`,
+  raincoat: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M20 22 Q12 32 12 60 L60 60 Q60 32 52 22 Q48 18 36 18 Q24 18 20 22Z" fill="#1D9E75"/><path d="M20 22 L24 42 L36 38 L48 42 L52 22" fill="#0F6E56"/><path d="M28 10 Q32 6 36 8 Q40 6 44 10" stroke="#0C447C" stroke-width="2" fill="none"/></svg>`,
+  skihelmet: `<svg width="72" height="72" viewBox="0 0 72 72"><path d="M16 36 Q16 18 36 16 Q56 18 56 36 L56 46 Q50 54 36 54 Q22 54 16 46Z" fill="#E24B4A"/><rect x="18" y="38" width="36" height="10" rx="2" fill="#B5D4F4"/><ellipse cx="36" cy="38" rx="18" ry="6" fill="#C0254A"/></svg>`,
+  rainbow: `<svg width="72" height="72" viewBox="0 0 72 72"><path d="M10 50 Q10 20 36 18 Q62 20 62 50" fill="none" stroke="#E24B4A" stroke-width="5"/><path d="M16 50 Q16 26 36 24 Q56 26 56 50" fill="none" stroke="#EF9F27" stroke-width="5"/><path d="M22 50 Q22 30 36 28 Q50 30 50 50" fill="none" stroke="#639922" stroke-width="5"/><path d="M28 50 Q28 34 36 32 Q44 34 44 50" fill="none" stroke="#378ADD" stroke-width="5"/></svg>`,
+  hardhat: `<svg width="72" height="72" viewBox="0 0 72 72"><path d="M14 40 Q14 20 36 18 Q58 20 58 40Z" fill="#EF9F27"/><rect x="10" y="38" width="52" height="8" rx="2" fill="#BA7517"/><ellipse cx="36" cy="38" rx="26" ry="5" fill="#EF9F27"/></svg>`,
+  gymwear: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M24 22 Q18 30 18 52 L54 52 Q54 30 48 22 Q44 18 36 18 Q28 18 24 22Z" fill="#639922"/><path d="M24 22 L28 38 L36 34 L44 38 L48 22" fill="#3B6D11"/><rect x="32" y="48" width="8" height="14" rx="2" fill="#639922"/></svg>`,
+  stagesuit: `<svg width="72" height="72" viewBox="0 0 72 72"><ellipse cx="36" cy="12" rx="9" ry="10" fill="#FDDBB4"/><path d="M22 22 Q14 32 14 58 L58 58 Q58 32 50 22 Q46 18 36 18 Q26 18 22 22Z" fill="#7F77DD"/><path d="M22 22 L28 42 L36 38 L44 42 L50 22" fill="#534AB7"/><circle cx="26" cy="34" r="3" fill="#FAC775"/><circle cx="46" cy="34" r="3" fill="#FAC775"/><circle cx="36" cy="28" r="3" fill="#FAC775"/></svg>`,
+};
+
+const qs = [
+  {svg:"glove",q:"두꺼운 장갑을 끼고 요리해요.",h:"뜨거운 것을 만질 때 어떤 기능?",ans:"protect",ok:"맞아요! 장갑은 열과 충격으로부터 손을 지켜줘요.",bad:"아쉬워요. 장갑은 뜨거운 열로부터 손을 보호해요."},
+  {svg:"hanbok",q:"설날에 예쁜 한복을 입었어요.",h:"명절에 한복을 입는 이유는?",ans:"express",ok:"정답! 한복은 때와 장소, 전통을 표현하는 옷이에요.",bad:"아쉬워요. 한복은 명절의 분위기와 전통을 표현해요."},
+  {svg:"gymwear",q:"소방관이 두꺼운 방화복을 입어요.",h:"불 속에서 일할 때 옷의 역할은?",ans:"protect",ok:"정답! 방화복은 불꽃과 열로부터 몸을 보호해요.",bad:"아쉬워요. 방화복은 위험한 불꽃에서 몸을 지켜줘요."},
+  {svg:"uniform",q:"중요한 발표 날 교복을 단정하게 입었어요.",h:"교복을 입으면 어떤 기능이 강조될까?",ans:"express",ok:"맞아요! 교복은 학교 소속을 나타내고 단정함을 표현해요.",bad:"아쉬워요. 교복은 학교 소속과 예의를 표현하는 기능이에요."},
+  {svg:"swimmer",q:"수영복은 물속에서 빠르게 움직이게 해줘요.",h:"운동할 때 옷의 역할은?",ans:"protect",ok:"정답! 수영복은 몸의 움직임을 편하게 해주고 물의 저항을 줄여요.",bad:"아쉬워요. 수영복은 활동을 편하게 돕는 보호의 기능이에요."},
+  {svg:"uniform",q:"마라톤 선수가 번호가 적힌 유니폼을 입어요.",h:"번호와 소속이 쓰인 유니폼의 기능은?",ans:"express",ok:"맞아요! 유니폼은 소속 팀과 선수 번호를 표현해요.",bad:"아쉬워요. 번호와 팀 색은 소속을 나타내는 표현의 기능이에요."},
+  {svg:"coat",q:"겨울에 두꺼운 패딩 점퍼를 입었어요.",h:"추운 날씨에 두꺼운 옷을 입는 이유는?",ans:"protect",ok:"정답! 패딩은 체온을 유지해 추위로부터 몸을 보호해요.",bad:"아쉬워요. 패딩은 체온을 지켜주는 보호의 기능이에요."},
+  {svg:"dress",q:"결혼식에 드레스를 입고 가요.",h:"특별한 행사에 드레스를 입는 이유는?",ans:"express",ok:"맞아요! 드레스는 예의를 갖추고 행사 분위기를 표현해요.",bad:"아쉬워요. 행사 드레스는 예의와 기념을 표현하는 기능이에요."},
+  {svg:"gown",q:"의사 선생님이 흰 가운을 입고 있어요.",h:"흰 가운이 나타내는 것은?",ans:"express",ok:"정답! 흰 가운은 의사라는 직업과 역할을 표현해요.",bad:"아쉬워요. 흰 가운은 의사의 직업을 표현하는 기능이에요."},
+  {svg:"sunglass",q:"자외선이 강한 날 선글라스를 써요.",h:"햇빛이 강할 때 선글라스의 역할은?",ans:"protect",ok:"맞아요! 선글라스는 강한 자외선에서 눈을 보호해요.",bad:"아쉬워요. 선글라스는 자외선으로부터 눈을 지켜주는 보호의 기능이에요."},
+  {svg:"cap",q:"운동회 날 청군/홍군 모자를 써요.",h:"팀을 나누는 색깔 모자의 기능은?",ans:"express",ok:"정답! 팀 색깔 모자는 어느 팀인지 소속을 표현해요.",bad:"아쉬워요. 팀 색깔 모자는 소속을 나타내는 표현의 기능이에요."},
+  {svg:"scrubs",q:"간호사가 수술복(스크럽)을 입어요.",h:"병원에서 스크럽을 입는 이유는?",ans:"express",ok:"맞아요! 스크럽은 병원 직원임을 나타내는 표현의 기능이에요.",bad:"아쉬워요. 스크럽은 직업과 역할을 표현해요."},
+  {svg:"scarf",q:"목도리를 두르면 목이 따뜻해요.",h:"추울 때 목도리를 하는 이유는?",ans:"protect",ok:"정답! 목도리는 목 부위를 추위로부터 보호해요.",bad:"아쉬워요. 목도리는 체온을 유지하는 보호의 기능이에요."},
+  {svg:"tshirt",q:"좋아하는 가수 굿즈 티셔츠를 입어요.",h:"팬심을 담은 티셔츠의 기능은?",ans:"express",ok:"맞아요! 팬 티셔츠는 자신의 취향과 개성을 표현해요.",bad:"아쉬워요. 굿즈 티셔츠는 개성을 나타내는 표현의 기능이에요."},
+  {svg:"vest",q:"공사장 아저씨가 주황색 안전조끼를 입어요.",h:"안전조끼를 입는 핵심 이유는?",ans:"protect",ok:"정답! 안전조끼는 사고 위험으로부터 몸을 보호하는 기능이 핵심이에요.",bad:"아쉬워요. 안전조끼는 위험으로부터 몸을 보호하는 기능이 핵심이에요."},
+  {svg:"socks",q:"양말을 신으면 발이 따뜻하고 위생적이에요.",h:"양말이 하는 역할은?",ans:"protect",ok:"맞아요! 양말은 발을 따뜻하게 하고 땀을 흡수해 피부를 보호해요.",bad:"아쉬워요. 양말은 체온 유지와 청결을 돕는 보호의 기능이에요."},
+  {svg:"mortarboard",q:"졸업식에서 학사모와 가운을 써요.",h:"졸업식 복장이 나타내는 것은?",ans:"express",ok:"정답! 학사모와 가운은 졸업이라는 의미 있는 순간을 표현해요.",bad:"아쉬워요. 학사모와 가운은 졸업과 성취를 표현하는 기능이에요."},
+  {svg:"shorts",q:"여름에 반바지를 입으면 시원해요.",h:"더운 날씨에 반바지를 입는 이유는?",ans:"protect",ok:"맞아요! 반바지는 더위를 피해 적정 체온을 유지하게 해줘요.",bad:"아쉬워요. 반바지는 체온 조절을 돕는 보호의 기능이에요."},
+  {svg:"police",q:"경찰관이 제복을 입고 순찰해요.",h:"경찰 제복이 나타내는 것은?",ans:"express",ok:"정답! 경찰 제복은 직업과 공적 역할을 표현해요.",bad:"아쉬워요. 제복은 직업과 역할을 나타내는 표현의 기능이에요."},
+  {svg:"raincoat",q:"비가 올 것 같아 우비를 입었어요.",h:"비로부터 몸을 지키는 기능은?",ans:"protect",ok:"맞아요! 우비는 비와 습기로부터 몸을 보호해요.",bad:"아쉬워요. 우비는 비를 막아 몸을 보호하는 기능이에요."},
+  {svg:"skihelmet",q:"스키를 탈 때 고글과 헬멧을 써요.",h:"스키 장비의 핵심 역할은?",ans:"protect",ok:"정답! 고글과 헬멧은 낙상이나 설맹으로부터 몸을 보호해요.",bad:"아쉬워요. 스키 고글과 헬멧은 부상을 막는 보호의 기능이에요."},
+  {svg:"rainbow",q:"내가 제일 좋아하는 색깔 옷을 골라 입었어요.",h:"내 취향을 담은 옷 선택의 기능은?",ans:"express",ok:"맞아요! 좋아하는 색 옷은 나의 개성과 취향을 표현해요.",bad:"아쉬워요. 좋아하는 색을 고르는 것은 개성을 표현하는 기능이에요."},
+  {svg:"hardhat",q:"건설 현장에서 안전모를 꼭 써야 해요.",h:"안전모가 하는 가장 중요한 역할은?",ans:"protect",ok:"정답! 안전모는 머리를 충격과 낙하물로부터 보호해요.",bad:"아쉬워요. 안전모는 머리를 충격으로부터 보호하는 기능이에요."},
+  {svg:"gymwear",q:"체육 시간에 운동하기 편한 체육복을 입어요.",h:"운동복이 운동을 도와주는 이유는?",ans:"protect",ok:"맞아요! 체육복은 신체 활동을 편하게 하고 땀을 잘 흡수해요.",bad:"아쉬워요. 체육복은 활동을 돕는 보호의 기능이에요."},
+  {svg:"stagesuit",q:"댄스 공연에서 화려한 의상을 입어요.",h:"무대 의상이 강조하는 기능은?",ans:"express",ok:"정답! 무대 의상은 공연의 분위기와 캐릭터를 표현해요.",bad:"아쉬워요. 화려한 무대 의상은 표현의 기능이에요."},
+];
+
+let cur=0, correct=0, wrong=0, answered=false;
+
+function render(){
+  const q=qs[cur];
+  document.getElementById('qnum').textContent=`${cur+1} / ${qs.length}`;
+  document.getElementById('prog').style.width=`${(cur/qs.length)*100}%`;
+  document.getElementById('sco').textContent=`맞음 ${correct}`;
+  document.getElementById('scx').textContent=`틀림 ${wrong}`;
+  answered=false;
+  document.getElementById('qcard').innerHTML=`
+    <div class="qsvg">${svgs[q.svg]||''}</div>
+    <div class="qtext">${q.q}</div>
+    <div class="qhint">${q.h}</div>
+    <div class="brow">
+      <button class="bc bp" data-ans="protect">🛡️ 보호의 기능</button>
+      <button class="bc be" data-ans="express">🎨 표현의 기능</button>
+    </div>
+    <div class="fb" id="fb"></div>
+    <button class="bnext" id="bnext">${cur<qs.length-1?'다음 문제 →':'결과 보기 →'}</button>`;
+  document.querySelectorAll('.bc').forEach(b=>b.addEventListener('click',()=>answer(b.dataset.ans)));
+  document.getElementById('bnext').addEventListener('click',next);
+}
+
+function answer(choice){
+  if(answered)return;
+  answered=true;
+  const q=qs[cur];
+  const ok=choice===q.ans;
+  if(ok)correct++;else wrong++;
+  document.querySelectorAll('.bc').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.ans===q.ans)b.classList.add('correct');
+    else if(b.dataset.ans===choice)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  fb.textContent=(ok?'✓ ':'✗ ')+(ok?q.ok:q.bad);
+  fb.className='fb '+(ok?'fbo':'fbx');
+  fb.style.display='block';
+  document.getElementById('sco').textContent=`맞음 ${correct}`;
+  document.getElementById('scx').textContent=`틀림 ${wrong}`;
+  document.getElementById('bnext').style.display='block';
+}
+
+function next(){
+  cur++;
+  if(cur>=qs.length){showResult();return;}
+  render();
+}
+
+function showResult(){
+  const pct=Math.round(correct/qs.length*100);
+  let emoji,msg;
+  if(pct>=90){emoji='🏆';msg='완벽해요! 옷의 기능 박사네요!';}
+  else if(pct>=70){emoji='👍';msg='잘했어요! 조금 더 연습하면 완벽해요!';}
+  else if(pct>=50){emoji='🤔';msg='절반은 맞았어요. 다시 한번 도전해봐요!';}
+  else{emoji='📚';msg='교과서를 다시 읽고 재도전해봐요!';}
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('qcard').innerHTML=`
+    <div class="rcrd">
+      <div style="font-size:52px;margin-bottom:1rem">${emoji}</div>
+      <div class="rscore">${correct} / ${qs.length}</div>
+      <div class="rmsg">${msg}</div>
+      <div class="rgrid">
+        <div class="met"><div class="mlb">정답률</div><div class="mval">${pct}%</div></div>
+        <div class="met"><div class="mlb">틀린 문제</div><div class="mval">${wrong}개</div></div>
+      </div>
+      <button class="retry" id="rtbtn">다시 풀기</button>
+    </div>`;
+  document.getElementById('rtbtn').addEventListener('click',()=>{cur=0;correct=0;wrong=0;render();});
+}
+
+render();
+</script>
