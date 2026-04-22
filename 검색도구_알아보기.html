@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>검색 도구 알아보기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap');
+
+  :root {
+    --sky: #4FC3F7;
+    --mint: #4DB6AC;
+    --coral: #FF7043;
+    --yellow: #FFD54F;
+    --purple: #9575CD;
+    --bg: #F0F7FF;
+    --card: #FFFFFF;
+    --text: #2D3748;
+    --light: #E3F2FD;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Gowun Dodum', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* 헤더 */
+  header {
+    background: linear-gradient(135deg, #1565C0 0%, #0288D1 50%, #26C6DA 100%);
+    color: white;
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -30px;
+    width: 250px; height: 250px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  header h1 {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+  header p {
+    margin-top: 10px;
+    font-size: 1rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+  .header-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 탭 네비 */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 20px 16px 0;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab-btn {
+    font-family: 'Jua', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #EEF2FF;
+    color: #555;
+  }
+  .tab-btn.active {
+    background: #1565C0;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(21,101,192,0.35);
+  }
+
+  /* 섹션 */
+  .section {
+    display: none;
+    padding: 28px 16px 60px;
+    max-width: 860px;
+    margin: 0 auto;
+    animation: fadeIn 0.35s ease;
+  }
+  .section.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #1565C0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* 카드 */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border-left: 5px solid var(--sky);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .card.coral { border-left-color: var(--coral); }
+  .card.mint { border-left-color: var(--mint); }
+  .card.yellow { border-left-color: var(--yellow); }
+  .card.purple { border-left-color: var(--purple); }
+
+  .card-title {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card p { font-size: 0.95rem; line-height: 1.8; color: #444; }
+  .card ul { padding-left: 20px; margin-top: 8px; }
+  .card ul li { font-size: 0.93rem; line-height: 1.9; color: #444; }
+
+  /* 툴 그리드 */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .tool-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    transition: transform 0.2s;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .tool-card:hover { transform: translateY(-4px); }
+  .tool-card.google { border-color: #4285F4; }
+  .tool-card.naver { border-color: #03C75A; }
+  .tool-card.bing { border-color: #008272; }
+  .tool-card.ai { border-color: #9575CD; }
+  .tool-card.youtube { border-color: #FF0000; }
+
+  .tool-icon {
+    font-size: 2.4rem;
+    margin-bottom: 8px;
+  }
+  .tool-name {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+  .tool-desc { font-size: 0.82rem; color: #666; line-height: 1.6; }
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+    font-family: 'Jua', sans-serif;
+  }
+  .tag-blue { background: #E3F2FD; color: #1565C0; }
+  .tag-green { background: #E8F5E9; color: #2E7D32; }
+  .tag-purple { background: #EDE7F6; color: #6A1B9A; }
+  .tag-red { background: #FFEBEE; color: #C62828; }
+
+  /* 검색어 퀴즈 */
+  .quiz-box {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .quiz-question {
+    font-family: 'Jua', sans-serif;
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+    color: #333;
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .quiz-opt {
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 2px solid #E0E0E0;
+    background: #FAFAFA;
+    cursor: pointer;
+    font-size: 0.92rem;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .quiz-opt:hover { border-color: #90CAF9; background: #E3F2FD; }
+  .quiz-opt.correct { border-color: #4CAF50; background: #E8F5E9; color: #1B5E20; }
+  .quiz-opt.wrong { border-color: #EF5350; background: #FFEBEE; color: #B71C1C; }
+  .quiz-feedback {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.good { background: #E8F5E9; color: #1B5E20; }
+  .quiz-feedback.bad { background: #FFEBEE; color: #B71C1C; }
+
+  /* 검색어 변환 예시 */
+  .transform-box {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .search-bubble {
+    background: #EEF2FF;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    color: #333;
+    flex: 1;
+    min-width: 150px;
+  }
+  .search-bubble.bad { background: #FFEBEE; border: 1px dashed #EF9A9A; }
+  .search-bubble.good { background: #E8F5E9; border: 1px dashed #A5D6A7; }
+  .arrow-icon { font-size: 1.5rem; color: #888; }
+  .bubble-label {
+    font-family: 'Jua', sans-serif;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+  .bubble-label.bad { color: #EF5350; }
+  .bubble-label.good { color: #4CAF50; }
+
+  /* 주의사항 */
+  .warn-box {
+    background: #FFF8E1;
+    border: 2px solid #FFD54F;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 12px;
+  }
+  .warn-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .warn-text { font-size: 0.9rem; line-height: 1.8; color: #5D4037; }
+  .warn-text strong { font-family: 'Jua', sans-serif; color: #E65100; }
+
+  /* 정리 카드 */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .summary-item {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .summary-num {
+    font-family: 'Jua', sans-serif;
+    font-size: 2rem;
+    color: #1565C0;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .summary-label {
+    font-family: 'Jua', sans-serif;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    color: #333;
+  }
+  .summary-desc { font-size: 0.82rem; color: #666; line-height: 1.6; }
+
+  /* 검색 시뮬레이터 */
+  .simulator {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    margin-bottom: 16px;
+  }
+  .sim-bar {
+    display: flex;
+    align-items: center;
+    background: #F5F5F5;
+    border-radius: 30px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    border: 2px solid #E0E0E0;
+    gap: 10px;
+  }
+  .sim-bar span { font-size: 1.2rem; }
+  .sim-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    color: #333;
+  }
+  .sim-btn {
+    font-family: 'Jua', sans-serif;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    background: #1565C0;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .sim-btn:hover { background: #0D47A1; }
+  .sim-result {
+    min-height: 80px;
+    padding: 14px;
+    background: #F9FBFF;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: #444;
+    border: 1px dashed #BBDEFB;
+  }
+  .result-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #EEE;
+  }
+  .result-item:last-child { border-bottom: none; }
+  .result-title { font-family: 'Jua', sans-serif; color: #1565C0; font-size: 0.92rem; }
+  .result-desc { font-size: 0.82rem; color: #777; }
+  .result-tip {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #FFF9C4;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: #5D4037;
+    display: flex;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-emoji">🔍</span>
+  <h1>검색 도구 알아보기</h1>
+  <p>인터넷에서 원하는 정보를 똑똑하게 찾는 방법</p>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="showTab('tools')">🌐 검색 도구의 종류</button>
+  <button class="tab-btn" onclick="showTab('keyword')">🔑 검색어 선택법</button>
+  <button class="tab-btn" onclick="showTab('practice')">✏️ 연습해보기</button>
+  <button class="tab-btn" onclick="showTab('caution')">⚠️ 주의할 점</button>
+</nav>
+
+<!-- 1. 검색 도구 종류 -->
+<div class="section active" id="tools">
+  <div class="section-title">🌐 어떤 검색 도구가 있을까요?</div>
+
+  <div class="card">
+    <div class="card-title">🤔 검색 도구란?</div>
+    <p>검색 도구는 <strong>사용자가 원하는 정보를 찾을 수 있도록 도와주는 프로그램</strong>이에요. 검색어를 입력하면 관련 정보를 찾아서 보여줘요.</p>
+  </div>
+
+  <div class="tool-grid">
+    <div class="tool-card google">
+      <div class="tool-icon">🔵</div>
+      <div class="tool-name">구글 (Google)</div>
+      <div class="tool-desc">전 세계에서 가장 많이 사용하는 검색 도구예요. 다양한 언어와 나라의 자료를 찾을 수 있어요.</div>
+      <span class="tag tag-blue">세계 1위</span>
+    </div>
+    <div class="tool-card naver">
+      <div class="tool-icon">🟢</div>
+      <div class="tool-name">네이버 (Naver)</div>
+      <div class="tool-desc">우리나라에서 가장 많이 사용하는 검색 도구예요. 한국어 자료가 많고 뉴스, 블로그, 카페 등을 함께 볼 수 있어요.</div>
+      <span class="tag tag-green">국내 1위</span>
+    </div>
+    <div class="tool-card youtube">
+      <div class="tool-icon">🔴</div>
+      <div class="tool-name">유튜브 (YouTube)</div>
+      <div class="tool-desc">동영상 전문 검색 도구예요. 직업 소개 영상, 어떤 일을 하는지 보여주는 영상을 찾을 때 좋아요.</div>
+      <span class="tag tag-red">동영상 검색</span>
+    </div>
+    <div class="tool-card ai">
+      <div class="tool-icon">🤖</div>
+      <div class="tool-name">인공지능 검색</div>
+      <div class="tool-desc">클로드, 챗GPT 같은 인공지능에게 질문하면 답변을 정리해줘요. 단, 틀린 내용이 있을 수 있어서 확인이 필요해요.</div>
+      <span class="tag tag-purple">AI 도우미</span>
+    </div>
+  </div>
+
+  <div class="card mint">
+    <div class="card-title">📋 검색 결과의 종류</div>
+    <p>검색 도구에서는 한 가지가 아니라 여러 종류의 자료를 볼 수 있어요!</p>
+    <ul>
+      <li>📰 <strong>뉴스</strong> — 관련 사건이나 새로운 소식을 알려줘요</li>
+      <li>🖼️ <strong>이미지</strong> — 그림이나 사진이 필요할 때, 출처를 꼭 밝혀야 해요</li>
+      <li>📖 <strong>사전</strong> — 낱말의 뜻과 관련 여러 내용을 알 수 있어요</li>
+      <li>✍️ <strong>블로그</strong> — 관심 있는 사람들이 정리한 자료를 볼 수 있어요</li>
+      <li>🎬 <strong>동영상</strong> — 살아 움직이는 영상으로 자세히 볼 수 있어요</li>
+      <li>📚 <strong>도서</strong> — 관련 책 정보를 찾을 수 있어요</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 2. 검색어 선택법 -->
+<div class="section" id="keyword">
+  <div class="section-title">🔑 검색어를 어떻게 정해야 할까요?</div>
+
+  <div class="card coral">
+    <div class="card-title">💡 핵심 원칙</div>
+    <p>원하는 정보를 잘 찾으려면 <strong>알고 싶은 내용을 정확하고 구체적으로</strong> 입력해야 해요. 너무 짧거나 간단한 검색어는 너무 많은 결과가 나와서 내가 원하는 걸 찾기 어려워요.</p>
+  </div>
+
+  <div class="section-title" style="font-size:1.1rem; margin-top:4px;">❌ 이렇게 하면 안 돼요 → ✅ 이렇게 바꿔요</div>
+
+  <div class="transform-box">
+    <div class="search-bubble bad">
+      <div class="bubble-label bad">❌ 너무 짧아요</div>
+      드론
+    </div>
+    <div class="arrow-icon">→</div>
+    <div class="search-bubble good">
+      <div class="bubble-label good">✅ 구체적이에요</div>
+      드론 조종사가 하는 일
+    </div>
+  </div>
+
+  <div class="transform-box">
+    <div class="search-bubble bad">
+      <div class="bubble-label bad">❌ 너무 짧아요</div>
+      수의사
+    </div>
+    <div class="arrow-icon">→</div>
+    <div class="search-bubble good">
+      <div class="bubble-label good">✅ 구체적이에요</div>
+      수의사가 되는 방법
+    </div>
+  </div>
+
+  <div class="transform-box">
+    <div class="search-bubble bad">
+      <div class="bubble-label bad">❌ 너무 막연해요</div>
+      요리
+    </div>
+    <div class="arrow-icon">→</div>
+    <div class="search-bubble good">
+      <div class="bubble-label good">✅ 목적이 분명해요</div>
+      요리사에게 필요한 능력
+    </div>
+  </div>
+
+  <div class="transform-box">
+    <div class="search-bubble bad">
+      <div class="bubble-label bad">❌ 너무 막연해요</div>
+      기자
+    </div>
+    <div class="arrow-icon">→</div>
+    <div class="search-bubble good">
+      <div class="bubble-label good">✅ 목적이 분명해요</div>
+      기자가 하루에 하는 일
+    </div>
+  </div>
+
+  <div class="card yellow" style="margin-top: 8px;">
+    <div class="card-title">🌟 좋은 검색어 만드는 공식</div>
+    <p style="font-size:1rem; font-family:'Jua',sans-serif; color:#333; text-align:center; padding: 14px; background:#FFF8E1; border-radius:12px; margin-top:8px;">
+      [직업 이름] + [알고 싶은 것]<br>
+      <span style="font-size:0.85rem; color:#888; font-family:'Gowun Dodum',sans-serif;">예) "작곡가 하는 일" / "원예사 되는 방법" / "드론 조종사 필요한 자격증"</span>
+    </p>
+  </div>
+</div>
+
+<!-- 3. 연습해보기 -->
+<div class="section" id="practice">
+  <div class="section-title">✏️ 검색어 퀴즈</div>
+  <p style="font-size:0.9rem; color:#666; margin-bottom:18px;">더 좋은 검색어를 골라보세요!</p>
+
+  <div class="quiz-box">
+    <div class="quiz-question">🎯 수의사가 어떤 동물을 치료하는지 알고 싶어요. 어떤 검색어가 좋을까요?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ "동물"이라고만 검색하면 수의사와 관련 없는 자료가 너무 많이 나와요.')">① 동물</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ "수의사"만 검색하면 원하는 내용을 정확히 찾기 어려워요.')">② 수의사</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, true, '✅ 정답! "수의사가 치료하는 동물"처럼 알고 싶은 내용을 구체적으로 적으면 원하는 정보를 빠르게 찾을 수 있어요.')">③ 수의사가 치료하는 동물</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ 동물 치료에 관한 검색어인데 수의사가 빠졌어요. 더 구체적으로 적어야 해요.')">④ 동물 치료 방법</button>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-question">🎯 드론 조종사가 되려면 어떤 자격증이 필요한지 알고 싶어요. 어떤 검색어가 좋을까요?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ "드론"만 검색하면 드론 쇼핑, 드론 경기 등 관련 없는 자료가 너무 많이 나와요.')">① 드론</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, true, '✅ 정답! 직업 이름과 알고 싶은 내용(자격증)을 함께 넣으면 딱 맞는 자료를 찾을 수 있어요.')">② 드론 조종사 자격증</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ 자격증에 관한 내용인데 드론 조종사가 빠져 있어요.')">③ 자격증 따는 방법</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ 드론 조종 방법과 자격증은 달라요. 더 정확하게 적어요.')">④ 드론 조종 방법</button>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-question">🎯 작곡가가 하루에 어떤 일을 하는지 알고 싶어요. 어떤 검색어가 좋을까요?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ "음악"만 검색하면 노래, 악기, 공연 등 너무 많은 결과가 나와요.')">① 음악</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ 조금 더 구체적으로 "하루에 하는 일"처럼 알고 싶은 내용을 넣으면 더 좋아요.')">② 작곡가</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, false, '❌ 거의 좋은데, "하루에"라는 표현보다 "작곡가 하는 일"이 더 잘 검색돼요.')">③ 작곡가 하루 일과</button>
+      <button class="quiz-opt" onclick="checkQuiz(this, true, '✅ 정답! "작곡가 하는 일"처럼 직업과 알고 싶은 내용을 함께 넣으면 딱 맞는 자료가 나와요.')">④ 작곡가 하는 일</button>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="section-title" style="margin-top: 28px;">🖥️ 검색 도구 시뮬레이터</div>
+  <p style="font-size:0.9rem; color:#666; margin-bottom:14px;">검색어를 입력하면 어떤 결과가 나오는지 연습해보세요!</p>
+
+  <div class="simulator">
+    <div class="sim-bar">
+      <span>🔍</span>
+      <input class="sim-input" id="simInput" type="text" placeholder="검색어를 입력해 보세요" onkeydown="if(event.key==='Enter') runSim()">
+      <button class="sim-btn" onclick="runSim()">검색</button>
+    </div>
+    <div class="sim-result" id="simResult">
+      검색어를 입력하고 검색 버튼을 눌러보세요! 👆
+    </div>
+  </div>
+</div>
+
+<!-- 4. 주의할 점 -->
+<div class="section" id="caution">
+  <div class="section-title">⚠️ 정보를 찾을 때 주의할 점</div>
+
+  <div class="warn-box">
+    <div class="warn-icon">🧐</div>
+    <div class="warn-text">
+      <strong>모든 정보가 맞는 건 아니에요!</strong><br>
+      인터넷에는 누구나 글을 올릴 수 있어서 틀린 내용이 있을 수 있어요. 여러 곳에서 같은 내용이 나오는지 확인해요.
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <div class="warn-icon">🤖</div>
+    <div class="warn-text">
+      <strong>인공지능도 틀릴 수 있어요!</strong><br>
+      챗GPT, 클로드 같은 인공지능은 답변을 잘 정리해주지만, 가끔 틀린 정보를 자신 있게 말하기도 해요. 중요한 내용은 꼭 다른 곳에서도 확인해요.
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <div class="warn-icon">🖼️</div>
+    <div class="warn-text">
+      <strong>이미지는 출처를 밝혀요!</strong><br>
+      인터넷에서 찾은 그림이나 사진을 사용할 때는 어디서 가져왔는지 출처를 꼭 적어야 해요.
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <div class="warn-icon">🔗</div>
+    <div class="warn-text">
+      <strong>광고와 정보를 구별해요!</strong><br>
+      검색 결과 맨 위에 나오는 것이 항상 가장 좋은 정보는 아니에요. '광고'라고 적혀 있는 것은 돈을 내고 올린 글이에요.
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <div class="warn-icon">🔒</div>
+    <div class="warn-text">
+      <strong>개인 정보는 입력하지 않아요!</strong><br>
+      검색할 때 내 이름, 학교, 전화번호 같은 개인 정보는 절대 입력하지 않아요.
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top: 28px;">📝 오늘 배운 내용 정리</div>
+  <div class="summary-grid">
+    <div class="summary-item">
+      <div class="summary-num">①</div>
+      <div class="summary-label">검색 도구 선택</div>
+      <div class="summary-desc">글 → 네이버·구글<br>동영상 → 유튜브<br>AI 도움 → 클로드·챗GPT</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num">②</div>
+      <div class="summary-label">검색어는 구체적으로</div>
+      <div class="summary-desc">"드론" ❌<br>"드론 조종사 하는 일" ✅</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num">③</div>
+      <div class="summary-label">자료 종류 활용</div>
+      <div class="summary-desc">뉴스·사전·블로그·동영상 중 목적에 맞게 선택해요</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num">④</div>
+      <div class="summary-label">정보 확인하기</div>
+      <div class="summary-desc">여러 곳에서 같은 내용인지 확인하고, AI도 틀릴 수 있어요</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function checkQuiz(btn, correct, msg) {
+    const box = btn.closest('.quiz-box');
+    const opts = box.querySelectorAll('.quiz-opt');
+    const fb = box.querySelector('.quiz-feedback');
+    opts.forEach(o => { o.disabled = true; o.style.cursor = 'default'; });
+    btn.classList.add(correct ? 'correct' : 'wrong');
+    fb.textContent = msg;
+    fb.className = 'quiz-feedback show ' + (correct ? 'good' : 'bad');
+  }
+
+  const simData = {
+    '드론': { tip: '❗ "드론"만 입력하니 쇼핑, 뉴스 등 너무 많은 결과가 나왔어요!', results: [
+      { title: '드론 최저가 35,000원 (쇼핑)', desc: '다양한 드론 제품을 만나보세요' },
+      { title: '밤하늘을 수놓은 드론쇼 (뉴스)', desc: '어젯밤 한강에서 드론 1000대가...' },
+      { title: '드론 충돌 사고 (뉴스)', desc: '드론 관련 사건 소식...' }
+    ]},
+    '드론 조종사': { tip: '✅ "드론 조종사"로 검색하니 더 관련 있는 결과가 나왔어요! 더 구체적으로 "드론 조종사 하는 일"로 검색하면 더 좋아요.', results: [
+      { title: '드론 조종사 직업 소개 (블로그)', desc: '드론 조종사가 하는 일과 취업 방법을 알아봐요' },
+      { title: '드론 조종사 자격증 종류 (사전)', desc: '초경량비행장치 조종자 자격증...' },
+      { title: '드론 조종사 인터뷰 영상 (동영상)', desc: '현직 드론 조종사가 말하는 직업 이야기' }
+    ]},
+    '드론 조종사 하는 일': { tip: '🎉 아주 좋은 검색어예요! 원하는 정보가 정확하게 나왔어요.', results: [
+      { title: '드론 조종사 직무 소개 (사전)', desc: '고공 동영상·사진 촬영, 농약 살포, 기사 정보 수집 등을 수행' },
+      { title: '드론 조종사가 하루에 하는 일 (블로그)', desc: '현직 드론 조종사의 하루 일과를 소개합니다' },
+      { title: '드론 조종사가 되려면? (동영상)', desc: '숙련 기간 6개월~1년, 필요한 지식: 기계, 안전과 보안, 지리' }
+    ]},
+    '수의사': { tip: '❗ "수의사"만 입력하니 내가 원하는 내용을 정확히 찾기 어려워요!', results: [
+      { title: '수의사가 알려 주는 반려동물 기르기 (도서)', desc: '책 제목: 수의사가 알려 주는 반려동물 기르기' },
+      { title: '길 잃은 고양이를 돌봐 주는 수의사 (블로그)', desc: '동물 사랑 이야기...' },
+      { title: '수의사 이미지 (이미지)', desc: '수의사 관련 사진 모음' }
+    ]},
+    '수의사 하는 일': { tip: '🎉 아주 좋은 검색어예요! 원하는 정보가 정확하게 나왔어요.', results: [
+      { title: '수의사 직업 인터뷰 (블로그)', desc: '동물병원에서 아픈 동물을 돌보며 병을 고쳐주는 일...' },
+      { title: '수의사는 어떤 일을 할까요? (동영상)', desc: '수의사의 모든 것을 알아봐요' },
+      { title: '수의사 되는 방법 (사전)', desc: '수의학과 진학 후 국가시험 합격 필요...' }
+    ]}
+  };
+
+  function runSim() {
+    const q = document.getElementById('simInput').value.trim();
+    const result = document.getElementById('simResult');
+    if (!q) { result.innerHTML = '검색어를 입력해주세요! 👆'; return; }
+
+    const key = Object.keys(simData).find(k => q.includes(k.replace(/ /g, '')) || k.includes(q));
+    if (!key) {
+      result.innerHTML = `<div style="color:#888; text-align:center; padding:20px;">
+        🤔 "${q}"에 대한 예시 결과가 없어요.<br>
+        <span style="font-size:0.82rem">직업 이름 + 알고 싶은 내용으로 검색해보세요!<br>(예: 드론 조종사, 수의사 하는 일)</span>
+      </div>`;
+      return;
+    }
+
+    const d = simData[key];
+    result.innerHTML = d.results.map(r =>
+      `<div class="result-item"><div class="result-title">${r.title}</div><div class="result-desc">${r.desc}</div></div>`
+    ).join('') + `<div class="result-tip">💡 ${d.tip}</div>`;
+  }
+</script>
+
+</body>
+</html>
