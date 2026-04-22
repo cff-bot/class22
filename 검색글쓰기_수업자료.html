@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>필요한 정보를 검색하고 목적에 맞는 글 쓰기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap');
+
+  :root {
+    --indigo: #3949AB;
+    --indigo-d: #1A237E;
+    --indigo-l: #E8EAF6;
+    --amber: #F9A825;
+    --amber-l: #FFF8E1;
+    --teal: #00897B;
+    --teal-l: #E0F2F1;
+    --rose: #E53935;
+    --rose-l: #FFEBEE;
+    --bg: #F4F6FB;
+    --text: #263238;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Gowun Dodum', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1A237E 0%, #3949AB 55%, #5C6BC0 100%);
+    color: white; text-align: center; padding: 46px 20px 38px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content:''; position:absolute; width:300px; height:300px; border-radius:50%; background:rgba(255,255,255,.05); top:-100px; left:-80px; }
+  header::after  { content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,.05); bottom:-90px; right:-50px; }
+  .hd-icon { font-size:3rem; display:block; margin-bottom:10px; position:relative; z-index:1; }
+  header h1 { font-family:'Jua',sans-serif; font-size:clamp(1.6rem,5vw,2.5rem); position:relative; z-index:1; }
+  header p  { margin-top:8px; font-size:.9rem; opacity:.85; position:relative; z-index:1; }
+
+  /* STEP BAR */
+  .stepbar {
+    display:flex; overflow-x:auto; gap:0;
+    background:white; box-shadow:0 2px 8px rgba(0,0,0,.08);
+    position:sticky; top:0; z-index:100;
+  }
+  .step-btn {
+    flex:1; min-width:120px;
+    font-family:'Jua',sans-serif; font-size:.85rem;
+    padding:14px 8px; border:none; cursor:pointer;
+    background:#F5F5F5; color:#777;
+    border-bottom:3px solid transparent;
+    transition:all .2s; white-space:nowrap;
+  }
+  .step-btn.active { background:white; color:var(--indigo); border-bottom-color:var(--indigo); }
+
+  /* SECTIONS */
+  .section { display:none; padding:28px 16px 72px; max-width:900px; margin:0 auto; animation:fadeUp .3s ease; }
+  .section.active { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+  .sec-title { font-family:'Jua',sans-serif; font-size:1.4rem; color:var(--indigo-d); margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+
+  /* CARDS */
+  .card { background:white; border-radius:16px; padding:20px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+  .card-title { font-family:'Jua',sans-serif; font-size:1.05rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+
+  /* 학습 목표 */
+  .goal-list { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+  .goal-item { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border-radius:12px; }
+  .goal-item:nth-child(1) { background:var(--indigo-l); }
+  .goal-item:nth-child(2) { background:var(--teal-l); }
+  .goal-item:nth-child(3) { background:var(--amber-l); }
+  .goal-num { font-family:'Jua',sans-serif; font-size:1.3rem; flex-shrink:0; }
+  .goal-text { font-size:.9rem; line-height:1.8; color:#333; }
+
+  /* 글쓰기 과정 타임라인 */
+  .timeline { position:relative; padding-left:32px; }
+  .timeline::before { content:''; position:absolute; left:12px; top:0; bottom:0; width:2px; background:#C5CAE9; }
+  .tl-item { position:relative; margin-bottom:22px; }
+  .tl-dot { position:absolute; left:-26px; top:4px; width:20px; height:20px; border-radius:50%; background:var(--indigo); display:flex; align-items:center; justify-content:center; color:white; font-size:.65rem; font-family:'Jua',sans-serif; }
+  .tl-head { font-family:'Jua',sans-serif; font-size:1rem; color:var(--indigo-d); margin-bottom:6px; }
+  .tl-body { font-size:.87rem; line-height:1.8; color:#444; }
+  .tl-example { margin-top:8px; background:#F3F4FB; border-radius:10px; padding:10px 14px; font-size:.83rem; color:#333; line-height:1.75; border-left:3px solid var(--indigo); }
+
+  /* 은우 글 예시 */
+  .article-box { background:white; border-radius:16px; overflow:hidden; box-shadow:0 2px 14px rgba(0,0,0,.09); margin-bottom:16px; }
+  .article-header { background:linear-gradient(90deg, #3949AB, #5C6BC0); color:white; padding:12px 18px; font-family:'Jua',sans-serif; font-size:.9rem; display:flex; justify-content:space-between; align-items:center; }
+  .article-body { padding:18px; }
+  .article-title { font-family:'Jua',sans-serif; font-size:1.1rem; margin-bottom:6px; }
+  .article-meta { font-size:.73rem; color:#888; margin-bottom:12px; }
+  .article-section { margin-bottom:14px; }
+  .article-section-title { font-family:'Jua',sans-serif; font-size:.85rem; background:#E8EAF6; color:#1A237E; display:inline-block; padding:3px 10px; border-radius:6px; margin-bottom:6px; }
+  .article-text { font-size:.83rem; line-height:1.8; color:#444; }
+  .source-tag { font-size:.72rem; color:#888; margin-top:4px; }
+
+  /* 애노테이션 */
+  .anno { display:inline-block; background:#FFF9C4; border:1px solid #FFD54F; border-radius:6px; padding:1px 6px; font-size:.75rem; color:#5D4037; margin-left:4px; vertical-align:middle; cursor:pointer; position:relative; }
+  .anno-tooltip { display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#333; color:white; font-size:.75rem; padding:6px 10px; border-radius:8px; white-space:nowrap; z-index:10; min-width:160px; text-align:center; }
+  .anno:hover .anno-tooltip { display:block; }
+
+  /* 검색 계획 빌더 */
+  .planner { background:white; border-radius:16px; padding:20px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+  .job-select-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:18px; }
+  @media(max-width:500px) { .job-select-grid { grid-template-columns:repeat(2,1fr); } }
+  .job-btn { padding:12px 8px; border:2px solid #DDD; border-radius:12px; background:#FAFAFA; font-family:'Jua',sans-serif; font-size:.9rem; cursor:pointer; transition:all .2s; text-align:center; }
+  .job-btn.selected { border-color:var(--indigo); background:var(--indigo-l); color:var(--indigo); }
+  .job-btn:hover { border-color:#9FA8DA; }
+
+  .search-plan { background:#F8F9FF; border-radius:12px; padding:16px; margin-top:4px; }
+  .plan-row { display:flex; gap:10px; align-items:flex-start; margin-bottom:12px; }
+  .plan-label { font-family:'Jua',sans-serif; font-size:.82rem; color:white; background:var(--indigo); padding:4px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+  .plan-keywords { display:flex; flex-wrap:wrap; gap:6px; }
+  .kw-chip { padding:5px 12px; border-radius:20px; font-size:.8rem; background:white; border:1px solid #C5CAE9; color:#333; cursor:pointer; transition:all .18s; }
+  .kw-chip.active { background:var(--indigo); color:white; border-color:var(--indigo); }
+  .plan-preview { margin-top:10px; padding:10px 14px; background:white; border-radius:10px; border:1px dashed #9FA8DA; font-size:.85rem; color:#333; min-height:40px; }
+  .plan-preview span { font-family:'Jua',sans-serif; color:var(--indigo); }
+
+  /* 글쓰기 틀 */
+  .writing-frame { background:white; border-radius:16px; padding:22px; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+  .frame-section { margin-bottom:18px; padding-bottom:18px; border-bottom:1px dashed #E0E0E0; }
+  .frame-section:last-child { border-bottom:none; margin-bottom:0; }
+  .frame-label { font-family:'Jua',sans-serif; font-size:.9rem; color:white; background:var(--teal); padding:4px 12px; border-radius:20px; display:inline-block; margin-bottom:10px; }
+  .frame-label.amber { background:var(--amber); color:#333; }
+  .frame-label.rose  { background:var(--rose); }
+  .frame-guide { font-size:.83rem; color:#666; margin-bottom:8px; line-height:1.7; }
+  .frame-chip-row { display:flex; flex-wrap:wrap; gap:6px; }
+  .frame-chip { font-size:.8rem; padding:5px 12px; background:#F5F5F5; border-radius:20px; color:#444; border:1px solid #DDD; }
+
+  /* 출처 카드 */
+  .source-check { background:var(--amber-l); border-radius:14px; padding:16px 18px; border:2px solid var(--amber); margin-bottom:14px; }
+  .source-check-title { font-family:'Jua',sans-serif; font-size:1rem; color:#5D4037; margin-bottom:10px; }
+  .sc-item { display:flex; align-items:flex-start; gap:10px; font-size:.88rem; line-height:1.75; color:#333; padding:6px 0; border-bottom:1px solid #FFE082; }
+  .sc-item:last-child { border-bottom:none; }
+  .sc-dot { width:20px; height:20px; background:var(--amber); border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; font-size:.7rem; margin-top:2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="hd-icon">✍️</span>
+  <h1>필요한 정보를 검색하고<br>목적에 맞는 글 쓰기</h1>
+  <p>검색 → 계획 → 글쓰기의 세 단계로 완성해요</p>
+</header>
+
+<div class="stepbar">
+  <button class="step-btn active" onclick="showTab('goal')">🎯 학습 목표</button>
+  <button class="step-btn" onclick="showTab('model')">📄 예시 글 분석</button>
+  <button class="step-btn" onclick="showTab('plan')">🗺️ 검색 계획</button>
+  <button class="step-btn" onclick="showTab('write')">✏️ 글쓰기 틀</button>
+  <button class="step-btn" onclick="showTab('source')">📌 출처 밝히기</button>
+</div>
+
+<!-- ① 학습 목표 -->
+<div class="section active" id="goal">
+  <div class="sec-title">🎯 오늘 무엇을 배울까요?</div>
+  <div class="card">
+    <div class="goal-list">
+      <div class="goal-item">
+        <div class="goal-num">①</div>
+        <div class="goal-text"><strong>검색 계획을 세울 수 있어요.</strong><br>알고 싶은 직업과 필요한 정보를 미리 정한 뒤 검색어를 만들어요.</div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-num">②</div>
+        <div class="goal-text"><strong>목적에 맞게 정보를 선택할 수 있어요.</strong><br>검색 결과 중 목적·최신성·신뢰성 기준으로 필요한 자료를 골라요.</div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-num">③</div>
+        <div class="goal-text"><strong>글에 출처를 밝혀 쓸 수 있어요.</strong><br>자료를 참고하거나 활용할 때는 어디서 가져왔는지 꼭 적어요.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔄 글쓰기 전체 흐름</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">1</div>
+        <div class="tl-head">직업 고르기</div>
+        <div class="tl-body">체험하고 싶은 직업을 하나 정해요.</div>
+        <div class="tl-example">예) 드론 조종사, 수의사, 요리사, 원예사, 기자, 작곡가 중 하나</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">2</div>
+        <div class="tl-head">필요한 정보 떠올리기</div>
+        <div class="tl-body">그 직업에 대해 어떤 내용을 알고 싶은지 생각해봐요.</div>
+        <div class="tl-example">예) 하는 일 / 되는 방법 / 필요한 능력 / 새롭게 알게 된 점</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">3</div>
+        <div class="tl-head">검색 계획 세우기</div>
+        <div class="tl-body">필요한 정보에 맞는 구체적인 검색어를 미리 정해요.</div>
+        <div class="tl-example">예) "드론 조종사 하는 일" / "드론 조종사 자격증" / "드론 조종사 되는 방법"</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">4</div>
+        <div class="tl-head">정보 선택하기</div>
+        <div class="tl-body">목적·최신성·신뢰성 기준으로 좋은 자료를 골라요.</div>
+        <div class="tl-example">예) 사전, 공식 누리집, 신문 기사 → 우선 선택!</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">5</div>
+        <div class="tl-head">글 쓰기 + 출처 밝히기</div>
+        <div class="tl-body">선택한 정보를 기준에 따라 정리하고, 참고한 자료의 출처를 꼭 써요.</div>
+        <div class="tl-example">예) ■ 출처: 주니어커리어넷 누리집(www.career.go.kr/jr)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ② 예시 글 분석 -->
+<div class="section" id="model">
+  <div class="sec-title">📄 은우의 글을 함께 살펴봐요</div>
+  <p style="font-size:.88rem;color:#666;margin-bottom:16px;">은우가 드론 체험 교실을 위해 쓴 글이에요. 각 부분에 마우스를 올려보세요!</p>
+
+  <div class="article-box">
+    <div class="article-header">
+      <span>🏫 학교 &gt;&gt;&gt; 드론 체험 교육</span>
+      <span style="font-size:.75rem;opacity:.8;">게시자: 박은우</span>
+    </div>
+    <div class="article-body">
+      <div class="article-title">하늘을 향하는 직업, 드론 조종사</div>
+      <div class="article-meta">2000. 00. 00.</div>
+
+      <div class="article-section">
+        <div class="article-section-title">드론이란?</div>
+        <div class="article-text">
+          무선 전파를 이용하여 원격 조종되는 무인 비행 물체.
+          <span class="anno">📌출처<div class="anno-tooltip">■ 출처: OO백과사전<br>백과사전이라 신뢰할 수 있어요!</div></span>
+        </div>
+      </div>
+
+      <div class="article-section">
+        <div class="article-section-title">드론 조종사가 하는 일</div>
+        <div class="article-text">
+          → 농약 살포, 작물 성장 관리와 같은 농업 분야<br>
+          → 산불 감시, 야생 동물 추적과 같은 환경 분야<br>
+          → 소방 및 인명 구조 분야<br>
+          → 물류 배송 서비스 분야<br>
+          → 방송, 영화 촬영 분야<br>
+          → 축제 및 공연 행사 분야
+          <span class="anno">🎯목적<div class="anno-tooltip">직업 소개가 목적에 맞게<br>여러 분야로 구체적으로 정리됐어요!</div></span>
+        </div>
+      </div>
+
+      <div class="article-section">
+        <div class="article-section-title" style="background:#E8F5E9;color:#1B5E20;">드론 조종사가 되려면</div>
+        <div class="article-text">
+          → 한국교통안전공단에서 자격증을 취득해야 한다.<br>
+          → 드론과 관련한 기본적인 지식, 도전 정신과 정확한 상황 판단력이 필요하다.
+          <span class="anno">📌출처<div class="anno-tooltip">■ 출처: 주니어커리어넷 누리집<br>(www.career.go.kr/jr)<br>공식 누리집이라 신뢰해요!</div></span>
+        </div>
+      </div>
+
+      <div class="article-section">
+        <div class="article-section-title" style="background:#FFF3E0;color:#E65100;">새롭게 안 점, 느낀 점</div>
+        <div class="article-text">
+          → 미래에 드론이 많은 분야에서 활용될 것이라는 사실을 알았다.<br>
+          → 드론 조종사가 미래 사회에 전망이 밝은 직업이라고 느꼈다.
+          <span class="anno">✍️내 생각<div class="anno-tooltip">검색한 정보를 바탕으로<br>자신의 생각을 덧붙였어요!</div></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:5px solid var(--indigo);">
+    <div class="card-title">🔍 은우는 어떻게 글을 구성했나요?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+      <div style="background:var(--indigo-l);border-radius:10px;padding:12px;font-size:.83rem;line-height:1.75;color:#1A237E;">
+        <strong style="font-family:'Jua',sans-serif;">📐 정보를 나누는 기준</strong><br>
+        ① 직업·개념 설명<br>
+        ② 하는 일 (여러 분야로 구분)<br>
+        ③ 되는 방법<br>
+        ④ 새롭게 알게 된 점·느낀 점
+      </div>
+      <div style="background:var(--teal-l);border-radius:10px;padding:12px;font-size:.83rem;line-height:1.75;color:#004D40;">
+        <strong style="font-family:'Jua',sans-serif;">📚 활용한 자료 종류</strong><br>
+        • 사전 → 개념 설명<br>
+        • 동영상 → 직업 소개<br>
+        • 공식 누리집 → 자격증 정보<br>
+        각 자료마다 출처를 밝혔어요!
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ 검색 계획 -->
+<div class="section" id="plan">
+  <div class="sec-title">🗺️ 내 검색 계획을 세워봐요</div>
+  <p style="font-size:.88rem;color:#666;margin-bottom:16px;">직업을 고르고 검색할 내용을 선택해보세요!</p>
+
+  <div class="planner">
+    <div class="card-title" style="margin-bottom:12px;">1️⃣ 알고 싶은 직업을 골라요</div>
+    <div class="job-select-grid">
+      <button class="job-btn" onclick="selectJob(this,'요리사','👨‍🍳')">👨‍🍳 요리사</button>
+      <button class="job-btn" onclick="selectJob(this,'기자','📰')">📰 기자</button>
+      <button class="job-btn" onclick="selectJob(this,'드론 조종사','🚁')">🚁 드론 조종사</button>
+      <button class="job-btn" onclick="selectJob(this,'원예사','🌿')">🌿 원예사</button>
+      <button class="job-btn" onclick="selectJob(this,'작곡가','🎵')">🎵 작곡가</button>
+      <button class="job-btn" onclick="selectJob(this,'수의사','🐾')">🐾 수의사</button>
+    </div>
+
+    <div class="card-title" style="margin-bottom:12px;">2️⃣ 검색할 내용을 선택해요 <span style="font-size:.75rem;color:#888;">(여러 개 선택 가능)</span></div>
+    <div class="search-plan">
+      <div class="plan-row">
+        <div class="plan-label">검색 내용</div>
+        <div class="plan-keywords" id="topicChips">
+          <div class="kw-chip" onclick="toggleChip(this)">하는 일</div>
+          <div class="kw-chip" onclick="toggleChip(this)">되는 방법</div>
+          <div class="kw-chip" onclick="toggleChip(this)">필요한 능력</div>
+          <div class="kw-chip" onclick="toggleChip(this)">자격증</div>
+          <div class="kw-chip" onclick="toggleChip(this)">힘든 점</div>
+          <div class="kw-chip" onclick="toggleChip(this)">좋은 점</div>
+          <div class="kw-chip" onclick="toggleChip(this)">미래 전망</div>
+        </div>
+      </div>
+      <div class="plan-row">
+        <div class="plan-label">검색 도구</div>
+        <div class="plan-keywords" id="toolChips">
+          <div class="kw-chip" onclick="toggleChip(this)">🔍 네이버</div>
+          <div class="kw-chip" onclick="toggleChip(this)">🔍 구글</div>
+          <div class="kw-chip" onclick="toggleChip(this)">🎬 유튜브</div>
+          <div class="kw-chip" onclick="toggleChip(this)">📖 사전</div>
+          <div class="kw-chip" onclick="toggleChip(this)">🏛️ 진로 누리집</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="card-title" style="margin-bottom:8px;">3️⃣ 만들어질 검색어 미리보기</div>
+      <div class="plan-preview" id="planPreview">직업과 검색 내용을 선택하면 검색어가 나타나요!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ④ 글쓰기 틀 -->
+<div class="section" id="write">
+  <div class="sec-title">✏️ 직업 소개 글쓰기 틀</div>
+  <p style="font-size:.88rem;color:#666;margin-bottom:16px;">은우의 글 구성을 참고해서 내 글의 뼈대를 잡아봐요.</p>
+
+  <div class="writing-frame">
+    <div class="frame-section">
+      <div class="frame-label">제목</div>
+      <div class="frame-guide">직업의 특징이 잘 드러나는 제목을 써요.</div>
+      <div class="frame-chip-row">
+        <div class="frame-chip">하늘을 향하는 직업, 드론 조종사</div>
+        <div class="frame-chip">동물을 사랑한다면, 수의사!</div>
+        <div class="frame-chip">맛으로 세상을 바꾸는 요리사</div>
+      </div>
+    </div>
+
+    <div class="frame-section">
+      <div class="frame-label">① [직업 이름]이란?</div>
+      <div class="frame-guide">직업의 개념을 간단하게 설명해요. 사전이나 백과사전 자료를 활용하면 좋아요.</div>
+      <div class="frame-chip-row">
+        <div class="frame-chip">검색어: "[직업 이름] 뜻"</div>
+        <div class="frame-chip">검색어: "[직업 이름] 하는 일"</div>
+        <div class="frame-chip">자료 종류: 사전, 백과</div>
+      </div>
+    </div>
+
+    <div class="frame-section">
+      <div class="frame-label">② [직업 이름]이 하는 일</div>
+      <div class="frame-guide">어떤 분야에서 어떤 일을 하는지 구체적으로 정리해요. 화살표(→)로 항목을 나눠도 좋아요.</div>
+      <div class="frame-chip-row">
+        <div class="frame-chip">검색어: "[직업 이름] 직무"</div>
+        <div class="frame-chip">검색어: "[직업 이름] 하루 일과"</div>
+        <div class="frame-chip">자료 종류: 뉴스, 블로그, 동영상</div>
+      </div>
+    </div>
+
+    <div class="frame-section">
+      <div class="frame-label amber">③ [직업 이름]이 되려면</div>
+      <div class="frame-guide">자격증, 필요한 능력, 공부해야 할 것을 써요. 공식 누리집 자료가 가장 신뢰할 수 있어요.</div>
+      <div class="frame-chip-row">
+        <div class="frame-chip">검색어: "[직업 이름] 되는 방법"</div>
+        <div class="frame-chip">검색어: "[직업 이름] 자격증"</div>
+        <div class="frame-chip">자료 종류: 진로 공식 누리집</div>
+      </div>
+    </div>
+
+    <div class="frame-section">
+      <div class="frame-label rose">④ 새롭게 안 점, 느낀 점</div>
+      <div class="frame-guide">조사하면서 새롭게 알게 된 사실과 자신의 생각·느낌을 써요. 이 부분은 출처 없이 내 생각을 쓰면 돼요!</div>
+      <div class="frame-chip-row">
+        <div class="frame-chip">미래 전망</div>
+        <div class="frame-chip">인상 깊은 점</div>
+        <div class="frame-chip">체험 후 기대</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ 출처 밝히기 -->
+<div class="section" id="source">
+  <div class="sec-title">📌 출처를 꼭 밝혀요!</div>
+
+  <div class="source-check">
+    <div class="source-check-title">⚠️ 왜 출처를 밝혀야 할까요?</div>
+    <div class="sc-item"><div class="sc-dot">1</div><span>다른 사람이 만든 글·사진·영상을 사용할 때는 그 사람의 <strong>저작권</strong>을 보호해야 해요.</span></div>
+    <div class="sc-item"><div class="sc-dot">2</div><span>출처를 밝히면 읽는 사람이 <strong>더 믿을 수 있는 글</strong>이 돼요.</span></div>
+    <div class="sc-item"><div class="sc-dot">3</div><span>출처를 밝히는 것이 <strong>글을 쓰는 사람의 올바른 태도</strong>예요.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✅ 출처 쓰는 방법</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+      <div style="background:#F3F4FB;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.85;border-left:4px solid var(--indigo);">
+        <strong style="font-family:'Jua',sans-serif;color:var(--indigo);">📖 사전·백과사전</strong><br>
+        ■ 출처: OO백과사전
+      </div>
+      <div style="background:#E0F2F1;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.85;border-left:4px solid var(--teal);">
+        <strong style="font-family:'Jua',sans-serif;color:var(--teal);">🏛️ 공식 누리집</strong><br>
+        ■ 출처: 주니어커리어넷 누리집(www.career.go.kr/jr)<br>
+        ■ 출처: 대한수의사회(2019), '2019년 전체 수의사 분포 현황'
+      </div>
+      <div style="background:var(--amber-l);border-radius:10px;padding:14px;font-size:.85rem;line-height:1.85;border-left:4px solid var(--amber);">
+        <strong style="font-family:'Jua',sans-serif;color:#5D4037;">📰 신문·뉴스</strong><br>
+        ■ 출처: OO신문, 최누리 기자, 2026년 5월 20일
+      </div>
+      <div style="background:#F3E5F5;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.85;border-left:4px solid #7B1FA2;">
+        <strong style="font-family:'Jua',sans-serif;color:#4A148C;">🎬 동영상</strong><br>
+        ■ 출처: 국립OO과학관 (유튜브 채널명)
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:5px solid var(--rose);">
+    <div class="card-title">❌ 이런 자료는 출처로 쓰기 어려워요</div>
+    <div style="font-size:.87rem;line-height:1.85;color:#444;margin-top:4px;">
+      • 글쓴이가 <strong>비공개</strong>인 게시판 답변<br>
+      • 작성자를 알 수 없는 블로그<br>
+      • 날짜가 표시되지 않은 자료<br>
+      • 광고·홍보 목적이 명확한 글
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedJob = '';
+  let selectedEmoji = '';
+
+  function showTab(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function selectJob(btn, job, emoji) {
+    document.querySelectorAll('.job-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedJob = job;
+    selectedEmoji = emoji;
+    updatePreview();
+  }
+
+  function toggleChip(chip) {
+    chip.classList.toggle('active');
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const active = [...document.querySelectorAll('#topicChips .kw-chip.active')].map(c => c.textContent.trim());
+    const preview = document.getElementById('planPreview');
+    if (!selectedJob || active.length === 0) {
+      preview.innerHTML = '직업과 검색 내용을 선택하면 검색어가 나타나요!';
+      return;
+    }
+    const keywords = active.map(t => `<span>${selectedEmoji} "${selectedJob} ${t}"</span>`).join('&nbsp;&nbsp; ');
+    preview.innerHTML = `추천 검색어: ${keywords}`;
+  }
+</script>
+</body>
+</html>
