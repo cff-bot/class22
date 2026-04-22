@@ -1,0 +1,429 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#app{font-family:var(--font-sans);max-width:620px;margin:0 auto;padding:1rem 0}
+.screen{display:none}.screen.active{display:block}
+h2{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.pbar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.phase-dots{display:flex;gap:6px}
+.ph{width:28px;height:6px;border-radius:99px;background:var(--color-background-secondary);transition:background .3s}
+.ph.done{background:#85B7EB}.ph.active{background:#378ADD}
+.phase-label{font-size:12px;color:var(--color-text-secondary)}
+.tab-row{display:flex;gap:0;margin-bottom:1.25rem;border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+.tab-btn{flex:1;padding:10px;font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.tab-btn.on{background:#378ADD;color:white}
+.tab-content{display:none}.tab-content.on{display:block}
+.part-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+.part-card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem}
+.part-icon{font-size:24px;margin-bottom:6px}
+.part-name{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.part-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:8px}
+.part-examples{display:flex;flex-wrap:wrap;gap:4px}
+.ex-tag{font-size:11px;padding:3px 8px;border-radius:99px;background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.season-tabs{display:flex;gap:6px;margin-bottom:1rem}
+.stab{padding:6px 14px;border-radius:99px;border:.5px solid var(--color-border-tertiary);font-size:13px;background:transparent;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.stab.on{border-color:#378ADD;background:#E6F1FB;color:#0C447C}
+.season-content{display:none}.season-content.on{display:block}
+.season-card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:10px}
+.sc-head{display:flex;align-items:center;gap:8px;margin-bottom:.75rem}
+.sc-icon{font-size:22px}.sc-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.sc-tip{font-size:12px;color:var(--color-text-secondary);margin-top:8px;line-height:1.6;padding-top:8px;border-top:.5px solid var(--color-border-tertiary)}
+.cloth-pills{display:flex;flex-wrap:wrap;gap:6px}
+.cpill{font-size:12px;padding:4px 10px;border-radius:99px;font-weight:500}
+.cp-top{background:#E6F1FB;color:#0C447C}.cp-bottom{background:#EAF3DE;color:#27500A}
+.cp-outer{background:#FAEEDA;color:#633806}.cp-acc{background:#EEEDFE;color:#3C3489}
+.cp-shoes{background:#FAECE7;color:#712B13}
+.slot-area{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.slot-box{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;text-align:center}
+.slot-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:8px}
+.slot-val{font-size:22px;font-weight:500;min-height:36px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.slot-val.spin{opacity:.3;transform:scale(.9)}
+.sv-s{color:#185FA5}.sv-p{color:#993C1D}
+.btn-spin{width:100%;padding:14px;border-radius:var(--border-radius-md);border:none;background:#378ADD;color:white;font-size:16px;font-weight:500;cursor:pointer;margin-bottom:1rem;transition:all .15s}
+.btn-spin:hover{background:#185FA5}.btn-spin:active{transform:scale(.98)}
+.outfit-card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;display:none}
+.outfit-card.show{display:block}
+.otitle{font-size:13px;color:var(--color-text-secondary);margin-bottom:.75rem}
+.oitems{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.75rem}
+.otip{font-size:13px;color:var(--color-text-secondary);line-height:1.6;padding-top:.75rem;border-top:.5px solid var(--color-border-tertiary)}
+.quiz-info{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:1rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.qbadge{padding:4px 12px;border-radius:99px;font-size:12px;font-weight:500}
+.qbs{background:#E6F1FB;color:#0C447C}.qbp{background:#FAECE7;color:#712B13}
+.qlevel{padding:4px 10px;border-radius:99px;font-size:11px;background:#FAEEDA;color:#633806}
+.quiz-q{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:1.25rem;text-align:center;line-height:1.6}
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.cb{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 6px;cursor:pointer;text-align:center;transition:all .15s}
+.cb:hover{border-color:#378ADD;background:#E6F1FB}
+.cb.sel{border-color:#378ADD;background:#E6F1FB}
+.cb.correct{border-color:#639922!important;background:#EAF3DE!important}
+.cb.correct .cn{color:#3B6D11!important}
+.cb.wrong{border-color:#A32D2D!important;background:#FCEBEB!important}
+.cb.wrong .cn{color:#A32D2D!important}
+.cb.dim{opacity:.4;cursor:default}
+.ci{font-size:24px;margin-bottom:4px;display:block}
+.cn{font-size:11px;color:var(--color-text-secondary);line-height:1.3}
+.btn-check{width:100%;padding:12px;border-radius:var(--border-radius-md);border:none;background:#378ADD;color:white;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:.75rem}
+.btn-check:disabled{opacity:.4;cursor:default}
+.btn-check:not(:disabled):hover{background:#185FA5}
+.qfb{padding:12px 14px;border-radius:var(--border-radius-md);font-size:13px;line-height:1.6;display:none;margin-bottom:.75rem}
+.qfb.ok{background:#EAF3DE;color:#27500A;display:block}
+.qfb.ng{background:#FCEBEB;color:#791F1F;display:block}
+.qprog{display:flex;gap:3px;margin-bottom:1.25rem}
+.qpd{flex:1;height:5px;border-radius:99px;background:var(--color-background-secondary)}
+.qpd.done{background:#378ADD}.qpd.cur{background:#85B7EB}
+.srow{display:flex;gap:6px;justify-content:flex-end;margin-bottom:1rem}
+.sbadge{font-size:12px;padding:4px 10px;border-radius:99px}
+.sbo{background:#EAF3DE;color:#3B6D11}.sbx{background:#FCEBEB;color:#A32D2D}
+.btn-next{width:100%;padding:12px;border-radius:var(--border-radius-md);border:1.5px solid #378ADD;background:transparent;color:#185FA5;font-size:15px;font-weight:500;cursor:pointer;margin-top:1rem}
+.btn-next:hover{background:#E6F1FB}
+.btn-next.hide{display:none}
+.result-wrap{text-align:center;padding:2rem 1rem}
+.rbig{font-size:48px;margin-bottom:1rem}
+.rscore{font-size:36px;font-weight:500;margin-bottom:.5rem}
+.rmsg{font-size:15px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.rmet{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem}
+.rml{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.rmv{font-size:22px;font-weight:500}
+.btn-restart{padding:12px 28px;border-radius:var(--border-radius-md);border:1.5px solid #378ADD;color:#185FA5;background:transparent;font-size:15px;font-weight:500;cursor:pointer}
+.btn-restart:hover{background:#E6F1FB}
+</style>
+
+<div id="app">
+<div class="pbar-wrap">
+  <div class="phase-dots">
+    <div class="ph active" id="ph1"></div>
+    <div class="ph" id="ph2"></div>
+    <div class="ph" id="ph3"></div>
+  </div>
+  <span class="phase-label" id="phase-label">1단계 · 옷의 종류 알아보기</span>
+</div>
+
+<div class="screen active" id="s1">
+  <h2>옷의 종류 알아보기</h2>
+  <p class="sub">부위별, 계절별로 어떤 옷들이 있는지 살펴봐요.</p>
+  <div class="tab-row">
+    <button class="tab-btn on" onclick="switchTab('part')">부위별</button>
+    <button class="tab-btn" onclick="switchTab('season')">계절별</button>
+  </div>
+  <div class="tab-content on" id="tab-part">
+    <div class="part-grid">
+      <div class="part-card"><div class="part-icon">👕</div><div class="part-name">상의</div><div class="part-desc">몸의 위쪽을 덮는 옷이에요.</div><div class="part-examples"><span class="ex-tag">티셔츠</span><span class="ex-tag">셔츠</span><span class="ex-tag">블라우스</span><span class="ex-tag">니트</span><span class="ex-tag">맨투맨</span><span class="ex-tag">후드티</span></div></div>
+      <div class="part-card"><div class="part-icon">👖</div><div class="part-name">하의</div><div class="part-desc">몸의 아래쪽을 덮는 옷이에요.</div><div class="part-examples"><span class="ex-tag">청바지</span><span class="ex-tag">면 바지</span><span class="ex-tag">반바지</span><span class="ex-tag">치마</span><span class="ex-tag">슬랙스</span><span class="ex-tag">기모 바지</span></div></div>
+      <div class="part-card"><div class="part-icon">🧥</div><div class="part-name">겉옷</div><div class="part-desc">상의 위에 덧입는 옷이에요.</div><div class="part-examples"><span class="ex-tag">가디건</span><span class="ex-tag">점퍼</span><span class="ex-tag">패딩</span><span class="ex-tag">코트</span><span class="ex-tag">바람막이</span><span class="ex-tag">자켓</span></div></div>
+      <div class="part-card"><div class="part-icon">🧣</div><div class="part-name">소품·신발</div><div class="part-desc">옷차림을 완성하는 것들이에요.</div><div class="part-examples"><span class="ex-tag">목도리</span><span class="ex-tag">모자</span><span class="ex-tag">장갑</span><span class="ex-tag">운동화</span><span class="ex-tag">구두</span><span class="ex-tag">부츠</span></div></div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:1rem">💡 속옷·양말처럼 피부에 닿는 옷도 있고, 원피스처럼 상·하의가 붙은 옷도 있어요.</div>
+  </div>
+  <div class="tab-content" id="tab-season">
+    <div class="season-tabs">
+      <button class="stab on" onclick="switchSeason(event,'spring')">봄</button>
+      <button class="stab" onclick="switchSeason(event,'summer')">여름</button>
+      <button class="stab" onclick="switchSeason(event,'autumn')">가을</button>
+      <button class="stab" onclick="switchSeason(event,'winter')">겨울</button>
+    </div>
+    <div class="season-content on" id="sc-spring"><div class="season-card"><div class="sc-head"><span class="sc-icon">🌸</span><span class="sc-title">봄 옷차림</span></div><div class="cloth-pills"><span class="cpill cp-top">얇은 긴팔 티셔츠</span><span class="cpill cp-top">블라우스·셔츠</span><span class="cpill cp-bottom">면 바지</span><span class="cpill cp-bottom">치마</span><span class="cpill cp-outer">가디건</span><span class="cpill cp-outer">얇은 점퍼</span><span class="cpill cp-shoes">운동화·단화</span></div><div class="sc-tip">💡 봄은 일교차가 커요. 아침·저녁은 쌀쌀하니 가디건처럼 걸쳤다 벗을 수 있는 겉옷이 필수예요.</div></div></div>
+    <div class="season-content" id="sc-summer"><div class="season-card"><div class="sc-head"><span class="sc-icon">☀️</span><span class="sc-title">여름 옷차림</span></div><div class="cloth-pills"><span class="cpill cp-top">반팔 티셔츠</span><span class="cpill cp-top">민소매</span><span class="cpill cp-bottom">반바지</span><span class="cpill cp-bottom">얇은 치마</span><span class="cpill cp-acc">모자</span><span class="cpill cp-shoes">샌들·운동화</span></div><div class="sc-tip">💡 땀 흡수 잘 되는 면 소재가 좋아요. 에어컨이 강한 실내를 위해 얇은 겉옷을 챙겨요.</div></div></div>
+    <div class="season-content" id="sc-autumn"><div class="season-card"><div class="sc-head"><span class="sc-icon">🍂</span><span class="sc-title">가을 옷차림</span></div><div class="cloth-pills"><span class="cpill cp-top">긴팔 티셔츠</span><span class="cpill cp-top">니트</span><span class="cpill cp-bottom">청바지</span><span class="cpill cp-bottom">슬랙스</span><span class="cpill cp-outer">얇은 점퍼</span><span class="cpill cp-outer">가디건</span><span class="cpill cp-shoes">운동화·로퍼</span></div><div class="sc-tip">💡 가을도 일교차가 있어요. 봄과 비슷하게 얇은 겉옷을 챙기고 점점 두꺼운 옷으로 바꿔요.</div></div></div>
+    <div class="season-content" id="sc-winter"><div class="season-card"><div class="sc-head"><span class="sc-icon">❄️</span><span class="sc-title">겨울 옷차림</span></div><div class="cloth-pills"><span class="cpill cp-top">두꺼운 맨투맨·니트</span><span class="cpill cp-bottom">기모 바지</span><span class="cpill cp-outer">패딩·코트</span><span class="cpill cp-acc">목도리·장갑·모자</span><span class="cpill cp-shoes">방한화·부츠</span></div><div class="sc-tip">💡 체온 유지가 가장 중요해요. 내의부터 여러 겹 겹쳐 입으면 더 따뜻해요.</div></div></div>
+  </div>
+  <button class="btn-next" onclick="goPhase(2)">다 봤어요, 뽑기 하러 가기 →</button>
+</div>
+
+<div class="screen" id="s2">
+  <h2>때와 장소 뽑기</h2>
+  <p class="sub">버튼을 눌러 조합을 뽑아봐요. 어떤 옷이 어울릴까요?</p>
+  <div class="slot-area">
+    <div class="slot-box"><div class="slot-label">계절</div><div class="slot-val sv-s" id="sl-s">?</div></div>
+    <div class="slot-box"><div class="slot-label">장소 / 상황</div><div class="slot-val sv-p" id="sl-p">?</div></div>
+  </div>
+  <button class="btn-spin" onclick="doSpin()">🎰 뽑기!</button>
+  <div class="outfit-card" id="ocard">
+    <div class="otitle" id="otitle"></div>
+    <div class="oitems" id="oitems"></div>
+    <div class="otip" id="otip"></div>
+  </div>
+  <button class="btn-next hide" id="btn-to-quiz" onclick="goPhase(3)">퀴즈 도전하기 →</button>
+</div>
+
+<div class="screen" id="s3">
+  <h2>옷차림 퀴즈</h2>
+  <p class="sub">상황에 맞는 옷을 모두 골라봐요!</p>
+  <div class="qprog" id="qprog"></div>
+  <div class="srow">
+    <span class="sbadge sbo" id="qs-ok">맞음 0</span>
+    <span class="sbadge sbx" id="qs-ng">틀림 0</span>
+  </div>
+  <div class="quiz-info">
+    <span class="qbadge qbs" id="qbs"></span>
+    <span class="qbadge qbp" id="qbp"></span>
+    <span class="qlevel" id="qlevel"></span>
+  </div>
+  <div class="quiz-q" id="quiz-q"></div>
+  <div class="cg" id="cg"></div>
+  <button class="btn-check" id="btn-check" disabled onclick="checkAnswer()">정답 확인</button>
+  <div class="qfb" id="qfb"></div>
+  <button class="btn-next hide" id="btn-qnext" onclick="nextQuiz()"></button>
+</div>
+
+<div class="screen" id="s4">
+  <div class="result-wrap" id="result-wrap"></div>
+</div>
+</div>
+
+<script>
+const seasons=['봄','여름','가을','겨울'];
+const places=['학교 등교','현장 체험 학습','공연 관람','결혼식 참석','친구 생일잔치','할머니 댁 방문','운동회','캠핑'];
+const tagCls={top:'cp-top',bottom:'cp-bottom',outer:'cp-outer',acc:'cp-acc',shoes:'cp-shoes'};
+const ic={'블라우스·셔츠':'👔','정장 바지·원피스':'👗','구두':'👠','두꺼운 패딩':'🧥','수영복':'🩱','슬리퍼':'🩴','반팔 티셔츠':'👕','반바지':'🩳','운동화':'👟','목도리':'🧣','기모 바지':'👖','부츠':'🥾','두꺼운 긴팔':'👕','장갑·모자':'🧤','방한화':'🥾','반팔티':'👕','샌들':'👡','민소매':'👙','니트·셔츠':'🧶','슬랙스·치마':'👗','로퍼·단화':'👟','체육복':'🎽','패딩':'🧥','긴팔 티셔츠':'👕','등산 바지':'🩳','바람막이':'🧥','트레킹화':'🥾','정장':'👔','포근한 니트':'🧶','기모 청바지':'👖','얇은 원피스':'👗','코트':'🧥','가디건':'🧥','면 바지':'👖','단화':'👟','자켓':'🧥','운동복 바지':'🩳','니트':'🧶'};
+
+const outfits={
+  '봄-학교 등교':{items:[{t:'top',n:'얇은 긴팔 티셔츠'},{t:'bottom',n:'면 바지'},{t:'outer',n:'가디건'},{t:'shoes',n:'운동화'}],tip:'봄은 일교차가 크니 가디건처럼 걸쳤다 벗을 수 있는 겉옷을 챙겨요.'},
+  '여름-학교 등교':{items:[{t:'top',n:'반팔 티셔츠'},{t:'bottom',n:'반바지'},{t:'shoes',n:'운동화'}],tip:'여름엔 땀 흡수 잘 되는 면 소재가 좋아요.'},
+  '가을-학교 등교':{items:[{t:'top',n:'긴팔 티셔츠'},{t:'bottom',n:'기모 청바지'},{t:'outer',n:'바람막이'},{t:'shoes',n:'운동화'}],tip:'가을도 일교차가 있으니 얇은 겉옷을 챙겨요.'},
+  '겨울-학교 등교':{items:[{t:'top',n:'포근한 니트'},{t:'bottom',n:'기모 바지'},{t:'outer',n:'두꺼운 패딩'},{t:'acc',n:'목도리'},{t:'shoes',n:'방한화'}],tip:'겨울엔 체온 유지가 중요해요. 여러 겹 입어요.'},
+  '봄-현장 체험 학습':{items:[{t:'top',n:'긴팔 티셔츠'},{t:'bottom',n:'면 바지'},{t:'outer',n:'바람막이'},{t:'shoes',n:'트레킹화'}],tip:'많이 걷고 활동하니 편안한 옷과 신발이 필수예요.'},
+  '여름-현장 체험 학습':{items:[{t:'top',n:'반팔 티셔츠'},{t:'bottom',n:'반바지'},{t:'acc',n:'장갑·모자'},{t:'shoes',n:'운동화'}],tip:'햇빛이 강하니 모자를 꼭 챙겨요.'},
+  '가을-현장 체험 학습':{items:[{t:'top',n:'긴팔 티셔츠'},{t:'bottom',n:'등산 바지'},{t:'outer',n:'바람막이'},{t:'shoes',n:'트레킹화'}],tip:'야외 활동이 많으니 미끄럽지 않은 신발을 신어요.'},
+  '겨울-현장 체험 학습':{items:[{t:'top',n:'두꺼운 긴팔'},{t:'bottom',n:'기모 바지'},{t:'outer',n:'두꺼운 패딩'},{t:'acc',n:'장갑·모자'},{t:'shoes',n:'방한화'}],tip:'추운 곳에서 활동하니 체온 유지가 중요해요.'},
+  '봄-공연 관람':{items:[{t:'top',n:'블라우스·셔츠'},{t:'bottom',n:'슬랙스·치마'},{t:'outer',n:'가디건'},{t:'shoes',n:'로퍼·단화'}],tip:'실내지만 격식 있는 자리이니 단정하게 입어요.'},
+  '여름-공연 관람':{items:[{t:'top',n:'반팔 티셔츠'},{t:'bottom',n:'면 바지'},{t:'outer',n:'가디건'},{t:'shoes',n:'단화'}],tip:'공연장은 에어컨이 강하니 얇은 겉옷을 챙겨요.'},
+  '가을-공연 관람':{items:[{t:'top',n:'니트·셔츠'},{t:'bottom',n:'슬랙스·치마'},{t:'shoes',n:'로퍼·단화'}],tip:'격식 있으면서 편안한 옷차림이 어울려요.'},
+  '겨울-공연 관람':{items:[{t:'top',n:'포근한 니트'},{t:'bottom',n:'슬랙스·치마'},{t:'outer',n:'코트'},{t:'shoes',n:'부츠'}],tip:'코트를 입고 가되 실내에서는 벗을 수 있어요.'},
+  '봄-결혼식 참석':{items:[{t:'top',n:'블라우스·셔츠'},{t:'bottom',n:'정장 바지·원피스'},{t:'shoes',n:'구두'}],tip:'예의를 갖춰야 하는 자리예요.'},
+  '여름-결혼식 참석':{items:[{t:'top',n:'블라우스·셔츠'},{t:'bottom',n:'정장 바지·원피스'},{t:'shoes',n:'구두'}],tip:'더운 날에도 결혼식은 단정한 옷차림이 예의예요.'},
+  '가을-결혼식 참석':{items:[{t:'top',n:'블라우스·셔츠'},{t:'bottom',n:'슬랙스·치마'},{t:'outer',n:'자켓'},{t:'shoes',n:'구두'}],tip:'자켓을 걸치면 격식 있어 보여요.'},
+  '겨울-결혼식 참석':{items:[{t:'top',n:'블라우스·셔츠'},{t:'bottom',n:'정장 바지·원피스'},{t:'outer',n:'코트'},{t:'shoes',n:'구두'}],tip:'겨울에도 결혼식에는 단정한 정장 차림이 기본이에요.'},
+  '봄-친구 생일잔치':{items:[{t:'top',n:'긴팔 티셔츠'},{t:'bottom',n:'면 바지'},{t:'outer',n:'가디건'},{t:'shoes',n:'운동화'}],tip:'내 개성이 담긴 편안한 옷차림이 좋아요.'},
+  '여름-친구 생일잔치':{items:[{t:'top',n:'반팔 티셔츠'},{t:'bottom',n:'반바지'},{t:'shoes',n:'운동화'}],tip:'좋아하는 밝은 색 옷도 좋아요.'},
+  '가을-친구 생일잔치':{items:[{t:'top',n:'포근한 니트'},{t:'bottom',n:'기모 청바지'},{t:'shoes',n:'운동화'}],tip:'따뜻하고 편한 캐주얼 차림이 잘 어울려요.'},
+  '겨울-친구 생일잔치':{items:[{t:'top',n:'포근한 니트'},{t:'bottom',n:'기모 바지'},{t:'outer',n:'두꺼운 패딩'},{t:'shoes',n:'운동화'}],tip:'겨울 생일잔치도 편하고 따뜻하게 입어요.'},
+  '봄-할머니 댁 방문':{items:[{t:'top',n:'블라우스·셔츠'},{t:'bottom',n:'면 바지'},{t:'shoes',n:'로퍼·단화'}],tip:'어른께 인사드리는 자리라 단정한 옷이 좋아요.'},
+  '여름-할머니 댁 방문':{items:[{t:'top',n:'반팔 티셔츠'},{t:'bottom',n:'면 바지'},{t:'shoes',n:'단화'}],tip:'어른 앞에서는 노출이 심하지 않은 단정한 차림이 예의예요.'},
+  '가을-할머니 댁 방문':{items:[{t:'top',n:'니트·셔츠'},{t:'bottom',n:'면 바지'},{t:'outer',n:'가디건'},{t:'shoes',n:'로퍼·단화'}],tip:'방문 예의를 갖춰 깔끔하게 입어요.'},
+  '겨울-할머니 댁 방문':{items:[{t:'top',n:'포근한 니트'},{t:'bottom',n:'기모 바지'},{t:'outer',n:'코트'},{t:'shoes',n:'단화'}],tip:'따뜻하면서도 단정하게 입어요.'},
+  '봄-운동회':{items:[{t:'top',n:'체육복'},{t:'bottom',n:'운동복 바지'},{t:'acc',n:'장갑·모자'},{t:'shoes',n:'운동화'}],tip:'운동회는 활동이 많으니 체육복에 편한 운동화가 필수예요.'},
+  '여름-운동회':{items:[{t:'top',n:'반팔 티셔츠'},{t:'bottom',n:'반바지'},{t:'acc',n:'장갑·모자'},{t:'shoes',n:'운동화'}],tip:'햇빛이 강하니 모자를 꼭 써요.'},
+  '가을-운동회':{items:[{t:'top',n:'체육복'},{t:'bottom',n:'운동복 바지'},{t:'acc',n:'장갑·모자'},{t:'shoes',n:'운동화'}],tip:'시원하게 체육복을 입고 팀 색깔 모자를 써요.'},
+  '겨울-운동회':{items:[{t:'top',n:'두꺼운 긴팔'},{t:'bottom',n:'기모 바지'},{t:'outer',n:'바람막이'},{t:'shoes',n:'운동화'}],tip:'움직이기 편하면서 따뜻한 체육복을 입어요.'},
+  '봄-캠핑':{items:[{t:'top',n:'긴팔 티셔츠'},{t:'bottom',n:'등산 바지'},{t:'outer',n:'바람막이'},{t:'shoes',n:'트레킹화'}],tip:'편하고 튼튼한 옷차림이 좋아요.'},
+  '여름-캠핑':{items:[{t:'top',n:'반팔 티셔츠'},{t:'bottom',n:'반바지'},{t:'acc',n:'장갑·모자'},{t:'shoes',n:'트레킹화'}],tip:'벌레 대비로 긴 옷도 챙기면 좋아요.'},
+  '가을-캠핑':{items:[{t:'top',n:'두꺼운 긴팔'},{t:'bottom',n:'등산 바지'},{t:'outer',n:'바람막이'},{t:'shoes',n:'트레킹화'}],tip:'밤에 많이 추우니 따뜻한 겉옷을 꼭 챙겨요.'},
+  '겨울-캠핑':{items:[{t:'top',n:'두꺼운 긴팔'},{t:'bottom',n:'기모 바지'},{t:'outer',n:'두꺼운 패딩'},{t:'acc',n:'장갑·모자'},{t:'shoes',n:'방한화'}],tip:'겨울 캠핑은 체온 유지가 가장 중요해요.'},
+};
+
+// ✅ 전체 문제 데이터 — 정답/오답 꼼꼼히 검토 완료
+const quizPool=[
+  // 쉬움
+  {s:'여름',p:'학교 등교',lv:'쉬움',
+   q:'더운 여름 학교에 갈 때 어울리는 옷을 골라요.',
+   correct:['반팔 티셔츠','반바지','운동화'],
+   wrong:['두꺼운 패딩','목도리','기모 바지','부츠'],
+   fb:'여름엔 시원하고 가벼운 옷이 좋아요. 두꺼운 옷은 체온을 너무 높여요.'},
+  {s:'겨울',p:'현장 체험 학습',lv:'쉬움',
+   q:'추운 겨울 현장 체험 학습에 맞는 옷을 골라요.',
+   correct:['두꺼운 긴팔','두꺼운 패딩','장갑·모자','방한화'],
+   wrong:['반팔 티셔츠','샌들','민소매','얇은 원피스'],
+   fb:'겨울 야외 활동은 체온 유지가 핵심이에요. 여러 겹 두껍게 입어요.'},
+  {s:'여름',p:'캠핑',lv:'쉬움',
+   q:'여름 캠핑에 맞는 옷차림을 골라요.',
+   correct:['반팔 티셔츠','반바지','장갑·모자','트레킹화'],
+   wrong:['구두','정장','슬리퍼','수영복'],
+   fb:'캠핑은 편하고 활동적인 옷이 필요해요. 모자로 햇빛을 막고 트레킹화로 발을 보호해요.'},
+  // 보통
+  {s:'봄',p:'결혼식 참석',lv:'보통',
+   q:'봄 결혼식에 어울리는 옷을 모두 골라요.',
+   correct:['블라우스·셔츠','정장 바지·원피스','구두'],
+   wrong:['두꺼운 패딩','수영복','슬리퍼','운동화'],
+   fb:'결혼식은 격식 있는 자리예요. 운동화나 슬리퍼는 예의에 맞지 않아요.'},
+  {s:'가을',p:'공연 관람',lv:'보통',
+   q:'가을 공연 관람에 어울리는 옷을 모두 골라요.',
+   correct:['니트·셔츠','슬랙스·치마','로퍼·단화'],
+   wrong:['체육복','수영복','두꺼운 패딩','슬리퍼'],
+   fb:'공연 관람은 격식과 편안함이 함께 필요해요. 체육복은 너무 캐주얼해요.'},
+  {s:'봄',p:'캠핑',lv:'보통',
+   q:'봄 캠핑에 필요한 옷차림을 골라요.',
+   correct:['긴팔 티셔츠','등산 바지','바람막이','트레킹화'],
+   wrong:['정장','구두','수영복','민소매'],
+   fb:'캠핑은 활동적인 자리예요. 정장이나 구두는 불편하고 쉽게 더러워져요.'},
+  {s:'겨울',p:'친구 생일잔치',lv:'보통',
+   q:'겨울 친구 생일잔치에 어울리는 옷을 골라요.',
+   correct:['포근한 니트','기모 바지','두꺼운 패딩','운동화'],
+   wrong:['반팔 티셔츠','샌들','수영복','얇은 원피스'],
+   fb:'겨울 파티도 따뜻하고 편하게 입어요. 반팔이나 샌들은 너무 추워요.'},
+  {s:'가을',p:'운동회',lv:'보통',
+   q:'가을 운동회에 알맞은 옷차림은?',
+   correct:['체육복','운동복 바지','장갑·모자','운동화'],
+   wrong:['정장','구두','두꺼운 패딩','슬리퍼'],
+   fb:'운동회는 활동이 많아요. 편한 체육복과 운동화가 필수예요. 패딩은 움직이기 불편해요.'},
+  // 아리까리
+  {s:'여름',p:'할머니 댁 방문',lv:'아리까리',
+   q:'여름에 할머니 댁을 방문할 때 어울리는 옷은?',
+   correct:['반팔 티셔츠','면 바지','단화'],
+   wrong:['민소매','반바지','수영복','슬리퍼'],
+   fb:'어른 앞에서는 시원하면서도 단정해야 해요. 민소매나 반바지는 예의에 맞지 않아요.'},
+  {s:'봄',p:'현장 체험 학습',lv:'아리까리',
+   q:'봄 현장 체험 학습에 맞는 옷차림은?',
+   correct:['긴팔 티셔츠','면 바지','바람막이','트레킹화'],
+   wrong:['구두','두꺼운 패딩','슬리퍼','반바지'],
+   fb:'봄 야외 활동은 편안함이 핵심이에요. 구두나 슬리퍼는 걷기 불편하고, 반바지는 봄 일교차에 쌀쌀해요.'},
+  {s:'겨울',p:'결혼식 참석',lv:'아리까리',
+   q:'겨울 결혼식에 어울리는 옷을 골라요.',
+   correct:['블라우스·셔츠','정장 바지·원피스','코트','구두'],
+   wrong:['두꺼운 패딩','운동화','목도리','부츠'],
+   fb:'겨울 결혼식에 코트는 OK지만 패딩은 너무 캐주얼해요. 운동화·부츠보다 구두가 격식에 맞아요.'},
+  {s:'여름',p:'공연 관람',lv:'아리까리',
+   q:'여름 공연 관람에 어울리는 옷을 골라요.',
+   correct:['반팔 티셔츠','면 바지','가디건','단화'],
+   wrong:['민소매','반바지','슬리퍼','수영복'],
+   fb:'공연장은 에어컨이 강해요! 민소매·반바지는 춥고 슬리퍼는 예의에 맞지 않아요. 얇은 가디건을 챙겨요.'},
+  {s:'겨울',p:'할머니 댁 방문',lv:'아리까리',
+   q:'겨울에 할머니 댁 방문에 맞는 옷차림은?',
+   correct:['포근한 니트','기모 바지','코트','단화'],
+   wrong:['두꺼운 패딩','운동화','목도리','부츠'],
+   fb:'어른 댁 방문은 따뜻하면서도 단정해야 해요. 코트는 OK지만 패딩은 너무 캐주얼해요. 부츠보다 단화가 더 단정해요.'},
+  {s:'봄',p:'공연 관람',lv:'아리까리',
+   q:'봄 공연 관람에 어울리는 옷을 골라요.',
+   correct:['블라우스·셔츠','슬랙스·치마','가디건','로퍼·단화'],
+   wrong:['두꺼운 패딩','운동화','체육복','슬리퍼'],
+   fb:'공연 관람은 격식이 있는 자리예요. 봄이라도 운동화나 체육복보다 단정한 옷차림이 좋아요.'},
+  {s:'가을',p:'할머니 댁 방문',lv:'아리까리',
+   q:'가을 할머니 댁 방문에 맞는 옷차림은?',
+   correct:['니트·셔츠','면 바지','가디건','로퍼·단화'],
+   wrong:['두꺼운 패딩','체육복','슬리퍼','반바지'],
+   fb:'어른 댁 방문은 단정함이 기본이에요. 가을이라도 체육복이나 반바지는 예의에 맞지 않아요.'},
+];
+
+let spinCount=0,curQ=0,qOk=0,qNg=0,qAnswered=false,selected=new Set();
+
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('on',i===(t==='part'?0:1)));
+  document.getElementById('tab-part').classList.toggle('on',t==='part');
+  document.getElementById('tab-season').classList.toggle('on',t==='season');
+}
+function switchSeason(e,s){
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
+  e.target.classList.add('on');
+  ['spring','summer','autumn','winter'].forEach(k=>document.getElementById('sc-'+k).classList.toggle('on',k===s));
+}
+function setPhase(n){
+  [1,2,3].forEach(i=>document.getElementById('ph'+i).className='ph'+(i<n?' done':i===n?' active':''));
+  document.getElementById('phase-label').textContent=['1단계 · 옷의 종류 알아보기','2단계 · 때와 장소 뽑기','3단계 · 옷차림 퀴즈'][n-1];
+}
+function goPhase(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  setPhase(n);
+  if(n===3)renderQuiz();
+}
+function doSpin(){
+  const sv=document.getElementById('sl-s'),pv=document.getElementById('sl-p');
+  sv.classList.add('spin');pv.classList.add('spin');
+  let t=0;
+  const iv=setInterval(()=>{
+    sv.textContent=seasons[Math.floor(Math.random()*4)];
+    pv.textContent=places[Math.floor(Math.random()*8)];
+    if(++t>14){
+      clearInterval(iv);
+      const s=seasons[Math.floor(Math.random()*4)],p=places[Math.floor(Math.random()*8)];
+      sv.textContent=s;pv.textContent=p;
+      sv.classList.remove('spin');pv.classList.remove('spin');
+      showOutfit(s,p);
+      if(++spinCount>=2)document.getElementById('btn-to-quiz').classList.remove('hide');
+    }
+  },80);
+}
+function showOutfit(s,p){
+  const d=outfits[`${s}-${p}`]||outfits[`${s}-학교 등교`];
+  document.getElementById('otitle').textContent=`📋 ${s} / ${p} — 어울리는 옷차림`;
+  const oi=document.getElementById('oitems');oi.innerHTML='';
+  d.items.forEach(it=>{const sp=document.createElement('span');sp.className=`cpill ${tagCls[it.t]||'cp-top'}`;sp.textContent=it.n;oi.appendChild(sp);});
+  document.getElementById('otip').textContent='💡 '+d.tip;
+  document.getElementById('ocard').classList.add('show');
+}
+function renderQuiz(){
+  if(curQ>=quizPool.length){showResult();return;}
+  qAnswered=false;selected=new Set();
+  const q=quizPool[curQ];
+  document.getElementById('qbs').textContent=q.s;
+  document.getElementById('qbp').textContent=q.p;
+  document.getElementById('qlevel').textContent=q.lv==='아리까리'?'🤔 아리까리':q.lv==='쉬움'?'😊 쉬움':'🙂 보통';
+  document.getElementById('quiz-q').textContent=q.q;
+  document.getElementById('qs-ok').textContent=`맞음 ${qOk}`;
+  document.getElementById('qs-ng').textContent=`틀림 ${qNg}`;
+  document.getElementById('qfb').className='qfb';
+  document.getElementById('btn-qnext').classList.add('hide');
+  const bc=document.getElementById('btn-check');bc.disabled=true;
+  const prog=document.getElementById('qprog');prog.innerHTML='';
+  quizPool.forEach((_,i)=>{const d=document.createElement('div');d.className='qpd'+(i<curQ?' done':i===curQ?' cur':'');prog.appendChild(d);});
+  const all=[...q.correct,...q.wrong].sort(()=>Math.random()-.5);
+  const cg=document.getElementById('cg');cg.innerHTML='';
+  all.forEach(name=>{
+    const btn=document.createElement('div');btn.className='cb';
+    btn.innerHTML=`<span class="ci">${ic[name]||'👕'}</span><div class="cn">${name}</div>`;
+    btn.addEventListener('click',()=>{
+      if(qAnswered)return;
+      if(selected.has(name)){selected.delete(name);btn.classList.remove('sel');}
+      else{selected.add(name);btn.classList.add('sel');}
+      bc.disabled=selected.size===0;
+    });
+    cg.appendChild(btn);
+  });
+}
+function checkAnswer(){
+  if(qAnswered)return;
+  qAnswered=true;
+  const q=quizPool[curQ];
+  const cs=new Set(q.correct);
+  let allRight=true;
+  document.querySelectorAll('.cb').forEach(btn=>{
+    const name=btn.querySelector('.cn').textContent;
+    const isC=cs.has(name),isSel=selected.has(name);
+    if(isC)btn.classList.add('correct');
+    else if(isSel){btn.classList.add('wrong');allRight=false;}
+    if(isC&&!isSel)allRight=false;
+    btn.classList.add('dim');
+  });
+  if(allRight)qOk++;else qNg++;
+  const fb=document.getElementById('qfb');
+  fb.textContent=(allRight?'✓ 정답! ':'✗ 아쉬워요. ')+q.fb;
+  fb.className='qfb '+(allRight?'ok':'ng');
+  document.getElementById('qs-ok').textContent=`맞음 ${qOk}`;
+  document.getElementById('qs-ng').textContent=`틀림 ${qNg}`;
+  document.getElementById('btn-check').disabled=true;
+  const bn=document.getElementById('btn-qnext');
+  bn.classList.remove('hide');
+  bn.textContent=curQ<quizPool.length-1?'다음 문제 →':'결과 보기 →';
+}
+function nextQuiz(){curQ++;renderQuiz();}
+function showResult(){
+  document.getElementById('s3').classList.remove('active');
+  document.getElementById('s4').classList.add('active');
+  const pct=Math.round(qOk/quizPool.length*100);
+  let emoji,msg;
+  if(pct>=90){emoji='🏆';msg='완벽해요! 때와 장소에 맞는 옷차림을 정말 잘 알고 있어요!';}
+  else if(pct>=70){emoji='👍';msg='잘했어요! 아리까리한 문제도 많았는데 훌륭해요!';}
+  else if(pct>=50){emoji='🤔';msg='절반은 맞았어요. 학습 화면으로 돌아가 다시 살펴봐요!';}
+  else{emoji='📚';msg='어려웠죠? 1단계로 돌아가서 계절별 옷차림을 다시 살펴봐요!';}
+  document.getElementById('result-wrap').innerHTML=`
+    <div class="rbig">${emoji}</div>
+    <div class="rscore">${qOk} / ${quizPool.length}</div>
+    <div class="rmsg">${msg}</div>
+    <div class="rgrid">
+      <div class="rmet"><div class="rml">정답률</div><div class="rmv">${pct}%</div></div>
+      <div class="rmet"><div class="rml">틀린 문제</div><div class="rmv">${qNg}개</div></div>
+    </div>
+    <button class="btn-restart" id="rtn">처음부터 다시</button>`;
+  document.getElementById('rtn').addEventListener('click',()=>{
+    spinCount=0;curQ=0;qOk=0;qNg=0;
+    document.getElementById('ocard').classList.remove('show');
+    document.getElementById('sl-s').textContent='?';
+    document.getElementById('sl-p').textContent='?';
+    document.getElementById('btn-to-quiz').classList.add('hide');
+    document.getElementById('s4').classList.remove('active');
+    document.getElementById('s1').classList.add('active');
+    setPhase(1);
+  });
+}
+</script>
