@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자연재해 퀴즈</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Black+Han+Sans&display=swap');
+
+  :root {
+    --sky: #1a3a5c;
+    --sky-light: #2563a8;
+    --cloud: #e8f4fd;
+    --sun: #f59e0b;
+    --storm: #dc2626;
+    --green: #16a34a;
+    --sand: #fef3c7;
+    --text: #1e293b;
+    --white: #ffffff;
+    --card-bg: rgba(255,255,255,0.97);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(160deg, #0f2744 0%, #1a3a5c 40%, #2563a8 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* 배경 구름 장식 */
+  body::before {
+    content: '🌩️';
+    font-size: 120px;
+    position: fixed;
+    top: -20px;
+    right: -10px;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  body::after {
+    content: '🌊';
+    font-size: 180px;
+    position: fixed;
+    bottom: -40px;
+    left: -20px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  /* 헤더 */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: dropIn 0.7s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes dropIn {
+    from { opacity:0; transform: translateY(-30px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .header h1 {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(28px, 6vw, 44px);
+    color: var(--white);
+    letter-spacing: -1px;
+    text-shadow: 0 3px 12px rgba(0,0,0,0.4);
+    line-height: 1.15;
+  }
+  .header h1 span { color: var(--sun); }
+  .header p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  /* 진행 바 */
+  .progress-wrap {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+    animation: dropIn 0.7s 0.1s cubic-bezier(.22,1,.36,1) both;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sun), #f97316);
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.22,1,.36,1);
+    box-shadow: 0 0 8px rgba(245,158,11,0.6);
+  }
+
+  /* 점수 */
+  .score-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 99px;
+    padding: 6px 18px;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(8px);
+    animation: dropIn 0.7s 0.15s cubic-bezier(.22,1,.36,1) both;
+  }
+  .score-badge span { color: var(--sun); font-size: 17px; }
+
+  /* 카드 */
+  .card {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 30px 28px 26px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 2px 0 rgba(255,255,255,0.1) inset;
+    animation: cardIn 0.5s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform: translateY(20px) scale(0.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .q-num {
+    background: var(--sky);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+  .q-category {
+    background: var(--sand);
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+
+  .question {
+    font-size: clamp(17px, 3.5vw, 21px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.55;
+    margin-bottom: 22px;
+  }
+
+  .options {
+    display: grid;
+    gap: 10px;
+  }
+
+  .opt-btn {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt-btn:hover:not(:disabled) {
+    background: #eff6ff;
+    border-color: var(--sky-light);
+    transform: translateX(4px);
+  }
+  .opt-btn .opt-label {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  .opt-btn:hover:not(:disabled) .opt-label {
+    background: var(--sky-light);
+    color: white;
+  }
+
+  /* 정답/오답 상태 */
+  .opt-btn.correct {
+    background: #dcfce7;
+    border-color: var(--green);
+    animation: pulse-green 0.4s ease;
+  }
+  .opt-btn.correct .opt-label { background: var(--green); color: white; }
+  .opt-btn.wrong {
+    background: #fee2e2;
+    border-color: var(--storm);
+  }
+  .opt-btn.wrong .opt-label { background: var(--storm); color: white; }
+  .opt-btn:disabled { cursor: default; }
+
+  @keyframes pulse-green {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  /* 피드백 */
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 500;
+    display: none;
+    animation: fadeUp 0.3s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(6px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #f0fdf4; color: #166534; border: 1.5px solid #bbf7d0; }
+  .feedback.no { background: #fff7ed; color: #9a3412; border: 1.5px solid #fed7aa; }
+  .feedback strong { display: block; font-size: 16px; margin-bottom: 4px; }
+
+  .next-btn {
+    width: 100%;
+    margin-top: 16px;
+    background: linear-gradient(135deg, var(--sky), var(--sky-light));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 16px rgba(37,99,168,0.4);
+  }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,99,168,0.5); }
+  .next-btn.show { display: block; animation: fadeUp 0.3s 0.1s ease both; }
+
+  /* 결과 화면 */
+  .result-screen {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: cardIn 0.5s cubic-bezier(.22,1,.36,1) both;
+    display: none;
+  }
+  .result-emoji { font-size: 72px; margin-bottom: 16px; }
+  .result-grade {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: var(--sky);
+  }
+  .result-score {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .result-score span { color: var(--sky-light); }
+  .result-msg { color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 28px; }
+  .result-breakdown {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .breakdown-item {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 14px 10px;
+  }
+  .breakdown-item .bi-num { font-size: 24px; font-weight: 900; color: var(--sky); }
+  .breakdown-item .bi-label { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .restart-btn {
+    background: linear-gradient(135deg, var(--sky), var(--sky-light));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 40px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 16px rgba(37,99,168,0.4);
+  }
+  .restart-btn:hover { transform: translateY(-2px); }
+
+  /* 시작화면 */
+  .start-screen {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: cardIn 0.5s cubic-bezier(.22,1,.36,1) both;
+  }
+  .start-emoji { font-size: 60px; margin-bottom: 18px; }
+  .start-screen h2 {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 26px;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .start-screen p {
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+  .topic-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .chip {
+    background: var(--sand);
+    color: #92400e;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 99px;
+  }
+  .start-btn {
+    background: linear-gradient(135deg, var(--sky), var(--sky-light));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 18px 50px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 16px rgba(37,99,168,0.4);
+  }
+  .start-btn:hover { transform: translateY(-2px); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌪️ 자연재해<span> 퀴즈</span></h1>
+  <p>우리나라의 계절별 자연재해 알아보기</p>
+</div>
+
+<!-- 시작 화면 -->
+<div class="start-screen" id="startScreen">
+  <div class="start-emoji">🌦️</div>
+  <h2>자연재해 퀴즈에 도전!</h2>
+  <p>우리나라에서 발생하는 다양한 자연재해에 대해 알아봅시다.<br>총 <strong>35문제</strong>가 출제됩니다.</p>
+  <div class="topic-chips">
+    <div class="chip">봄 — 황사·가뭄</div>
+    <div class="chip">여름 — 폭염·호우·홍수</div>
+    <div class="chip">가을 — 태풍</div>
+    <div class="chip">겨울 — 폭설·한파</div>
+    <div class="chip">자연재해 대비</div>
+  </div>
+  <button class="start-btn" onclick="startQuiz()">퀴즈 시작하기 →</button>
+</div>
+
+<!-- 퀴즈 화면 -->
+<div id="quizArea" class="hidden" style="width:100%;max-width:600px;display:flex;flex-direction:column;align-items:center;">
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span id="qCounter">1 / 35</span>
+      <span id="qScore">점수: 0점</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="card" id="quizCard">
+    <div class="q-meta">
+      <div class="q-num" id="qNum">Q1</div>
+      <div class="q-category" id="qCat">봄</div>
+    </div>
+    <div class="question" id="questionText"></div>
+    <div class="options" id="optionsArea"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">다음 문제 →</button>
+  </div>
+</div>
+
+<!-- 결과 화면 -->
+<div class="result-screen" id="resultScreen">
+  <div class="result-emoji" id="resultEmoji"></div>
+  <div class="result-grade" id="resultGrade"></div>
+  <div class="result-score" id="resultScore"></div>
+  <div class="result-msg" id="resultMsg"></div>
+  <div class="result-breakdown">
+    <div class="breakdown-item">
+      <div class="bi-num" id="rCorrect">0</div>
+      <div class="bi-label">✅ 정답</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="bi-num" id="rWrong">0</div>
+      <div class="bi-label">❌ 오답</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="bi-num" id="rRate">0%</div>
+      <div class="bi-label">📊 정답률</div>
+    </div>
+  </div>
+  <button class="restart-btn" onclick="restartQuiz()">🔄 다시 도전하기</button>
+</div>
+
+<script>
+const allQuestions = [
+  // === 봄 ===
+  {
+    cat: '봄 — 황사',
+    q: '황사는 어디서 발생한 모래먼지가 우리나라로 날아오는 것일까요?',
+    opts: ['히말라야 산맥', '중국이나 몽골의 사막', '시베리아 평원', '일본 화산 지대'],
+    ans: 1,
+    exp: '황사는 중국이나 몽골의 사막에서 발생한 모래 먼지가 바람을 타고 우리나라로 날아와 가라앉는 현상입니다.'
+  },
+  {
+    cat: '봄 — 황사',
+    q: '황사가 심할 때 건강을 지키기 위해 가장 적절한 행동은 무엇일까요?',
+    opts: ['창문을 활짝 열어 환기한다', '마스크를 착용하고 외출을 자제한다', '에어컨을 세게 튼다', '물을 적게 마신다'],
+    ans: 1,
+    exp: '황사가 심할 때는 미세한 모래먼지가 호흡기에 영향을 줄 수 있어, 마스크를 착용하고 외출을 자제하는 것이 좋습니다.'
+  },
+  {
+    cat: '봄 — 가뭄',
+    q: '가뭄이란 무엇인가요?',
+    opts: ['바람이 매우 강하게 부는 현상', '오랫동안 비가 오지 않거나 매우 적게 오는 기간이 지속되는 현상', '갑작스럽게 많은 눈이 내리는 현상', '해수면이 높아지는 현상'],
+    ans: 1,
+    exp: '가뭄은 오랫동안 비가 오지 않거나 매우 적게 오는 기간이 지속되는 현상입니다.'
+  },
+  {
+    cat: '봄 — 가뭄',
+    q: '가뭄이 계속되면 어떤 피해가 발생할 수 있을까요?',
+    opts: ['농작물이 잘 자란다', '농작물이 말라 죽고 식수가 부족해진다', '홍수가 발생한다', '도로가 얼어붙는다'],
+    ans: 1,
+    exp: '가뭄이 지속되면 농작물이 물 부족으로 말라 죽고, 저수지나 강의 수위가 낮아져 식수까지 부족해질 수 있습니다.'
+  },
+  {
+    cat: '봄 — 황사',
+    q: '황사가 주로 우리나라에 영향을 미치는 계절은 언제인가요?',
+    opts: ['여름', '가을', '겨울', '봄'],
+    ans: 3,
+    exp: '황사는 주로 봄철에 편서풍을 타고 중국과 몽골의 사막에서 발생한 모래먼지가 우리나라로 날아옵니다.'
+  },
+
+  // === 여름 ===
+  {
+    cat: '여름 — 폭염',
+    q: '폭염이란 무엇인가요?',
+    opts: ['갑작스럽게 많은 비가 내리는 현상', '일상생활을 어렵게 할 정도로 매우 심한 더위', '강한 바람이 부는 현상', '짧은 시간에 눈이 많이 내리는 현상'],
+    ans: 1,
+    exp: '폭염은 일상생활을 어렵게 할 정도로 매우 심한 더위를 말합니다. 기상청은 일 최고기온이 33°C 이상인 날이 이틀 이상 지속될 때 폭염 특보를 발령합니다.'
+  },
+  {
+    cat: '여름 — 폭염',
+    q: '폭염이 심할 때 야외에서 주의해야 할 가장 위험한 증상은 무엇인가요?',
+    opts: ['동상', '열사병(온열 질환)', '동상과 저체온증', '수해'],
+    ans: 1,
+    exp: '폭염이 심할 때 야외에서 열사병 등 온열 질환에 걸릴 수 있습니다. 특히 낮 12시~17시 사이 야외 활동을 자제해야 합니다.'
+  },
+  {
+    cat: '여름 — 호우·홍수',
+    q: '호우와 홍수의 차이를 올바르게 설명한 것은?',
+    opts: ['호우와 홍수는 완전히 같은 현상이다', '호우는 비가 많이 내리는 현상이고, 홍수는 비가 많이 내려 물이 흘러넘치는 현상이다', '홍수는 바다에서 발생하고 호우는 육지에서 발생한다', '호우는 겨울에만 발생한다'],
+    ans: 1,
+    exp: '호우는 짧은 시간에 많은 비가 내리는 현상이고, 홍수는 많은 비로 인해 강이나 하천의 물이 넘쳐흐르는 현상입니다.'
+  },
+  {
+    cat: '여름 — 호우·홍수',
+    q: '홍수 피해를 줄이기 위해 우리나라가 하는 대비책이 아닌 것은?',
+    opts: ['댐 건설', '제방 축조', '배수로 정비', '모래 사막 조성'],
+    ans: 3,
+    exp: '홍수 피해를 줄이기 위해 댐 건설, 제방 축조, 배수로 정비 등의 시설을 마련합니다. 모래 사막 조성은 관련이 없습니다.'
+  },
+  {
+    cat: '여름 — 폭염',
+    q: '폭염 특보에는 폭염 주의보와 폭염 경보가 있습니다. 둘 중 더 위험한 단계는?',
+    opts: ['폭염 주의보', '폭염 경보', '둘 다 같다', '폭염 특보는 한 종류만 있다'],
+    ans: 1,
+    exp: '기상 특보에는 주의보와 경보 두 단계가 있으며, 경보가 더 위험한 단계입니다. 폭염 경보는 주의보보다 기온이 높거나 지속 기간이 길 때 발령됩니다.'
+  },
+
+  // === 가을 ===
+  {
+    cat: '가을 — 태풍',
+    q: '태풍은 주로 어느 방향으로 이동하며 우리나라에 영향을 줄까요?',
+    opts: ['동쪽에서 서쪽으로', '북쪽에서 남쪽으로', '대체로 남서쪽에서 북동쪽으로', '서쪽에서 동쪽으로만'],
+    ans: 2,
+    exp: '태풍은 대체로 우리나라 남서쪽에서 북동쪽으로 진행하며 많은 비와 강한 바람을 몰고 옵니다.'
+  },
+  {
+    cat: '가을 — 태풍',
+    q: '태풍이 가져오는 것 중 긍정적인 측면이 있다면 무엇일까요?',
+    opts: ['가뭄 해소와 수자원 공급', '기온 상승', '해수면 하강', '대기 오염 증가'],
+    ans: 0,
+    exp: '태풍은 큰 피해를 주기도 하지만, 가뭄을 해소하고 수자원을 공급하며, 적도 부근의 열에너지를 고위도로 옮겨 지구 에너지 균형을 맞추는 역할도 합니다.'
+  },
+  {
+    cat: '가을 — 태풍',
+    q: '태풍이 우리나라에 가장 많이 영향을 미치는 계절은?',
+    opts: ['봄', '여름', '여름과 가을', '겨울'],
+    ans: 2,
+    exp: '태풍은 주로 여름과 가을 사이(7~9월)에 우리나라에 영향을 줍니다. 교과서에서는 여름과 가을에 걸쳐 발생한다고 서술하고 있습니다.'
+  },
+  {
+    cat: '가을 — 태풍',
+    q: '태풍이 발생하는 주요 지역은 어디인가요?',
+    opts: ['북극해', '남극 주변', '열대 바다(적도 근처)', '지중해'],
+    ans: 2,
+    exp: '태풍은 열대 바다에서 발생하는 강력한 열대성 저기압입니다. 수온이 높은 적도 근처 바다에서 에너지를 얻어 발달합니다.'
+  },
+  {
+    cat: '가을 — 태풍',
+    q: '태풍 경보가 발령되었을 때 해야 할 행동으로 옳은 것은?',
+    opts: ['해변에서 파도를 구경한다', '창문을 열어 환기시킨다', '실내에 머물며 외출을 자제한다', '산으로 올라간다'],
+    ans: 2,
+    exp: '태풍 경보 발령 시 실내에 머물며 외출을 자제해야 합니다. 강풍과 집중호우로 인한 사고 위험이 크기 때문입니다.'
+  },
+
+  // === 겨울 ===
+  {
+    cat: '겨울 — 폭설',
+    q: '폭설을 다른 말로 무엇이라고 부를까요?',
+    opts: ['한설', '대설', '강설', '백설'],
+    ans: 1,
+    exp: '폭설은 짧은 시간 동안 눈이 많이 내리는 현상으로, 대설이라고도 부릅니다.'
+  },
+  {
+    cat: '겨울 — 폭설',
+    q: '폭설이 내렸을 때의 피해로 알맞지 않은 것은?',
+    opts: ['교통이 마비된다', '시설물이 눈의 무게로 붕괴될 수 있다', '가뭄이 심해진다', '비닐하우스 등 시설이 파손될 수 있다'],
+    ans: 2,
+    exp: '폭설이 내리면 교통 마비, 시설물 붕괴, 농업 시설 파손 등의 피해가 생깁니다. 오히려 눈이 녹으면 수분이 공급되므로 가뭄과는 관련이 없습니다.'
+  },
+  {
+    cat: '겨울 — 한파',
+    q: '한파란 무엇인가요?',
+    opts: ['여름에 갑작스럽게 폭우가 내리는 현상', '기온이 갑자기 내려가면서 발생하는 매서운 추위', '가을에 태풍이 오는 현상', '봄에 황사가 심해지는 현상'],
+    ans: 1,
+    exp: '한파는 기온이 갑자기 내려가면서 발생하는 매서운 추위를 말합니다. 한파 특보는 일 최저기온이 급격히 하강할 때 발령됩니다.'
+  },
+  {
+    cat: '겨울 — 한파',
+    q: '한파가 지속될 때 주의해야 할 건강 문제는?',
+    opts: ['일사병', '동상과 저체온증', '폭염 피해', '황사 흡입'],
+    ans: 1,
+    exp: '한파가 지속되면 체온이 급격히 내려가 동상이나 저체온증 등의 건강 문제가 발생할 수 있습니다.'
+  },
+  {
+    cat: '겨울 — 한파',
+    q: '한파로 인해 발생하는 생활 속 피해로 알맞은 것은?',
+    opts: ['수도관이 얼어 터진다', '홍수가 발생한다', '해수면이 낮아진다', '농작물이 썩는다'],
+    ans: 0,
+    exp: '한파가 심할 때 수도관이 얼어 터지는 동파 피해가 발생합니다. 또한 도로가 결빙되어 교통사고 위험도 높아집니다.'
+  },
+
+  // === 종합 — 계절 분류 ===
+  {
+    cat: '종합 — 계절',
+    q: '다음 중 봄에 주로 발생하는 자연재해를 모두 고르면?',
+    opts: ['황사, 가뭄', '폭설, 한파', '폭염, 홍수', '태풍, 폭설'],
+    ans: 0,
+    exp: '봄에는 중국과 몽골 사막에서 불어오는 황사와 강수량 부족으로 인한 가뭄이 주로 발생합니다.'
+  },
+  {
+    cat: '종합 — 계절',
+    q: '다음 중 여름에 주로 발생하는 자연재해를 모두 고르면?',
+    opts: ['가뭄, 한파', '황사, 폭설', '폭염, 호우, 홍수', '태풍, 동파'],
+    ans: 2,
+    exp: '여름에는 폭염(매우 심한 더위), 호우(많은 비), 홍수(물이 흘러넘침)가 주로 발생합니다.'
+  },
+  {
+    cat: '종합 — 계절',
+    q: '태풍은 주로 어느 계절(들)에 우리나라에 영향을 줄까요?',
+    opts: ['봄', '겨울', '여름과 가을', '봄과 여름'],
+    ans: 2,
+    exp: '태풍은 주로 여름과 가을에 우리나라에 영향을 미칩니다. 7월~9월 사이에 집중적으로 발생합니다.'
+  },
+  {
+    cat: '종합 — 계절',
+    q: '겨울에 주로 발생하는 자연재해 두 가지는?',
+    opts: ['황사, 가뭄', '폭설, 한파', '폭염, 호우', '태풍, 홍수'],
+    ans: 1,
+    exp: '겨울에는 폭설(대설)과 한파가 주로 발생합니다. 폭설은 짧은 시간에 많은 눈이 내리는 것이고, 한파는 기온이 갑자기 내려가는 것입니다.'
+  },
+
+  // === 자연재해 대비 ===
+  {
+    cat: '자연재해 대비',
+    q: '자연재해 발생이 예상될 때 나라에서 발표하는 정보를 무엇이라고 하나요?',
+    opts: ['날씨 예보', '기상 특보', '환경 보고', '재난 통보'],
+    ans: 1,
+    exp: '자연재해가 예상될 때 기상청은 기상 특보를 발표하여 국민이 미리 대비할 수 있도록 합니다.'
+  },
+  {
+    cat: '자연재해 대비',
+    q: '기상 특보에는 두 단계가 있습니다. 덜 위험한 단계에서 더 위험한 단계 순서로 바르게 나열한 것은?',
+    opts: ['경보 → 주의보', '주의보 → 경보', '예비 → 경계', '알림 → 경고'],
+    ans: 1,
+    exp: '기상 특보는 주의보 → 경보 순서로 위험도가 높아집니다. 경보가 발령되면 더 강한 주의와 대피가 필요합니다.'
+  },
+  {
+    cat: '자연재해 대비',
+    q: '자연재해 발생 시 긴급하게 국민에게 위험을 알리는 방법은?',
+    opts: ['긴급 재난 문자', '신문 광고', '학교 통신문', '우편 발송'],
+    ans: 0,
+    exp: '자연재해 발생 시 정부는 긴급 재난 문자를 국민의 스마트폰으로 발송하여 빠르게 위험을 알립니다.'
+  },
+  {
+    cat: '자연재해 대비',
+    q: '자연재해 피해를 줄이기 위해 나라에서 하는 노력이 아닌 것은?',
+    opts: ['각종 시설 마련', '정기적으로 재난 대비 훈련 실시', '기상 특보 발표', '태풍의 발생 자체를 막는다'],
+    ans: 3,
+    exp: '현재 기술로는 태풍 등 자연재해의 발생 자체를 막을 수는 없습니다. 대신 시설 마련, 훈련, 기상 특보 등을 통해 피해를 줄이려 노력합니다.'
+  },
+  {
+    cat: '자연재해 대비',
+    q: '2023년 8월 뉴스 기사에서 제6호 태풍 카눈으로 발령된 특보는?',
+    opts: ['태풍 주의보와 태풍 경보', '폭염 주의보', '한파 경보', '황사 주의보'],
+    ans: 0,
+    exp: '기사에 따르면 태풍 카눈 상륙이 예상되면서 전국 곳곳에 태풍 주의보와 태풍 경보가 발령되었습니다.'
+  },
+  {
+    cat: '자연재해 대비',
+    q: '자연재해 발생 시 방송과 인터넷을 통해 어디에 주목하며 행동해야 하나요?',
+    opts: ['SNS 소문', '기상 특보', '친구의 연락', '광고'],
+    ans: 1,
+    exp: '자연재해가 발생하면 방송, 인터넷 등을 통해 기상 특보에 주목하면서 국민 행동 요령에 따라 행동해야 합니다.'
+  },
+
+  // === 심화 / 상식 ===
+  {
+    cat: '심화 — 기후와 재해',
+    q: '인간 활동이 자연재해 피해를 더 크게 만들 수 있는 예로 알맞은 것은?',
+    opts: ['나무 심기', '숲을 농지로 바꾸면 홍수 피해가 커질 수 있다', '댐 건설', '배수로 정비'],
+    ans: 1,
+    exp: '숲은 빗물을 흡수하고 유속을 늦추는 역할을 합니다. 숲을 없애고 농지로 바꾸면 빗물이 한꺼번에 흘러 홍수 피해가 커질 수 있습니다.'
+  },
+  {
+    cat: '심화 — 기후와 재해',
+    q: '우리나라에서 자연재해가 계절마다 다르게 발생하는 주된 이유는?',
+    opts: ['땅의 모양이 계절마다 바뀌기 때문', '계절에 따라 바람, 기온, 강수량의 차이가 크기 때문', '태양이 지구를 중심으로 돌기 때문', '바다의 깊이가 달라지기 때문'],
+    ans: 1,
+    exp: '우리나라는 계절에 따라 바람, 기온, 강수량의 차이가 커서 계절마다 다른 자연재해가 발생합니다.'
+  },
+  {
+    cat: '심화 — 기후와 재해',
+    q: '다음 중 자연재해가 아닌 것은?',
+    opts: ['태풍', '황사', '홍수', '교통사고'],
+    ans: 3,
+    exp: '자연재해는 자연 현상으로 인해 발생하는 피해입니다. 교통사고는 인재(人災)로, 자연재해가 아닙니다.'
+  },
+  {
+    cat: '심화 — 기후와 재해',
+    q: '기후 변화로 인해 자연재해의 양상이 어떻게 바뀌고 있나요?',
+    opts: ['자연재해가 모두 사라지고 있다', '폭염, 집중호우 등 극단적인 기상 현상이 더 자주, 강하게 발생하고 있다', '태풍은 줄어들고 황사만 늘어나고 있다', '겨울 한파가 완전히 사라졌다'],
+    ans: 1,
+    exp: '지구 온난화 등 기후 변화로 인해 폭염, 집중호우, 태풍 등 극단적인 기상 현상이 더 자주, 더 강하게 발생하는 추세입니다.'
+  },
+  {
+    cat: '심화 — 기후와 재해',
+    q: '자연재해로 인한 피해를 "자연재해"라고 부르는 조건은?',
+    opts: ['어떤 자연 현상이든 피해가 생기면 자연재해다', '홍수, 태풍, 한파 등 피할 수 없는 자연 현상으로 사람들의 생명이나 재산에 피해가 생기는 것', '인간이 만든 시설이 망가질 때만 자연재해다', '정부가 공식 발표할 때만 자연재해다'],
+    ans: 1,
+    exp: '홍수, 태풍, 한파 등 피할 수 없는 자연 현상으로 사람들의 생명이나 재산에 피해가 생기는 것을 자연재해라고 합니다.'
+  },
+];
+
+// 35문제 선택 (전체 35개이므로 셔플만)
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+  questions = shuffle(allQuestions);
+  current = 0; score = 0; answered = false;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById('qNum').textContent = `Q${current + 1}`;
+  document.getElementById('qCat').textContent = q.cat;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('qCounter').textContent = `${current + 1} / ${questions.length}`;
+  document.getElementById('qScore').textContent = `점수: ${score * 10}점`;
+  document.getElementById('progressFill').style.width = `${(current / questions.length) * 100}%`;
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn';
+
+  const area = document.getElementById('optionsArea');
+  area.innerHTML = '';
+  const labels = ['①', '②', '③', '④'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    area.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback');
+  const nb = document.getElementById('nextBtn');
+
+  if (idx === q.ans) {
+    score++;
+    btns[idx].classList.add('correct');
+    fb.className = 'feedback ok show';
+    fb.innerHTML = `<strong>🎉 정답!</strong>${q.exp}`;
+  } else {
+    btns[idx].classList.add('wrong');
+    btns[q.ans].classList.add('correct');
+    fb.className = 'feedback no show';
+    fb.innerHTML = `<strong>❌ 오답!</strong>정답은 <b>①②③④</b>[${q.ans + 1}번] "${q.opts[q.ans]}"입니다.<br>${q.exp}`;
+  }
+
+  const isLast = current === questions.length - 1;
+  nb.className = 'next-btn show';
+  nb.textContent = isLast ? '결과 보기 🏆' : '다음 문제 →';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    // 카드 재애니메이션
+    const card = document.getElementById('quizCard');
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = '';
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quizArea').classList.add('hidden');
+  const rs = document.getElementById('resultScreen');
+  rs.style.display = 'block';
+  rs.style.animation = 'none';
+  rs.offsetHeight;
+  rs.style.animation = '';
+
+  const total = questions.length;
+  const rate = Math.round((score / total) * 100);
+
+  document.getElementById('rCorrect').textContent = score;
+  document.getElementById('rWrong').textContent = total - score;
+  document.getElementById('rRate').textContent = rate + '%';
+  document.getElementById('resultScore').innerHTML = `<span>${score * 10}</span> / ${total * 10}점`;
+
+  let emoji, grade, msg;
+  if (rate >= 90) {
+    emoji = '🏆'; grade = '자연재해 박사!';
+    msg = '완벽에 가까운 점수예요!\n자연재해에 대해 정말 잘 알고 있군요.';
+  } else if (rate >= 75) {
+    emoji = '🌟'; grade = '자연재해 전문가';
+    msg = '훌륭한 점수예요!\n조금만 더 공부하면 만점도 가능해요.';
+  } else if (rate >= 60) {
+    emoji = '👍'; grade = '자연재해 탐구자';
+    msg = '좋은 점수예요!\n틀린 문제를 다시 확인해 보세요.';
+  } else if (rate >= 40) {
+    emoji = '📚'; grade = '자연재해 입문자';
+    msg = '조금 더 공부가 필요해요.\n다시 도전해 보세요!';
+  } else {
+    emoji = '🌱'; grade = '자연재해 새싹';
+    msg = '교과서를 다시 읽고\n다시 도전해 봐요!';
+  }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultGrade').textContent = grade;
+  document.getElementById('resultMsg').textContent = msg;
+}
+
+function restartQuiz() {
+  document.getElementById('resultScreen').style.display = 'none';
+  startQuiz();
+}
+</script>
+</body>
+</html>
