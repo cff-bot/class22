@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리나라 기후 퀴즈</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+  :root {
+    --sky: #4A90D9;
+    --ocean: #1B5E8E;
+    --grass: #5BAD6F;
+    --sand: #F5C842;
+    --easy: #6DBF67;
+    --medium: #F0A500;
+    --hard: #E05C5C;
+    --white: #FDFAF2;
+    --dark: #1A2B3C;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(160deg, #87CEEB 0%, #B8E4F9 30%, #E8F5C8 70%, #A8D8A8 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 180px;
+    background: linear-gradient(to top, #2E7D32 0%, #4CAF50 40%, transparent 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* 설정 화면 */
+  .setup-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  .setup-box {
+    background: rgba(255,255,255,0.93);
+    border-radius: 28px;
+    padding: 40px 32px;
+    text-align: center;
+    max-width: 440px;
+    width: 92%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .setup-title {
+    font-family: 'Gaegu', cursive;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+
+  .setup-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .setup-emoji-row {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    letter-spacing: 4px;
+  }
+
+  .count-label {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .count-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .count-btn {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    border: 2.5px solid #ddd;
+    background: #f9f9f9;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .count-btn:hover { border-color: var(--sky); color: var(--sky); transform: scale(1.05); }
+  .count-btn.selected {
+    background: var(--sky);
+    border-color: var(--sky);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(74,144,217,0.4);
+  }
+
+  .start-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    border: none;
+    background: #ddd;
+    color: #aaa;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: not-allowed;
+    transition: all 0.3s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .start-btn.ready {
+    background: linear-gradient(135deg, #4A90D9, #2E7D32);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(74,144,217,0.4);
+  }
+
+  .start-btn.ready:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(74,144,217,0.5); }
+
+  /* 게임 화면 */
+  #gameContainer { display: none; }
+
+  .game-header {
+    text-align: center;
+    padding: 20px 0 8px;
+  }
+
+  .game-title {
+    font-family: 'Gaegu', cursive;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--dark);
+    text-shadow: 0 2px 8px rgba(255,255,255,0.8);
+  }
+
+  .game-subtitle { font-size: 0.82rem; color: #444; margin-top: 3px; }
+
+  /* 점수판 */
+  .scoreboard {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 14px 0;
+  }
+
+  .player-card {
+    background: rgba(255,255,255,0.85);
+    border-radius: 16px;
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 110px;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .player-card.active {
+    border-color: var(--sand);
+    background: rgba(255,255,255,0.98);
+    box-shadow: 0 4px 16px rgba(245,200,66,0.4);
+    transform: translateY(-3px);
+  }
+
+  .active-badge {
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--sand);
+    color: #333;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .player-emoji { font-size: 1.6rem; margin-bottom: 2px; }
+  .player-name {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #333;
+    outline: none;
+    cursor: text;
+    min-width: 50px;
+  }
+  .player-score { font-size: 1.3rem; font-weight: 900; color: var(--sky); }
+  .player-score span { font-size: 0.7rem; color: #888; font-weight: 400; }
+
+  /* 필터 */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 10px 0;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #ccc;
+    background: rgba(255,255,255,0.7);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #555;
+  }
+
+  .filter-btn.on {
+    background: var(--sky);
+    border-color: var(--sky);
+    color: white;
+  }
+
+  /* 난이도 범례 */
+  .legend {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin: 8px 0 4px;
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #555; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* 진행 바 */
+  .progress-text { text-align: center; font-size: 0.78rem; color: #444; margin: 6px 0 3px; font-weight: 700; }
+  .progress-bar-wrap { height: 6px; background: rgba(255,255,255,0.5); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--sky), var(--grass)); border-radius: 10px; transition: width 0.5s ease; }
+
+  /* 카드 그리드 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+    padding-bottom: 80px;
+  }
+
+  .card-wrap {
+    height: 120px;
+    perspective: 800px;
+    cursor: pointer;
+  }
+
+  .card-wrap.solved { opacity: 0.4; pointer-events: none; }
+
+  .card-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 14px;
+  }
+
+  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%; height: 100%;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  }
+
+  .card-front {
+    background: #2A6496;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 8px);
+  }
+
+  .card-front-icon { font-size: 2rem; }
+  .card-front-num { font-size: 0.72rem; color: rgba(255,255,255,0.6); font-weight: 700; margin-top: 4px; }
+
+  .card-back {
+    background: white;
+    transform: rotateY(180deg);
+    justify-content: flex-start;
+    padding: 10px;
+  }
+
+  .difficulty-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    position: absolute;
+    top: 8px; right: 8px;
+  }
+
+  .card-wrap.diff-쉬움 .difficulty-dot { background: var(--easy); }
+  .card-wrap.diff-보통 .difficulty-dot { background: var(--medium); }
+  .card-wrap.diff-어려움 .difficulty-dot { background: var(--hard); }
+
+  .card-category {
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+
+  .cat-기온 { background: #FFE0B2; color: #E65100; }
+  .cat-강수 { background: #BBDEFB; color: #1565C0; }
+  .cat-옷차림 { background: #F8BBD0; color: #880E4F; }
+  .cat-식생활 { background: #C8E6C9; color: #1B5E20; }
+
+  .card-question {
+    font-size: 0.68rem;
+    color: #333;
+    line-height: 1.35;
+    text-align: center;
+    word-break: keep-all;
+  }
+
+  /* 모달 */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    padding: 16px;
+  }
+
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: white;
+    border-radius: 24px;
+    padding: 24px 22px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .modal-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .modal-player-info {
+    font-size: 0.82rem;
+    color: #555;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .modal-question {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.5;
+    margin-bottom: 18px;
+    word-break: keep-all;
+  }
+
+  .options-grid { display: flex; flex-direction: column; gap: 9px; }
+
+  .option-btn {
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #e5e5e5;
+    background: #fafafa;
+    font-size: 0.88rem;
+    color: #333;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+    word-break: keep-all;
+  }
+
+  .option-btn:hover:not(:disabled) { background: #f0f6ff; border-color: var(--sky); }
+  .option-btn.correct { background: #e8f5e9; border-color: var(--easy); color: #2E7D32; font-weight: 700; }
+  .option-btn.wrong { background: #ffebee; border-color: var(--hard); color: #c62828; }
+
+  .short-answer-area { margin-bottom: 10px; }
+
+  .short-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #e0e0e0;
+    font-size: 0.92rem;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .short-input:focus { border-color: var(--sky); }
+
+  .submit-btn {
+    width: 100%;
+    padding: 11px;
+    border-radius: 12px;
+    border: none;
+    background: var(--sky);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    margin-top: 4px;
+  }
+
+  .submit-btn:hover { background: #357ABD; }
+
+  .result-box {
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .result-box.correct { background: #e8f5e9; border: 2px solid var(--easy); }
+  .result-box.wrong { background: #ffebee; border: 2px solid var(--hard); }
+  .result-emoji { font-size: 2.4rem; margin-bottom: 6px; }
+  .result-text { font-size: 1.2rem; font-weight: 900; color: var(--dark); margin-bottom: 6px; }
+  .result-answer { font-size: 0.82rem; color: #555; margin-bottom: 4px; word-break: keep-all; }
+  .result-score { font-size: 1.1rem; font-weight: 900; color: var(--grass); margin-top: 8px; }
+
+  .next-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #4A90D9, #2E7D32);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .next-btn:hover { opacity: 0.9; }
+
+  /* 최종 화면 */
+  .winner-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+    padding: 16px;
+  }
+
+  .winner-overlay.show { opacity: 1; pointer-events: all; }
+
+  .winner-box {
+    background: white;
+    border-radius: 28px;
+    padding: 36px 28px;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .winner-trophy { font-size: 3.5rem; margin-bottom: 8px; }
+  .winner-title { font-family: 'Gaegu', cursive; font-size: 1.8rem; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+  .winner-name { font-size: 1.4rem; font-weight: 900; color: var(--sky); margin-bottom: 4px; }
+  .winner-score { font-size: 1rem; color: #555; margin-bottom: 16px; }
+
+  .restart-btn {
+    padding: 13px 32px;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg, #4A90D9, #2E7D32);
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    margin-top: 8px;
+  }
+
+  .restart-btn:hover { opacity: 0.9; }
+
+  @keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 설정 화면 -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-box">
+    <div class="setup-emoji-row">🌦️🌡️🌧️🧥🍚</div>
+    <div class="setup-title">우리나라 기후 퀴즈</div>
+    <div class="setup-subtitle">기온 · 강수 · 옷차림 · 식생활<br>카드를 뒤집어 퀴즈를 풀어 보세요!</div>
+    <div class="count-label">몇 명이서 할까요?</div>
+    <div class="count-btns">
+      <button class="count-btn" onclick="selectCount(3)">3</button>
+      <button class="count-btn" onclick="selectCount(4)">4</button>
+      <button class="count-btn" onclick="selectCount(5)">5</button>
+    </div>
+    <button class="start-btn" id="startBtn" onclick="startGame()">게임 시작 →</button>
+  </div>
+</div>
+
+<!-- 게임 화면 -->
+<div id="gameContainer">
+  <div class="container">
+    <div class="game-header">
+      <div class="game-title">🌦️ 우리나라 기후 퀴즈</div>
+      <p class="game-subtitle">카드를 뒤집어 퀴즈를 풀어 보세요!</p>
+    </div>
+
+    <div class="scoreboard" id="scoreboard"></div>
+
+    <div class="filter-bar">
+      <button class="filter-btn on" data-filter="all">전체</button>
+      <button class="filter-btn" data-filter="기온">🌡️ 기온</button>
+      <button class="filter-btn" data-filter="강수">🌧️ 강수</button>
+      <button class="filter-btn" data-filter="옷차림">🧥 옷차림</button>
+      <button class="filter-btn" data-filter="식생활">🍚 식생활</button>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#6DBF67"></div>쉬움(10점)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#F0A500"></div>보통(20점)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#E05C5C"></div>어려움(30점)</div>
+    </div>
+
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+</div>
+
+<!-- 퀴즈 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- 게임 종료 -->
+<div class="winner-overlay" id="winnerOverlay">
+  <div class="winner-box">
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-title">기후 탐구왕!</div>
+    <div class="winner-name" id="winnerName"></div>
+    <div class="winner-score" id="winnerScore"></div>
+    <div style="margin-bottom:12px; font-size:0.85rem; color:#666; line-height:1.8" id="allScores"></div>
+    <button class="restart-btn" onclick="restartGame()">🔄 다시 하기</button>
+  </div>
+</div>
+
+<script>
+const QUIZ_DATA = [
+  // ── 기온 ──
+  { id:1, cat:'기온', diff:'쉬움', icon:'🌡️',
+    q:'우리나라 여름 평균 기온이 가장 높은 도시는?', type:'obj',
+    opts:['서울','강릉','대구','서귀포'],
+    ans:2, exp:'대구는 분지 지형이라 바람이 잘 통하지 않아 여름 평균 기온이 약 26°C로 우리나라에서 가장 더워요.' },
+
+  { id:2, cat:'기온', diff:'쉬움', icon:'❄️',
+    q:'우리나라에서 겨울 평균 기온이 가장 낮은 곳은?', type:'obj',
+    opts:['서울','평양','중강진','강릉'],
+    ans:2, exp:'중강진은 북쪽 내륙 깊숙이 있어 겨울 평균 기온이 약 -12.8°C로 매우 추워요.' },
+
+  { id:3, cat:'기온', diff:'쉬움', icon:'🌿',
+    q:'같은 겨울인데 강릉이 서울보다 따뜻한 이유는?', type:'obj',
+    opts:['강릉이 바다 근처여서','태백산맥이 북서풍을 막아줘서','강릉이 남쪽이어서','강릉에 온천이 많아서'],
+    ans:1, exp:'태백산맥이 차가운 북서풍을 막아주고 동해 난류가 기온을 높여줘서 강릉의 겨울은 서울보다 따뜻해요.' },
+
+  { id:4, cat:'기온', diff:'보통', icon:'📊',
+    q:'우리나라 기온의 남북 차이가 여름보다 겨울에 더 큰 이유는?', type:'obj',
+    opts:['여름엔 비가 많아서','겨울에 북서 계절풍이 북쪽부터 강하게 불어서','남쪽에 화산이 있어서','겨울에 태양이 남쪽에 있어서'],
+    ans:1, exp:'겨울에 북서 계절풍이 북쪽에서 남쪽으로 불면서 북쪽이 훨씬 차가워져 남북 기온 차가 커져요.' },
+
+  { id:5, cat:'기온', diff:'보통', icon:'🌊',
+    q:'서귀포의 겨울 평균 기온은 약 몇 °C인가요?', type:'obj',
+    opts:['약 -2°C','약 2°C','약 5°C','약 8°C'],
+    ans:3, exp:'서귀포는 우리나라 가장 남쪽 제주도에 있어 겨울 평균 기온이 약 8.3°C로 따뜻해요.' },
+
+  { id:6, cat:'기온', diff:'어려움', icon:'🔬',
+    q:'계절풍의 방향이 여름과 겨울에 반대로 바뀌는 과학적 이유를 쓰세요.', type:'short',
+    ans:'육지와 바다의 비열 차이 때문', keywords:['비열','육지','바다','빨리'],
+    exp:'육지는 바다보다 빨리 더워지고 빨리 식어요. 이 비열 차이 때문에 여름엔 바다(고기압)→육지(저기압), 겨울엔 육지(고기압)→바다(저기압) 방향으로 바람이 불어요.' },
+
+  // ── 강수 ──
+  { id:7, cat:'강수', diff:'쉬움', icon:'🌧️',
+    q:'우리나라에서 강수량이 가장 많은 계절은?', type:'obj',
+    opts:['봄','여름','가을','겨울'],
+    ans:1, exp:'우리나라는 연 강수량의 절반 이상이 여름에 집중돼요. 남쪽 바다에서 오는 습한 바람과 장마 때문이에요.' },
+
+  { id:8, cat:'강수', diff:'쉬움', icon:'❄️',
+    q:'우리나라에서 강수량이 가장 적은 계절은?', type:'obj',
+    opts:['봄','여름','가을','겨울'],
+    ans:3, exp:'겨울에는 북서 대륙에서 건조한 바람이 불어와 강수량이 가장 적어요.' },
+
+  { id:9, cat:'강수', diff:'쉬움', icon:'🗺️',
+    q:'우리나라의 강수량 분포를 색으로 나타낼 때, 파란색이 진할수록 의미하는 것은?', type:'obj',
+    opts:['기온이 높다','강수량이 많다','인구가 많다','산이 높다'],
+    ans:1, exp:'강수량 분포도에서 파란색이 진할수록 강수량이 많다는 뜻이에요.' },
+
+  { id:10, cat:'강수', diff:'보통', icon:'📍',
+    q:'대체로 우리나라 강수량의 남북 분포 특징은?', type:'obj',
+    opts:['북쪽으로 갈수록 강수량이 많다','남쪽으로 갈수록 강수량이 많다','남북 차이가 거의 없다','동서 차이가 더 크다'],
+    ans:1, exp:'대체로 북쪽에서 남쪽으로 갈수록 강수량이 많아지는 경향이 있어요.' },
+
+  { id:11, cat:'강수', diff:'보통', icon:'🏔️',
+    q:'같은 산인데 강원도 대관령 서쪽보다 동쪽에 눈이 더 많이 오는 이유는?', type:'obj',
+    opts:['서쪽이 더 높아서','동쪽 바다에서 수증기를 머금은 바람이 산에 부딪혀서','동쪽이 더 따뜻해서','서쪽에 사람이 많아서'],
+    ans:1, exp:'동해에서 불어온 습한 바람이 태백산맥에 부딪혀 상승하면서 동쪽에 많은 눈을 내려요. 이를 바람받이(풍상) 효과라고 해요.' },
+
+  { id:12, cat:'강수', diff:'어려움', icon:'💧',
+    q:'중강진의 연 강수량은 약 637mm인데, 서울은 약 1418mm예요. 이렇게 차이가 나는 이유를 쓰세요.', type:'short',
+    ans:'중강진은 북쪽 내륙이라 여름 계절풍의 영향이 약하기 때문', keywords:['내륙','북쪽','계절풍','습'],
+    exp:'중강진은 북쪽 내륙 깊숙이 있어 여름에 습한 바람이 오기 전에 약해지고, 서울은 남쪽 습한 바람의 영향을 더 많이 받아요.' },
+
+  // ── 옷차림 ──
+  { id:13, cat:'옷차림', diff:'쉬움', icon:'🧥',
+    q:'우리나라에서 두꺼운 방한복이 가장 필요한 계절은?', type:'obj',
+    opts:['봄','여름','가을','겨울'],
+    ans:3, exp:'겨울에는 북서 대륙에서 차갑고 건조한 바람이 불어와 두꺼운 옷이 필요해요.' },
+
+  { id:14, cat:'옷차림', diff:'쉬움', icon:'👙',
+    q:'여름에 얇고 시원한 옷을 입는 이유와 관련된 계절풍은?', type:'obj',
+    opts:['북서 계절풍','남동 계절풍','북동 계절풍','남서 계절풍'],
+    ans:1, exp:'여름에는 남쪽 바다에서 따뜻하고 습한 남동 계절풍이 불어와 덥고 습해요.' },
+
+  { id:15, cat:'옷차림', diff:'보통', icon:'🌸',
+    q:'봄·가을에 옷차림이 비슷한 이유는?', type:'obj',
+    opts:['기온이 비슷하게 온화하기 때문','비가 똑같이 오기 때문','바람 방향이 같기 때문','눈이 내리기 때문'],
+    ans:0, exp:'봄과 가을은 기온이 15~20°C 내외로 온화해서 비슷한 겉옷이나 가벼운 외투를 입어요.' },
+
+  { id:16, cat:'옷차림', diff:'보통', icon:'🏖️',
+    q:'같은 여름인데 강릉과 서울의 옷차림이 약간 다른 이유는?', type:'obj',
+    opts:['강릉이 더 덥기 때문','강릉은 동해 바다 영향으로 서울보다 덜 습하고 서늘한 날이 있기 때문','강릉에 쇼핑몰이 없어서','서울이 더 추워서'],
+    ans:1, exp:'강릉은 동해 바다 가까이 있어 해풍이 불면 서울보다 서늘하게 느껴지는 날도 있어요.' },
+
+  { id:17, cat:'옷차림', diff:'어려움', icon:'🌨️',
+    q:'겨울에 서울보다 제주도에서 더 가벼운 옷을 입어도 되는 이유를 기후 용어로 설명하세요.', type:'short',
+    ans:'제주도는 남쪽 섬이라 위도가 낮고 겨울에도 따뜻한 기후이기 때문', keywords:['위도','남쪽','따뜻','온난'],
+    exp:'제주도는 위도가 낮고 바다로 둘러싸여 있어 겨울에도 기온이 0°C 아래로 잘 내려가지 않아요.' },
+
+  { id:18, cat:'옷차림', diff:'어려움', icon:'🌬️',
+    q:'겨울철 체감 온도가 기온보다 더 춥게 느껴지는 이유와 관련된 계절풍은?', type:'short',
+    ans:'북서 계절풍이 강하게 불어 체감 온도를 낮추기 때문', keywords:['북서','바람','계절풍','체감'],
+    exp:'겨울에 북서 계절풍이 강하게 불면 기온보다 훨씬 춥게 느껴지는 체감 온도 효과가 나타나요.' },
+
+  // ── 식생활 ──
+  { id:19, cat:'식생활', diff:'쉬움', icon:'🥒',
+    q:'겨울에 따뜻한 제주도에서 겨울에도 수확할 수 있는 채소는?', type:'obj',
+    opts:['배추','무','옥수수','고추'],
+    ans:1, exp:'제주도는 겨울에도 기온이 따뜻해서 무를 겨울에도 수확할 수 있어요.' },
+
+  { id:20, cat:'식생활', diff:'쉬움', icon:'🍊',
+    q:'제주도에서 주로 재배되는 과일은?', type:'obj',
+    opts:['사과','배','감귤','포도'],
+    ans:2, exp:'제주도는 따뜻한 기후 덕분에 감귤(귤) 재배에 유리해요.' },
+
+  { id:21, cat:'식생활', diff:'쉬움', icon:'🍎',
+    q:'우리나라에서 사과를 많이 재배하는 지역으로 가장 알맞은 곳은?', type:'obj',
+    opts:['제주도','강원도·경북 내륙','서해안 갯벌 지역','부산 해안가'],
+    ans:1, exp:'사과는 일교차가 크고 서늘한 기후를 좋아해 강원도나 경북 내륙(대구·청송 등) 지역에서 잘 자라요.' },
+
+  { id:22, cat:'식생활', diff:'보통', icon:'🌾',
+    q:'우리나라에서 가을에 곡식을 수확할 수 있는 기후적 이유는?', type:'obj',
+    opts:['가을에 비가 많이 와서','여름에 덥고 강수량이 많아 벼가 잘 자라기 때문','겨울이 따뜻해서','봄에 눈이 오기 때문'],
+    ans:1, exp:'여름에 기온이 높고 강수량이 풍부해 벼가 잘 자라고, 가을에 맑고 건조한 날씨가 이어져 곡식이 잘 익어요.' },
+
+  { id:23, cat:'식생활', diff:'보통', icon:'🫙',
+    q:'우리나라에서 김치 같은 발효·저장 음식이 발달한 기후적 이유는?', type:'obj',
+    opts:['여름이 길어서','겨울에 채소 재배가 어렵고 추워서','사막 기후여서','비가 1년 내내 고르게 와서'],
+    ans:1, exp:'겨울에 기온이 낮아 채소 재배가 어려워서 김치·된장·간장처럼 오래 보관할 수 있는 발효 저장 음식이 발달했어요.' },
+
+  { id:24, cat:'식생활', diff:'어려움', icon:'🗺️',
+    q:'같은 우리나라인데 북쪽(평안도)과 남쪽(전라도)의 음식 맛이 다른 기후적 이유를 쓰세요.', type:'short',
+    ans:'북쪽은 추워서 음식을 싱겁고 담백하게, 남쪽은 더워서 음식이 상하지 않도록 짜고 매콤하게 발달', keywords:['북쪽','남쪽','덥','춥','소금','맵'],
+    exp:'북쪽은 기온이 낮아 음식이 잘 상하지 않아 간을 약하게, 남쪽은 기온이 높아 음식이 빨리 상하므로 소금·고추를 많이 넣어 짜고 맵게 발달했어요.' },
+];
+
+const ALL_PLAYERS = [
+  { name: '탐험가 1', emoji: '🧑', score: 0 },
+  { name: '탐험가 2', emoji: '👧', score: 0 },
+  { name: '탐험가 3', emoji: '🧒', score: 0 },
+  { name: '탐험가 4', emoji: '👦', score: 0 },
+  { name: '탐험가 5', emoji: '🌟', score: 0 },
+];
+
+let selectedCount = 0;
+let players = [];
+let currentPlayer = 0;
+let currentFilter = 'all';
+let solvedCards = new Set();
+let flippedCard = null;
+let currentQuiz = null;
+
+function selectCount(n) {
+  selectedCount = n;
+  document.querySelectorAll('.count-btn').forEach(btn => btn.classList.remove('selected'));
+  document.querySelectorAll('.count-btn')[n - 3].classList.add('selected');
+  document.getElementById('startBtn').classList.add('ready');
+}
+
+function startGame() {
+  if (!selectedCount) return;
+  players = ALL_PLAYERS.slice(0, selectedCount).map(p => ({...p, score: 0}));
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('gameContainer').style.display = 'block';
+  renderScoreboard();
+  renderCards();
+}
+
+function renderScoreboard() {
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = players.map((p, i) => `
+    <div class="player-card ${i === currentPlayer ? 'active' : ''}" onclick="setPlayer(${i})">
+      ${i === currentPlayer ? '<div class="active-badge">⭐ 내 차례</div>' : ''}
+      <div class="player-emoji">${p.emoji}</div>
+      <div class="player-name" contenteditable="true" onblur="renamePlayer(${i}, this.innerText)">${p.name}</div>
+      <div class="player-score">${p.score}<span>점</span></div>
+    </div>
+  `).join('');
+}
+
+function setPlayer(i) {
+  currentPlayer = i;
+  renderScoreboard();
+}
+
+function renamePlayer(i, name) {
+  players[i].name = name.trim() || `탐험가 ${i+1}`;
+}
+
+function getFilteredCards() {
+  if (currentFilter === 'all') return QUIZ_DATA;
+  return QUIZ_DATA.filter(q => q.cat === currentFilter);
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardGrid');
+  const cards = getFilteredCards();
+  const total = cards.length;
+  const solved = cards.filter(q => solvedCards.has(q.id)).length;
+
+  document.getElementById('progressText').textContent = `${solved} / ${total} 문제 완료`;
+  document.getElementById('progressBar').style.width = `${total ? (solved/total*100) : 0}%`;
+
+  grid.innerHTML = cards.map(q => `
+    <div class="card-wrap diff-${q.diff} ${solvedCards.has(q.id) ? 'solved' : ''} ${flippedCard === q.id ? 'flipped' : ''}"
+         id="card-${q.id}" onclick="flipCard(${q.id})">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="card-front-icon">${q.icon}</div>
+          <div class="card-front-num">Q${q.id}</div>
+        </div>
+        <div class="card-back">
+          <div class="difficulty-dot"></div>
+          <div class="card-category cat-${q.cat}">${q.cat}</div>
+          <div class="card-question">${q.q.length > 40 ? q.q.slice(0,38)+'…' : q.q}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function flipCard(id) {
+  if (solvedCards.has(id)) return;
+  const quiz = QUIZ_DATA.find(q => q.id === id);
+  if (!quiz) return;
+  flippedCard = id;
+  renderCards();
+  setTimeout(() => showModal(quiz), 300);
+}
+
+function showModal(quiz) {
+  currentQuiz = quiz;
+  const modal = document.getElementById('modalContent');
+  const diffColor = quiz.diff === '쉬움' ? '#6DBF67' : quiz.diff === '보통' ? '#F0A500' : '#E05C5C';
+  const catEmoji = quiz.cat === '기온' ? '🌡️' : quiz.cat === '강수' ? '🌧️' : quiz.cat === '옷차림' ? '🧥' : '🍚';
+  const points = quiz.diff === '쉬움' ? 10 : quiz.diff === '보통' ? 20 : 30;
+
+  let inputHTML = '';
+  if (quiz.type === 'obj') {
+    inputHTML = `<div class="options-grid">${quiz.opts.map((o,i) => `
+      <button class="option-btn" onclick="checkObj(${i})" id="opt-${i}">
+        <span style="color:${diffColor};font-weight:900">${['①','②','③','④'][i]}</span> ${o}
+      </button>`).join('')}</div>`;
+  } else {
+    inputHTML = `<div class="short-answer-area">
+      <input class="short-input" id="shortInput" type="text" placeholder="답을 입력하세요..." onkeydown="if(event.key==='Enter')checkShort()">
+    </div>
+    <button class="submit-btn" onclick="checkShort()">✅ 제출</button>`;
+  }
+
+  modal.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="modal-badge" style="background:${diffColor}20;color:${diffColor}">
+        ${quiz.diff} · +${points}점
+      </div>
+      <div style="font-size:0.75rem;color:#888">${catEmoji} ${quiz.cat}</div>
+    </div>
+    <div class="modal-player-info">🎯 ${players[currentPlayer].emoji} ${players[currentPlayer].name}의 차례</div>
+    <div class="modal-question">${quiz.q}</div>
+    ${inputHTML}
+    <div style="text-align:right;margin-top:10px">
+      <button onclick="closeModal()" style="background:none;border:none;color:#aaa;font-size:0.78rem;cursor:pointer;font-family:inherit">✕ 넘기기</button>
+    </div>`;
+
+  document.getElementById('modalOverlay').classList.add('show');
+
+  if (quiz.type === 'short') {
+    setTimeout(() => document.getElementById('shortInput')?.focus(), 100);
+  }
+}
+
+function checkObj(chosen) {
+  const quiz = currentQuiz;
+  const points = quiz.diff === '쉬움' ? 10 : quiz.diff === '보통' ? 20 : 30;
+  const correct = chosen === quiz.ans;
+
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === quiz.ans) btn.classList.add('correct');
+    else if (i === chosen && !correct) btn.classList.add('wrong');
+  });
+
+  setTimeout(() => showResult(correct, quiz.opts[quiz.ans], points, quiz.exp), 400);
+}
+
+function checkShort() {
+  const input = document.getElementById('shortInput');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  const quiz = currentQuiz;
+  const points = quiz.diff === '쉬움' ? 10 : quiz.diff === '보통' ? 20 : 30;
+  const correct = quiz.keywords.some(kw => val.includes(kw));
+  showResult(correct, quiz.ans, points, quiz.exp);
+}
+
+function showResult(correct, answerText, points, exp) {
+  const modal = document.getElementById('modalContent');
+  if (correct) {
+    players[currentPlayer].score += points;
+    renderScoreboard();
+    solvedCards.add(currentQuiz.id);
+  }
+  modal.innerHTML = `
+    <div class="result-box ${correct ? 'correct' : 'wrong'}">
+      <div class="result-emoji">${correct ? '🎉' : '😢'}</div>
+      <div class="result-text">${correct ? '정답이에요!' : '아쉬워요!'}</div>
+      <div class="result-answer">정답: ${answerText}</div>
+      <div style="font-size:0.75rem;color:#666;margin-top:6px;line-height:1.4">${exp}</div>
+      ${correct ? `<div class="result-score">+${points}점 획득!</div>` : ''}
+    </div>
+    <button class="next-btn" onclick="closeModal()">
+      ${getNextPlayerName()} 차례로 →
+    </button>`;
+}
+
+function getNextPlayerName() {
+  const next = (currentPlayer + 1) % players.length;
+  return `${players[next].emoji} ${players[next].name}`;
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  flippedCard = null;
+  currentPlayer = (currentPlayer + 1) % players.length;
+  renderScoreboard();
+  renderCards();
+  if (solvedCards.size >= QUIZ_DATA.length) {
+    setTimeout(showWinner, 500);
+  }
+}
+
+function showWinner() {
+  const sorted = [...players].sort((a,b) => b.score - a.score);
+  const winner = sorted[0];
+  document.getElementById('winnerName').textContent = `${winner.emoji} ${winner.name}`;
+  document.getElementById('winnerScore').textContent = `${winner.score}점으로 우승!`;
+  document.getElementById('allScores').innerHTML = sorted.map((p,i) =>
+    `${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${p.emoji} ${p.name}: ${p.score}점`
+  ).join('<br>');
+  document.getElementById('winnerOverlay').classList.add('show');
+}
+
+function restartGame() {
+  currentPlayer = 0;
+  solvedCards = new Set();
+  flippedCard = null;
+  currentQuiz = null;
+  selectedCount = 0;
+  players = [];
+  document.getElementById('winnerOverlay').classList.remove('show');
+  document.getElementById('gameContainer').style.display = 'none';
+  document.getElementById('setupScreen').style.display = 'flex';
+  document.querySelectorAll('.count-btn').forEach(btn => btn.classList.remove('selected'));
+  document.getElementById('startBtn').classList.remove('ready');
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    currentFilter = btn.dataset.filter;
+    renderCards();
+  });
+});
+</script>
+</body>
+</html>
