@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>영양 버블 - 음식 영양소 퀴즈</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #fff8ee;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh;
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+#game-root {
+  width: 100%; max-width: 700px; height: 100vh; max-height: 620px;
+  background: linear-gradient(160deg, #fff5e0 0%, #fff0d0 50%, #ffe8bb 100%);
+  position: relative; overflow: hidden;
+  border-radius: 16px;
+  user-select: none;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  border: 2px solid #f5d08a;
+}
+
+/* 상단 바 */
+#title-bar {
+  position: absolute; top: 10px; left: 14px;
+  font-size: 20px; font-weight: 900; color: #c05a00;
+  letter-spacing: 2px; z-index: 10;
+}
+#title-sub {
+  font-size: 11px; font-weight: 700;
+  color: #e07a20; letter-spacing: 1px;
+  display: block; margin-top: 1px;
+}
+#score-bar {
+  position: absolute; top: 8px; right: 12px;
+  color: #7a3a00; font-size: 13px; font-weight: 700;
+  z-index: 10; text-align: right; line-height: 1.7;
+}
+#lives-display { font-size: 16px; letter-spacing: 3px; }
+#level-badge {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,160,30,0.2); border: 2px solid rgba(255,160,30,0.5);
+  border-radius: 20px; padding: 3px 16px;
+  font-size: 13px; font-weight: 800; color: #c05a00;
+  z-index: 10; white-space: nowrap;
+  transition: background 0.4s;
+}
+#best-badge {
+  position: absolute; top: 36px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; color: rgba(180,100,0,0.6);
+  z-index: 10; white-space: nowrap;
+}
+
+/* 문제 박스 */
+#problem-box {
+  position: absolute; left: 10px; top: 52px;
+  width: 200px; min-height: 160px;
+  background: rgba(255,255,255,0.75);
+  border: 2.5px solid rgba(255,160,30,0.5);
+  border-radius: 14px; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 12px 10px;
+  transition: border-color 0.3s;
+  box-shadow: 0 2px 12px rgba(255,150,0,0.10);
+}
+#problem-type-tag {
+  font-size: 11px; font-weight: 800;
+  color: #e07a20; letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+#problem-emoji {
+  font-size: 36px; margin-bottom: 4px; line-height: 1;
+}
+#problem-question {
+  font-size: 13px; font-weight: 700; color: #5a3000;
+  text-align: center; line-height: 1.5;
+  word-break: keep-all;
+}
+
+/* 정답 표시 */
+#answer-display {
+  position: absolute; left: 10px; bottom: 68px;
+  width: 200px; height: 38px;
+  background: rgba(255,255,255,0.8);
+  border: 2px solid rgba(255,160,30,0.4);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #c05a00;
+  z-index: 10; text-align: center; padding: 4px 8px;
+  word-break: keep-all;
+}
+
+/* 게임 필드 */
+#game-field {
+  position: absolute; left: 220px; top: 52px;
+  right: 10px; bottom: 60px;
+  overflow: hidden;
+}
+
+/* 점수 존 */
+.zone {
+  position: absolute; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  pointer-events: none; z-index: 1;
+}
+#zone1 { background: rgba(255,200,50,0.10); color: rgba(180,120,0,0.35); }
+#zone2 { background: rgba(255,170,30,0.07); color: rgba(180,120,0,0.25); }
+#zone3 { background: rgba(255,140,10,0.04); color: rgba(180,120,0,0.18); }
+
+/* 버블 */
+.answer-bubble {
+  position: absolute; width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  cursor: pointer; z-index: 5;
+  border: 2.5px solid rgba(255,255,255,0.7);
+  transition: transform 0.08s;
+  text-align: center; padding: 4px;
+  line-height: 1.3; word-break: keep-all;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+}
+.answer-bubble:active { transform: scale(0.92); }
+.answer-bubble.decoy { border: 2.5px solid rgba(255,255,255,0.9); }
+
+.bc0 { background: #ff9f43; color: #5a2800; }
+.bc1 { background: #ffd32a; color: #5a3800; }
+.bc2 { background: #0be881; color: #004020; }
+.bc3 { background: #f53b57; color: #fff; }
+.bc4 { background: #3c40c4; color: #fff; }
+.bc5 { background: #05c46b; color: #003820; }
+.bc6 { background: #ff5e57; color: #fff; }
+.bc7 { background: #ffdd59; color: #5a3800; }
+
+/* 플래시 */
+#flash {
+  position: absolute; inset: 0; opacity: 0;
+  pointer-events: none; z-index: 20; border-radius: 14px;
+}
+
+/* 레벨업 팝업 */
+#levelup-popup {
+  display: none; position: absolute;
+  top: 38%; left: 50%; transform: translate(-50%,-50%);
+  background: rgba(255,255,255,0.95);
+  border: 2px solid #ffb830;
+  border-radius: 16px; padding: 12px 24px;
+  font-size: 16px; font-weight: 900; color: #c05a00;
+  z-index: 30; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(255,150,0,0.2);
+}
+
+/* 점수 팝업 */
+#pt-popup {
+  position: absolute; font-size: 16px; font-weight: 900;
+  color: #e06000; pointer-events: none; z-index: 25;
+  opacity: 0; text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
+}
+
+/* 하단 바 */
+#bottom-bar {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 56px;
+  background: rgba(255,255,255,0.6);
+  border-top: 1.5px solid rgba(255,180,50,0.3);
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; z-index: 10; padding: 0 14px;
+}
+.diff-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: rgba(200,150,50,0.2);
+  transition: background 0.3s;
+}
+.diff-dot.on { background: #f0900a; }
+#bottom-label { font-size: 11px; color: #c07020; font-weight: 700; margin-right: 4px; }
+
+/* 오버레이 */
+#overlay {
+  position: absolute; inset: 0;
+  background: rgba(255,248,230,0.92);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 40; border-radius: 14px;
+}
+#overlay-box { text-align: center; }
+#ov-title {
+  font-size: 32px; font-weight: 900; color: #c05a00;
+  letter-spacing: 3px; margin-bottom: 4px;
+}
+#ov-title-sub {
+  font-size: 13px; font-weight: 700; color: #e07a20;
+  letter-spacing: 2px; margin-bottom: 20px;
+}
+#ov-emoji { font-size: 56px; margin-bottom: 12px; display: block; }
+#ov-sub {
+  font-size: 15px; color: #7a4000; margin-bottom: 22px; line-height: 2;
+}
+.ov-btn {
+  font-size: 17px; font-weight: 900;
+  padding: 12px 36px; border-radius: 30px; border: none;
+  background: #f0900a; color: #fff; cursor: pointer;
+  letter-spacing: 2px;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 4px 16px rgba(240,130,0,0.3);
+}
+.ov-btn:hover { background: #d07000; }
+.ov-btn:active { transform: scale(0.96); }
+</style>
+</head>
+<body>
+<div id="game-root">
+  <div id="flash"></div>
+  <div id="title-bar">🍱 영양 버블<span id="title-sub">음식·영양소 퀴즈</span></div>
+  <div id="score-bar">
+    <div id="lives-display">❤️❤️❤️</div>
+    <div><span id="score-num">0</span>점</div>
+  </div>
+  <div id="level-badge">Lv.1 영양 새싹</div>
+  <div id="best-badge"></div>
+
+  <div id="problem-box">
+    <div id="problem-type-tag">식품군</div>
+    <div id="problem-emoji">🥕</div>
+    <div id="problem-question">로딩 중...</div>
+  </div>
+  <div id="answer-display">?</div>
+
+  <div id="game-field">
+    <div class="zone" id="zone1">⭐⭐⭐ 3점</div>
+    <div class="zone" id="zone2">⭐⭐ 2점</div>
+    <div class="zone" id="zone3">⭐ 1점</div>
+  </div>
+
+  <div id="bottom-bar">
+    <span id="bottom-label">난이도</span>
+    <div class="diff-dot" id="dd0"></div>
+    <div class="diff-dot" id="dd1"></div>
+    <div class="diff-dot" id="dd2"></div>
+    <div class="diff-dot" id="dd3"></div>
+    <div class="diff-dot" id="dd4"></div>
+  </div>
+
+  <div id="levelup-popup"></div>
+  <div id="pt-popup"></div>
+
+  <div id="overlay">
+    <div id="overlay-box">
+      <span id="ov-emoji">🍱</span>
+      <div id="ov-title">영양 버블</div>
+      <div id="ov-title-sub">— 음식 · 영양소 퀴즈 —</div>
+      <div id="ov-sub">
+        떨어지는 버블에서<br>
+        <b style="color:#c05a00">올바른 답</b>을 골라 터치하세요!<br>
+        빨리 맞출수록 점수가 높아요 🎯
+      </div>
+      <button class="ov-btn" onclick="startGame()">시작!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 퀴즈 데이터 ──────────────────────────────────────────
+// type: 'group'=식품군, 'nutrient'=영양소, 'function'=기능, 'balance'=균형식사
+const QUIZ_DATA = [
+  // ── 식품군 (레벨 1~2) ──
+  { q:"달걀은 어느 식품군?", emoji:"🥚", ans:"고기·생선·달걀·콩류", fakes:["곡류","채소류","유지·당류","우유·유제품"], type:"group", diff:1 },
+  { q:"밥은 어느 식품군?", emoji:"🍚", ans:"곡류", fakes:["고기·생선·달걀·콩류","채소류","과일류","유지·당류"], type:"group", diff:1 },
+  { q:"사과는 어느 식품군?", emoji:"🍎", ans:"과일류", fakes:["채소류","곡류","유지·당류","우유·유제품"], type:"group", diff:1 },
+  { q:"우유는 어느 식품군?", emoji:"🥛", ans:"우유·유제품", fakes:["고기·생선·달걀·콩류","곡류","채소류","과일류"], type:"group", diff:1 },
+  { q:"두부는 어느 식품군?", emoji:"🟫", ans:"고기·생선·달걀·콩류", fakes:["곡류","채소류","유지·당류","과일류"], type:"group", diff:1 },
+  { q:"시금치는 어느 식품군?", emoji:"🥬", ans:"채소류", fakes:["과일류","곡류","고기·생선·달걀·콩류","유지·당류"], type:"group", diff:1 },
+  { q:"식용유는 어느 식품군?", emoji:"🫙", ans:"유지·당류", fakes:["곡류","채소류","고기·생선·달걀·콩류","과일류"], type:"group", diff:2 },
+  { q:"빵은 어느 식품군?", emoji:"🍞", ans:"곡류", fakes:["유지·당류","고기·생선·달걀·콩류","채소류","과일류"], type:"group", diff:1 },
+  { q:"고등어는 어느 식품군?", emoji:"🐟", ans:"고기·생선·달걀·콩류", fakes:["채소류","곡류","유지·당류","과일류"], type:"group", diff:2 },
+  { q:"치즈는 어느 식품군?", emoji:"🧀", ans:"우유·유제품", fakes:["고기·생선·달걀·콩류","유지·당류","곡류","채소류"], type:"group", diff:2 },
+  { q:"감자는 어느 식품군?", emoji:"🥔", ans:"곡류", fakes:["채소류","과일류","유지·당류","고기·생선·달걀·콩류"], type:"group", diff:3 },
+  { q:"땅콩은 어느 식품군?", emoji:"🥜", ans:"유지·당류", fakes:["고기·생선·달걀·콩류","곡류","채소류","과일류"], type:"group", diff:3 },
+
+  // ── 주요 영양소 (레벨 2~3) ──
+  { q:"밥·빵의 주요 영양소는?", emoji:"🍚", ans:"탄수화물", fakes:["단백질","지방","칼슘","비타민C"], type:"nutrient", diff:2 },
+  { q:"고기의 주요 영양소는?", emoji:"🥩", ans:"단백질", fakes:["탄수화물","지방","칼슘","비타민A"], type:"nutrient", diff:2 },
+  { q:"우유의 주요 무기질은?", emoji:"🥛", ans:"칼슘", fakes:["철분","나트륨","인","비타민D"], type:"nutrient", diff:2 },
+  { q:"채소·과일에 풍부한 영양소는?", emoji:"🥦", ans:"비타민", fakes:["탄수화물","단백질","지방","칼슘"], type:"nutrient", diff:2 },
+  { q:"버터·기름의 주요 영양소는?", emoji:"🧈", ans:"지방", fakes:["탄수화물","단백질","칼슘","비타민C"], type:"nutrient", diff:2 },
+  { q:"시금치에 풍부한 무기질은?", emoji:"🥬", ans:"철분", fakes:["칼슘","나트륨","칼륨","마그네슘"], type:"nutrient", diff:3 },
+  { q:"뼈와 치아를 만드는 영양소는?", emoji:"🦷", ans:"칼슘", fakes:["철분","단백질","탄수화물","비타민C"], type:"nutrient", diff:2 },
+  { q:"근육을 만드는 주요 영양소는?", emoji:"💪", ans:"단백질", fakes:["탄수화물","지방","칼슘","비타민"], type:"nutrient", diff:2 },
+  { q:"에너지를 내는 주요 영양소는?", emoji:"⚡", ans:"탄수화물", fakes:["칼슘","비타민","무기질","물"], type:"nutrient", diff:2 },
+  { q:"피부·눈 건강에 좋은 비타민은?", emoji:"👁️", ans:"비타민A", fakes:["비타민C","비타민D","비타민B","비타민E"], type:"nutrient", diff:3 },
+  { q:"감기 예방에 좋은 비타민은?", emoji:"🤧", ans:"비타민C", fakes:["비타민A","비타민D","칼슘","철분"], type:"nutrient", diff:3 },
+  { q:"햇빛을 받으면 생기는 비타민은?", emoji:"☀️", ans:"비타민D", fakes:["비타민A","비타민C","비타민B","칼슘"], type:"nutrient", diff:3 },
+
+  // ── 기능·균형 (레벨 3~4) ──
+  { q:"혈액을 만드는 데 필요한 무기질은?", emoji:"🩸", ans:"철분", fakes:["칼슘","나트륨","칼륨","인"], type:"function", diff:4 },
+  { q:"변비 예방에 도움이 되는 성분은?", emoji:"🌾", ans:"식이섬유", fakes:["단백질","지방","탄수화물","칼슘"], type:"function", diff:4 },
+  { q:"물의 역할로 맞는 것은?", emoji:"💧", ans:"체온 조절", fakes:["뼈 성장","에너지 저장","근육 생성","피부 색소"], type:"function", diff:4 },
+  { q:"하루 식사에서 가장 많이 먹어야 할 식품군은?", emoji:"🍽️", ans:"곡류", fakes:["고기·생선·달걀·콩류","유지·당류","우유·유제품","과일류"], type:"balance", diff:3 },
+  { q:"균형 잡힌 식사를 위해 매일 마셔야 할 것은?", emoji:"🥛", ans:"우유", fakes:["탄산음료","주스","스포츠음료","커피"], type:"balance", diff:3 },
+  { q:"패스트푸드를 자주 먹으면 과다 섭취되는 것은?", emoji:"🍔", ans:"나트륨", fakes:["칼슘","비타민C","식이섬유","철분"], type:"balance", diff:4 },
+  { q:"아침을 꼭 먹어야 하는 이유는?", emoji:"🌅", ans:"뇌에 에너지 공급", fakes:["살이 빠짐","키가 큼","피부가 좋아짐","눈이 좋아짐"], type:"balance", diff:4 },
+  { q:"채소를 충분히 먹으면 보충되는 것은?", emoji:"🥗", ans:"비타민·무기질", fakes:["탄수화물","단백질","지방","칼로리"], type:"balance", diff:3 },
+];
+
+// ── 레벨 설정 ──────────────────────────────────────────
+const LEVEL_STEP = 4;
+const MAX_LIVES = 3;
+const LEVEL_NAMES = ["영양 새싹","영양 꿈나무","영양 탐험가","영양 마스터","영양 박사","영양의 왕"];
+const SPEED_TABLE = [0.6, 0.85, 1.1, 1.4, 1.7, 2.1];
+
+let score=0, lives=MAX_LIVES, level=0, prevLevel=0;
+let correctCount=0, bestScore=0;
+let bubbles=[], speed=SPEED_TABLE[0];
+let gameRunning=false, frameId=null, curAns='', curQ=null;
+let usedIndices=[];
+
+function fieldEl(){ return document.getElementById('game-field'); }
+
+function setZones(){
+  const f=fieldEl(), fh=f.offsetHeight||500;
+  const z1=document.getElementById('zone1');
+  const z2=document.getElementById('zone2');
+  const z3=document.getElementById('zone3');
+  const h=Math.floor(fh/3);
+  z1.style.top='0'; z1.style.height=h+'px';
+  z2.style.top=h+'px'; z2.style.height=h+'px';
+  z3.style.top=(h*2)+'px'; z3.style.height=(fh-h*2)+'px';
+}
+
+function updateLives(){
+  document.getElementById('lives-display').textContent='❤️'.repeat(Math.max(lives,0))+('🖤'.repeat(Math.max(MAX_LIVES-lives,0)));
+}
+
+function updateLevelBadge(){
+  document.getElementById('level-badge').textContent=`Lv.${level+1} ${LEVEL_NAMES[Math.min(level,5)]}`;
+}
+
+function updateDiffIndicator(diff){
+  for(let i=0;i<5;i++) document.getElementById('dd'+i).classList.toggle('on',i<diff);
+}
+
+// ── 퀴즈 선택 ──────────────────────────────────────────
+function pickQuestion(){
+  // 레벨에 따라 diff 범위 설정
+  const maxDiff = Math.min(level+2, 4);
+  const minDiff = Math.max(level-1, 1);
+  let pool = QUIZ_DATA.filter(q=> q.diff>=minDiff && q.diff<=maxDiff);
+  if(pool.length===0) pool=[...QUIZ_DATA];
+  // 최근 사용 피하기
+  let filtered = pool.filter((_,i)=> !usedIndices.includes(QUIZ_DATA.indexOf(pool[i])));
+  if(filtered.length<2) { usedIndices=[]; filtered=pool; }
+  const q = filtered[Math.floor(Math.random()*filtered.length)];
+  usedIndices.push(QUIZ_DATA.indexOf(q));
+  if(usedIndices.length>8) usedIndices.shift();
+  return q;
+}
+
+// ── 버블 생성 ──────────────────────────────────────────
+function spawnBubbles(q){
+  const f=fieldEl(); f.innerHTML=''; bubbles=[];
+  const fw=f.offsetWidth||480;
+  // 정답 + 오답 섞기
+  let opts=[q.ans];
+  const fakePool=[...q.fakes].sort(()=>Math.random()-0.5);
+  const count=Math.min(4+Math.floor(level/2), 7);
+  for(let i=0;i<fakePool.length&&opts.length<count;i++) opts.push(fakePool[i]);
+  opts.sort(()=>Math.random()-0.5);
+
+  let usedX=[];
+  for(let i=0;i<opts.length;i++){
+    let x,att=0;
+    do{ x=Math.floor(Math.random()*(fw-80))+2; att++; } while(usedX.some(u=>Math.abs(u-x)<76)&&att<30);
+    usedX.push(x);
+    const startY=-80-Math.random()*80*(i+1);
+    const el=document.createElement('div');
+    el.className='answer-bubble bc'+(i%8);
+    el.style.left=x+'px'; el.style.top=startY+'px';
+    el.textContent=opts[i];
+    const v=opts[i];
+    el.addEventListener('click',()=>onBubble(el,v));
+    el.addEventListener('touchend',e=>{ e.preventDefault(); onBubble(el,v); });
+    f.appendChild(el);
+    bubbles.push({el,y:startY,val:v});
+  }
+}
+
+let curP=null;
+
+function newProblem(){
+  curQ=pickQuestion();
+  curAns=curQ.ans;
+  document.getElementById('problem-type-tag').textContent=
+    curQ.type==='group'?'식품군':curQ.type==='nutrient'?'영양소':curQ.type==='function'?'기능':'균형식사';
+  document.getElementById('problem-emoji').textContent=curQ.emoji;
+  document.getElementById('problem-question').textContent=curQ.q;
+  document.getElementById('answer-display').textContent='?';
+  updateDiffIndicator(curQ.diff);
+  spawnBubbles(curQ);
+}
+
+function getZonePts(yRatio){ if(yRatio<0.33)return 3; if(yRatio<0.66)return 2; return 1; }
+
+function onBubble(el,val){
+  if(!gameRunning)return;
+  const f=fieldEl(), fh=f.offsetHeight||500;
+  const b=bubbles.find(x=>x.el===el);
+  if(!b)return;
+  if(val===curAns){
+    correctCount++;
+    const pts=getZonePts(b.y/fh);
+    score+=pts;
+    if(score>bestScore){ bestScore=score; document.getElementById('best-badge').textContent='최고 기록: '+bestScore+'점'; }
+    document.getElementById('score-num').textContent=score;
+    document.getElementById('answer-display').textContent=val;
+    flash('#44dd88'); showPt('+'+pts+'점',el);
+    prevLevel=level;
+    level=Math.floor(correctCount/LEVEL_STEP);
+    speed=SPEED_TABLE[Math.min(level,5)];
+    if(level>prevLevel){ updateLevelBadge(); showLevelUp(); }
+    bubbles=[]; f.innerHTML='';
+    setTimeout(newProblem,400);
+  } else {
+    loseLife(); flash('#ff6644');
+    el.style.background='#ffb3b3'; el.style.color='#800000';
+    // 정답 살짝 힌트
+    bubbles.forEach(b=>{
+      if(b.val===curAns){
+        b.el.style.border='3px solid #22bb55';
+        b.el.style.boxShadow='0 0 8px rgba(0,200,80,0.5)';
+      }
+    });
+  }
+}
+
+function showLevelUp(){
+  const el=document.getElementById('levelup-popup');
+  el.textContent='🎉 레벨 업! Lv.'+(level+1)+' '+LEVEL_NAMES[Math.min(level,5)];
+  el.style.display='block';
+  setTimeout(()=>{ el.style.display='none'; },1400);
+}
+
+function loseLife(){
+  lives--; updateLives();
+  if(lives<=0) endGame();
+}
+
+function flash(col){
+  const f=document.getElementById('flash');
+  f.style.background=col; f.style.opacity='0.25'; f.style.transition='none';
+  setTimeout(()=>{ f.style.transition='opacity 0.2s'; f.style.opacity='0'; },130);
+}
+
+function showPt(txt,el){
+  const p=document.getElementById('pt-popup');
+  const rect=el.getBoundingClientRect();
+  const root=document.getElementById('game-root').getBoundingClientRect();
+  p.textContent=txt;
+  p.style.left=(rect.left-root.left+8)+'px';
+  p.style.top=(rect.top-root.top-8)+'px';
+  p.style.opacity='1'; p.style.transition='none';
+  setTimeout(()=>{ p.style.transition='opacity 0.5s, top 0.5s'; p.style.opacity='0'; p.style.top=(rect.top-root.top-38)+'px'; },50);
+}
+
+function gameLoop(){
+  if(!gameRunning)return;
+  const f=fieldEl(), fh=f.offsetHeight||500;
+  let missed=false;
+  bubbles.forEach(b=>{ b.y+=speed; b.el.style.top=b.y+'px'; if(b.y>fh+10&&b.val===curAns) missed=true; });
+  bubbles=bubbles.filter(b=>b.y<=fh+10);
+  if(missed){ loseLife(); if(lives>0) setTimeout(newProblem,300); }
+  else if(bubbles.length===0&&gameRunning) setTimeout(newProblem,150);
+  if(gameRunning) frameId=requestAnimationFrame(gameLoop);
+}
+
+function startGame(){
+  document.getElementById('overlay').style.display='none';
+  score=0; lives=MAX_LIVES; level=0; prevLevel=0; correctCount=0;
+  speed=SPEED_TABLE[0]; gameRunning=true; usedIndices=[];
+  document.getElementById('score-num').textContent='0';
+  updateLives(); updateLevelBadge(); setZones();
+  newProblem();
+  frameId=requestAnimationFrame(gameLoop);
+}
+
+function endGame(){
+  gameRunning=false; cancelAnimationFrame(frameId);
+  if(score>bestScore) bestScore=score;
+  const ob=document.getElementById('overlay-box');
+  const newBest=score>=bestScore&&score>0?'<br>🏆 최고 기록 갱신!':'';
+  ob.innerHTML=`
+    <span id="ov-emoji">🍱</span>
+    <div id="ov-title">게임 종료!</div>
+    <div id="ov-title-sub">— 영양 버블 —</div>
+    <div id="ov-sub">최종 점수: <b style="color:#c05a00">${score}점</b><br>최고 기록: <b style="color:#c05a00">${bestScore}점</b>${newBest}<br>도달 레벨: Lv.${level+1} ${LEVEL_NAMES[Math.min(level,5)]}</div>
+    <button class="ov-btn" onclick="startGame()">다시 시작</button>
+  `;
+  document.getElementById('overlay').style.display='flex';
+}
+
+window.addEventListener('load',()=>{ setZones(); });
+window.addEventListener('resize', setZones);
+</script>
+</body>
+</html>
