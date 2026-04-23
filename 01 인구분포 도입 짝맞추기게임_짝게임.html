@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>인구 분포 짝 맞추기</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+:root{
+  --pu:#6B3FA0;--pl:#9B72CF;--pp:#EDE7F6;
+  --te:#00897B;--tl:#4DB6AC;--tp:#E0F2F1;
+  --bg:#F0EBF8;--wh:#FFFFFF;--dk:#1A1A2E;--gr:#78717A;
+  --ok:#2E7D32;--okp:#C8E6C9;--ng:#C62828;--ngp:#FFCDD2;
+  --gold:#F9A825;--cen:#120630;
+  --adv:#D84315;--advl:#FF7043;--advp:#FBE9E7;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);height:100vh;overflow:hidden;display:flex;flex-direction:column;user-select:none;}
+
+/* ── TAB BAR ── */
+.tabbar{display:flex;height:40px;flex-shrink:0;background:var(--dk);}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:rgba(255,255,255,.45);cursor:pointer;gap:5px;transition:all .2s;border-bottom:3px solid transparent;}
+.tab.active-basic{color:white;border-bottom-color:var(--pl);background:rgba(107,63,160,.25);}
+.tab.active-adv{color:white;border-bottom-color:var(--advl);background:rgba(216,67,21,.25);}
+
+/* ── HEADER ── */
+header{background:var(--pu);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 13px;height:48px;flex-shrink:0;box-shadow:0 2px 8px rgba(107,63,160,.4);gap:8px;transition:background .3s;}
+header.adv-header{background:var(--adv);}
+.htitle{font-size:14px;font-weight:800;white-space:nowrap;}
+.hright{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.best-box{background:rgba(249,168,37,.28);border:1.5px solid rgba(249,168,37,.6);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#FFE082;white-space:nowrap;}
+.timer-box{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 12px;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px;}
+.score-box{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 10px;font-size:13px;font-weight:700;}
+.combo-box{background:rgba(255,193,7,.3);border:1.5px solid rgba(255,193,7,.6);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:800;color:#FFE082;display:none;}
+.btn-r{background:rgba(255,255,255,.22);border:none;border-radius:16px;color:white;font-family:inherit;font-size:12px;font-weight:700;padding:4px 11px;cursor:pointer;}
+.btn-r:active{background:rgba(255,255,255,.38);}
+
+/* ── TIME BAR (심화) ── */
+.timebar-wrap{height:8px;background:#1a0a3c;flex-shrink:0;overflow:hidden;display:none;}
+.timebar-wrap.visible{display:block;}
+.timebar{height:100%;width:100%;background:linear-gradient(to right,var(--te),var(--pl));border-radius:0;transition:width .5s linear,background .5s;}
+.timebar.danger{background:linear-gradient(to right,#C62828,#FF5722);animation:tbpulse .4s ease infinite alternate;}
+@keyframes tbpulse{from{opacity:.8}to{opacity:1}}
+
+/* ── PLAYER LABELS ── */
+.plabels{display:flex;height:30px;flex-shrink:0;}
+.plabel{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;gap:5px;color:white;}
+.plabel.L{width:38%;background:linear-gradient(135deg,#5e35b1,#9B72CF);}
+.plabel.L.adv{background:linear-gradient(135deg,#BF360C,#FF7043);}
+.plabel.R{width:38%;background:linear-gradient(135deg,#00897B,#4DB6AC);}
+.plabel.R.adv{background:linear-gradient(135deg,#4527A0,#7E57C2);}
+.clabel{flex:1;background:var(--cen);display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,.3);font-weight:700;letter-spacing:1px;}
+.pdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.6);}
+
+/* ── GAME AREA ── */
+.game-area{flex:1;display:flex;overflow:hidden;position:relative;}
+#svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;}
+.column{display:flex;flex-direction:column;justify-content:center;padding:6px 9px;gap:7px;z-index:10;position:relative;}
+.column.L{width:38%;padding-right:7px;}
+.column.R{width:38%;padding-left:7px;}
+.czone{flex:1;background:var(--cen);position:relative;z-index:1;}
+
+/* ── CARDS ── */
+.card{height:64px;border-radius:11px;display:flex;align-items:center;padding:0 11px;cursor:pointer;transition:transform .12s,box-shadow .12s,background .15s,border-color .15s,opacity .3s;position:relative;box-shadow:0 2px 5px rgba(0,0,0,.10);font-size:12px;font-weight:700;line-height:1.35;word-break:keep-all;}
+.column.L .card{background:white;border:2.5px solid var(--pl);color:var(--pu);justify-content:flex-end;text-align:right;padding-right:20px;}
+.column.R .card{background:white;border:2.5px solid var(--tl);color:#00695C;justify-content:flex-start;text-align:left;padding-left:20px;}
+/* adv mode card colors */
+.adv-mode .column.L .card{border-color:var(--advl);color:var(--adv);}
+.adv-mode .column.R .card{border-color:#7E57C2;color:#4527A0;}
+
+.card::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;top:50%;transform:translateY(-50%);z-index:20;}
+.column.L .card::after{right:-7px;background:var(--pl);border:2.5px solid white;box-shadow:0 0 0 1.5px var(--pl);}
+.column.R .card::after{left:-7px;background:var(--tl);border:2.5px solid white;box-shadow:0 0 0 1.5px var(--tl);}
+.adv-mode .column.L .card::after{background:var(--advl);box-shadow:0 0 0 1.5px var(--advl);}
+.adv-mode .column.R .card::after{background:#7E57C2;box-shadow:0 0 0 1.5px #7E57C2;}
+
+.card.SL{background:var(--pp);border-color:var(--pu);transform:scale(1.04);box-shadow:0 4px 16px rgba(107,63,160,.35);}
+.card.SL::after{background:var(--pu);box-shadow:0 0 0 2px var(--pu),0 0 10px rgba(107,63,160,.6);}
+.adv-mode .card.SL{background:var(--advp);border-color:var(--adv);}
+.adv-mode .card.SL::after{background:var(--adv);box-shadow:0 0 0 2px var(--adv),0 0 10px rgba(216,67,21,.6);}
+.card.SR{background:var(--tp);border-color:var(--te);transform:scale(1.04);box-shadow:0 4px 16px rgba(0,137,123,.35);}
+.card.SR::after{background:var(--te);box-shadow:0 0 0 2px var(--te),0 0 10px rgba(0,137,123,.6);}
+.card.OK{background:var(--okp);border-color:var(--ok);color:var(--ok);pointer-events:none;animation:pop .3s ease;}
+.card.OK::after{background:var(--ok);border-color:white;box-shadow:0 0 0 2px var(--ok);}
+.card.NG{animation:shake .3s ease;}
+.card.slide-in{animation:slideIn .25s ease;}
+.card.dim{opacity:.35;pointer-events:none;}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PENALTY FLASH ── */
+.penalty-flash{position:fixed;inset:0;background:rgba(198,40,40,.25);pointer-events:none;z-index:80;opacity:0;transition:opacity .15s;}
+.penalty-flash.show{opacity:1;}
+
+/* ── SCORE POP ── */
+.score-pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:42px;font-weight:900;color:var(--ok);pointer-events:none;z-index:90;opacity:0;text-shadow:0 2px 12px rgba(0,0,0,.3);}
+.score-pop.show{animation:scorePop .6s ease forwards;}
+@keyframes scorePop{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;background:rgba(10,5,30,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(5px);padding:18px;}
+.overlay.hidden{display:none;}
+.ocard{background:white;border-radius:20px;padding:24px 20px;max-width:420px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.4);}
+.oemoji{font-size:44px;margin-bottom:6px;}
+.otitle{font-size:19px;font-weight:900;color:var(--dk);margin-bottom:5px;}
+.osub{font-size:12.5px;color:var(--gr);margin-bottom:14px;line-height:1.6;}
+.howto{margin-bottom:14px;text-align:left;}
+.hrow{display:flex;align-items:flex-start;gap:9px;margin-bottom:7px;font-size:12.5px;color:var(--dk);line-height:1.5;}
+.hnum{width:21px;height:21px;border-radius:50%;background:var(--pu);color:white;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.hnum.adv{background:var(--adv);}
+.stats{display:flex;gap:8px;margin-bottom:14px;}
+.sbox{flex:1;background:var(--bg);border-radius:12px;padding:10px 4px;}
+.snum{font-size:22px;font-weight:900;color:var(--pu);}
+.slabel{font-size:10px;color:var(--gr);margin-top:1px;}
+.bestbox{background:linear-gradient(135deg,#fff8e1,#fff3cd);border:2px solid var(--gold);border-radius:12px;padding:10px 13px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.trophy{font-size:24px;}
+.binfo{text-align:left;}
+.blabel{font-size:10px;color:#795548;font-weight:700;margin-bottom:2px;}
+.btime{font-size:20px;font-weight:900;color:#E65100;font-variant-numeric:tabular-nums;}
+.bdetail{font-size:10px;color:var(--gr);margin-top:1px;}
+.newbadge{background:linear-gradient(135deg,#FF6F00,#FFB300);color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:18px;margin-left:6px;animation:pulse .6s ease infinite alternate;}
+@keyframes pulse{from{opacity:.8;transform:scale(.97)}to{opacity:1;transform:scale(1.03)}}
+.btn-start{background:linear-gradient(135deg,var(--pu),var(--pl));color:white;border:none;border-radius:48px;font-family:inherit;font-size:14px;font-weight:800;padding:12px 32px;cursor:pointer;box-shadow:0 4px 14px rgba(107,63,160,.4);width:100%;transition:transform .12s;margin-bottom:8px;}
+.btn-start.adv-btn{background:linear-gradient(135deg,var(--adv),var(--advl));box-shadow:0 4px 14px rgba(216,67,21,.4);}
+.btn-start:active{transform:scale(.97);}
+.btn-sub{background:var(--bg);color:var(--pu);border:2px solid var(--pl);border-radius:48px;font-family:inherit;font-size:13px;font-weight:700;padding:10px 28px;cursor:pointer;width:100%;transition:transform .12s;}
+.btn-sub:active{transform:scale(.97);}
+.rbar{height:5px;background:var(--bg);border-radius:4px;margin-bottom:13px;overflow:hidden;}
+.rfill{height:100%;background:linear-gradient(to right,var(--pu),var(--te));border-radius:4px;transition:width .9s ease;}
+
+/* mode badge */
+.mode-badge{display:inline-block;font-size:10px;font-weight:900;padding:2px 9px;border-radius:12px;margin-bottom:10px;}
+.mode-badge.basic{background:var(--pp);color:var(--pu);}
+.mode-badge.adv{background:var(--advp);color:var(--adv);}
+
+/* big score display for adv */
+.big-score{font-size:56px;font-weight:900;color:var(--adv);line-height:1;}
+.big-score-label{font-size:13px;color:var(--gr);margin-bottom:12px;}
+
+.toast{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-14px);color:white;font-size:12px;font-weight:800;padding:6px 18px;border-radius:48px;z-index:50;opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--ok);}
+.toast.ng{background:var(--ng);}
+.toast.combo{background:linear-gradient(135deg,#FF6F00,#FFB300);}
+</style>
+</head>
+<body>
+
+<!-- TAB BAR -->
+<div class="tabbar">
+  <div class="tab active-basic" id="tab-basic" onclick="switchMode('basic')">📚 기초 — 짝 맞추기</div>
+  <div class="tab" id="tab-adv"   onclick="switchMode('adv')">⚡ 심화 — 30초 스피드</div>
+</div>
+
+<!-- HEADER -->
+<header id="main-header">
+  <div class="htitle" id="h-title">🗺️ 인구 분포 짝 맞추기</div>
+  <div class="hright">
+    <div class="best-box"  id="best-display">🏆 기록없음</div>
+    <div class="timer-box" id="timer">00:00</div>
+    <div class="score-box" id="score-display">0 / 8</div>
+    <div class="combo-box" id="combo-box">🔥 0 콤보</div>
+    <button class="btn-r" onclick="resetGame()">↺ 다시</button>
+  </div>
+</header>
+
+<!-- TIME BAR (심화) -->
+<div class="timebar-wrap" id="timebar-wrap">
+  <div class="timebar" id="timebar"></div>
+</div>
+
+<!-- PLAYER LABELS -->
+<div class="plabels" id="plabels">
+  <div class="plabel L" id="plabel-l"><div class="pdot"></div><span id="pl-txt">왼쪽 — 개념 카드</span></div>
+  <div class="clabel">── 연결선 ──</div>
+  <div class="plabel R" id="plabel-r"><div class="pdot"></div><span id="pr-txt">오른쪽 — 설명 카드</span></div>
+</div>
+
+<!-- GAME AREA -->
+<div class="game-area" id="game-area">
+  <svg id="svg"></svg>
+  <div class="column L" id="col-left"></div>
+  <div class="czone"></div>
+  <div class="column R" id="col-right"></div>
+</div>
+
+<!-- EFFECTS -->
+<div class="penalty-flash" id="pflash"></div>
+<div class="score-pop"     id="spop"></div>
+<div class="toast"         id="toast"></div>
+
+<!-- ═══ START OVERLAY (basic) ═══ -->
+<div class="overlay" id="ov-start-basic">
+  <div class="ocard">
+    <div class="oemoji">📚</div>
+    <div class="mode-badge basic">기초 모드</div>
+    <div class="otitle">인구 분포 짝 맞추기</div>
+    <div class="osub">태블릿을 가로로 놓고 두 명이 함께!</div>
+    <div class="howto">
+      <div class="hrow"><div class="hnum">1</div><div>왼쪽 친구가 <b>개념 카드</b>를 탭해요.</div></div>
+      <div class="hrow"><div class="hnum">2</div><div>오른쪽 친구가 맞는 <b>설명 카드</b>를 탭해요.</div></div>
+      <div class="hrow"><div class="hnum">3</div><div>맞으면 가운데에 <b>초록 연결선</b>이 생겨요!</div></div>
+      <div class="hrow"><div class="hnum">4</div><div>8쌍 완성 → <b>최고 기록</b>에 도전!</div></div>
+    </div>
+    <div class="bestbox">
+      <div class="trophy">🏆</div>
+      <div class="binfo">
+        <div class="blabel">기초 최고 기록</div>
+        <div class="btime" id="sb-basic-time">아직 없어요</div>
+        <div class="bdetail" id="sb-basic-detail">첫 번째 기록에 도전!</div>
+      </div>
+    </div>
+    <button class="btn-start" onclick="startGame('basic')">🚀 기초 시작!</button>
+    <button class="btn-sub"   onclick="switchMode('adv')">⚡ 심화 모드로 가기</button>
+  </div>
+</div>
+
+<!-- ═══ START OVERLAY (adv) ═══ -->
+<div class="overlay hidden" id="ov-start-adv">
+  <div class="ocard">
+    <div class="oemoji">⚡</div>
+    <div class="mode-badge adv">심화 모드</div>
+    <div class="otitle">30초 스피드 챌린지!</div>
+    <div class="osub">30초 안에 최대한 많이 맞혀요.<br>틀리면 <b>⏰ -2초</b> 페널티!</div>
+    <div class="howto">
+      <div class="hrow"><div class="hnum adv">1</div><div>왼쪽→오른쪽 순서로 탭해서 짝을 맞춰요.</div></div>
+      <div class="hrow"><div class="hnum adv">2</div><div>맞히면 새 카드가 올라와요 — 계속 도전!</div></div>
+      <div class="hrow"><div class="hnum adv">3</div><div>연속으로 맞히면 🔥 <b>콤보 보너스</b>!</div></div>
+      <div class="hrow"><div class="hnum adv">4</div><div>30초 후 맞힌 쌍 수로 <b>최고기록</b> 경쟁!</div></div>
+    </div>
+    <div class="bestbox">
+      <div class="trophy">🏆</div>
+      <div class="binfo">
+        <div class="blabel">심화 최고 기록</div>
+        <div class="btime" id="sb-adv-time">아직 없어요</div>
+        <div class="bdetail" id="sb-adv-detail">첫 번째 기록에 도전!</div>
+      </div>
+    </div>
+    <button class="btn-start adv-btn" onclick="startGame('adv')">⚡ 심화 시작!</button>
+    <button class="btn-sub"          onclick="switchMode('basic')">📚 기초 모드로 가기</button>
+  </div>
+</div>
+
+<!-- ═══ COMPLETE (basic) ═══ -->
+<div class="overlay hidden" id="ov-done-basic">
+  <div class="ocard">
+    <div class="oemoji" id="done-emoji-basic">🎉</div>
+    <div class="mode-badge basic">기초 모드</div>
+    <div class="otitle" id="done-title-basic">완성!</div>
+    <div class="rbar"><div class="rfill" id="rfill-basic" style="width:0%"></div></div>
+    <div class="stats">
+      <div class="sbox"><div class="snum" id="bf-time">—</div><div class="slabel">걸린 시간</div></div>
+      <div class="sbox"><div class="snum" id="bf-wrong" style="color:var(--ng)">—</div><div class="slabel">틀린 횟수</div></div>
+      <div class="sbox"><div class="snum" id="bf-grade" style="color:var(--te)">—</div><div class="slabel">평가</div></div>
+    </div>
+    <div class="bestbox">
+      <div class="trophy">🏆</div>
+      <div class="binfo">
+        <div class="blabel">기초 최고 기록</div>
+        <div class="btime" id="db-best-time">—</div>
+        <div class="bdetail" id="db-best-detail"></div>
+      </div>
+    </div>
+    <div class="osub" id="bf-msg" style="margin-bottom:12px"></div>
+    <button class="btn-start" onclick="resetGame()">↺ 다시 도전!</button>
+    <button class="btn-sub"   onclick="switchMode('adv')" style="margin-top:6px">⚡ 심화 도전!</button>
+  </div>
+</div>
+
+<!-- ═══ COMPLETE (adv) ═══ -->
+<div class="overlay hidden" id="ov-done-adv">
+  <div class="ocard">
+    <div class="oemoji" id="done-emoji-adv">🏆</div>
+    <div class="mode-badge adv">심화 모드</div>
+    <div class="otitle" id="done-title-adv">시간 종료!</div>
+    <div class="big-score" id="af-score">0</div>
+    <div class="big-score-label">쌍 완성</div>
+    <div class="rbar"><div class="rfill" id="rfill-adv" style="width:0%;background:linear-gradient(to right,var(--adv),var(--advl))"></div></div>
+    <div class="stats">
+      <div class="sbox"><div class="snum" id="af-combo" style="color:var(--gold)">—</div><div class="slabel">최고 콤보</div></div>
+      <div class="sbox"><div class="snum" id="af-wrong" style="color:var(--ng)">—</div><div class="slabel">틀린 횟수</div></div>
+      <div class="sbox"><div class="snum" id="af-grade" style="color:var(--adv)">—</div><div class="slabel">평가</div></div>
+    </div>
+    <div class="bestbox">
+      <div class="trophy">🏆</div>
+      <div class="binfo">
+        <div class="blabel">심화 최고 기록</div>
+        <div class="btime" id="da-best-time">—</div>
+        <div class="bdetail" id="da-best-detail"></div>
+      </div>
+    </div>
+    <div class="osub" id="af-msg" style="margin-bottom:12px"></div>
+    <button class="btn-start adv-btn" onclick="resetGame()">↺ 다시 도전!</button>
+    <button class="btn-sub"          onclick="switchMode('basic')" style="margin-top:6px">📚 기초로 가기</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
+const BASIC_PAIRS = [
+  {left:"인구",           right:"일정한 지역에 살고 있는 사람의 수"},
+  {left:"인구 분포",      right:"인구가 모이거나 흩어져 있는 정도"},
+  {left:"인구 밀도",      right:"1km² 안에 사는 사람의 수"},
+  {left:"자연환경",       right:"기후·지형이 인구 분포에 영향을 줌"},
+  {left:"인문환경",       right:"교통·일자리·교육이 인구 분포에 영향을 줌"},
+  {left:"서울특별시",     right:"인구 밀도 약 15,506명/km² — 세계 최고 수준"},
+  {left:"강원특별자치도", right:"인구 밀도 약 91명/km² — 서울의 170분의 1"},
+  {left:"도시 발달 지역", right:"인구 밀도가 높게 나타남"},
+];
+
+// 심화: 더 어려운 12쌍 (무한 풀에서 랜덤 4개씩 출제)
+const ADV_PAIRS = [
+  // ── 면적·밀도 수치 ──
+  {left:"약 605km²",             right:"서울특별시 면적"},
+  {left:"약 16,831km²",          right:"강원특별자치도 면적"},
+  {left:"약 15,506명/km²",       right:"서울특별시 인구 밀도"},
+  {left:"약 91명/km²",           right:"강원특별자치도 인구 밀도"},
+  {left:"약 350명/km²",          right:"제주도 인구 밀도"},
+  {left:"약 516명/km²",          right:"우리나라 전체 평균 인구 밀도"},
+  {left:"약 58명/km²",           right:"세계 평균 인구 밀도"},
+
+  // ── 극단적 대비 ──
+  {left:"약 1,119명/km²",        right:"방글라데시 인구 밀도"},
+  {left:"약 2명/km²",            right:"몽골 인구 밀도"},
+  {left:"방글라데시 vs 몽골",     right:"인구 밀도 약 560배 차이"},
+  {left:"세계 인구의 절반",       right:"지구 육지 면적의 1%에 모여 삶"},
+  {left:"상주 인구 0명",          right:"남극 대륙"},
+
+  // ── 인구 규모 감각 ──
+  {left:"세계 인구 약 82억 명",   right:"2024년 기준 세계 인구"},
+  {left:"1초에 약 4.5명",         right:"전 세계에서 태어나는 속도"},
+  {left:"세계 인구 1위 나라",     right:"인도 — 2023년 중국 추월"},
+  {left:"1800년 → 2024년",        right:"세계 인구 10억 → 82억, 약 8배 증가"},
+
+  // ── 한국 특이점 ──
+  {left:"전국 면적의 0.6%",       right:"서울 면적이 차지하는 비율"},
+  {left:"서울보다 28배 넓지만…",  right:"강원도 인구는 서울의 16분의 1"},
+  {left:"수도권 인구 집중률 50%", right:"전 세계에서 보기 드문 극단적 집중"},
+  {left:"우리나라 인구 밀도",     right:"세계 평균의 약 9배"},
+
+  // ── 인구 이동 원인 사례 ──
+  {left:"경부고속도로 개통(1970년대)", right:"수원·대전·대구 인구 폭발적 증가"},
+  {left:"삼성 반도체 공장",        right:"평택·화성 인구 급증 — 일자리 효과"},
+  {left:"좋은 학군을 찾아 이사",   right:"강남 아파트값 상승의 원인 중 하나"},
+
+  // ── 자연환경 ──
+  {left:"사막·극지방·열대우림",   right:"기후 때문에 인구 희박"},
+  {left:"나일강·황허강 유역",     right:"하천 평야 — 인구 밀집"},
+];
+
+// ══════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════
+const KEY_B = 'pop_basic_v2';
+const KEY_A = 'pop_adv_v2';
+function getB(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
+function setB(k,d){try{localStorage.setItem(k,JSON.stringify(d));}catch(e){}}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function today(){return new Date().toLocaleDateString('ko-KR');}
+
+function updateBestUI(){
+  const bb=getB(KEY_B), ab=getB(KEY_A);
+  // header best
+  const cur = currentMode==='adv' ? ab : bb;
+  if(cur){
+    if(currentMode==='basic') document.getElementById('best-display').textContent='🏆 '+fmt(cur.secs);
+    else document.getElementById('best-display').textContent='🏆 '+cur.score+'쌍';
+  } else {
+    document.getElementById('best-display').textContent='🏆 기록없음';
+  }
+  // start screens
+  if(bb){
+    document.getElementById('sb-basic-time').textContent=fmt(bb.secs);
+    document.getElementById('sb-basic-detail').textContent='틀린 횟수 '+bb.wrong+'번 · '+bb.date;
+  }else{
+    document.getElementById('sb-basic-time').textContent='아직 없어요';
+    document.getElementById('sb-basic-detail').textContent='첫 번째 기록에 도전!';
+  }
+  if(ab){
+    document.getElementById('sb-adv-time').textContent=ab.score+'쌍';
+    document.getElementById('sb-adv-detail').textContent='틀린 횟수 '+ab.wrong+'번 · '+ab.date;
+  }else{
+    document.getElementById('sb-adv-time').textContent='아직 없어요';
+    document.getElementById('sb-adv-detail').textContent='첫 번째 기록에 도전!';
+  }
+}
+
+// ══════════════════════════════════════════
+//  MODE SWITCH
+// ══════════════════════════════════════════
+let currentMode = 'basic';
+
+function switchMode(mode){
+  stopAll();
+  currentMode = mode;
+  const isAdv = mode==='adv';
+
+  // tabs
+  document.getElementById('tab-basic').className='tab'+(isAdv?'':' active-basic');
+  document.getElementById('tab-adv').className  ='tab'+(isAdv?' active-adv':'');
+
+  // header
+  const hdr=document.getElementById('main-header');
+  hdr.className=isAdv?'adv-header':'';
+  document.getElementById('h-title').textContent=isAdv?'⚡ 30초 스피드 챌린지':'🗺️ 인구 분포 짝 맞추기';
+
+  // timebar
+  document.getElementById('timebar-wrap').className='timebar-wrap'+(isAdv?' visible':'');
+
+  // player labels
+  document.getElementById('plabel-l').className='plabel L'+(isAdv?' adv':'');
+  document.getElementById('plabel-r').className='plabel R'+(isAdv?' adv':'');
+  document.getElementById('pl-txt').textContent=isAdv?'왼쪽 — 문제 카드':'왼쪽 — 개념 카드';
+  document.getElementById('pr-txt').textContent=isAdv?'오른쪽 — 답 카드':'오른쪽 — 설명 카드';
+
+  // score label
+  document.getElementById('score-display').style.display=isAdv?'none':'';
+  document.getElementById('combo-box').style.display='none';
+
+  // game area
+  document.getElementById('game-area').className='game-area'+(isAdv?' adv-mode':'');
+
+  hideAllOverlays();
+  clearCards(); clearSVG();
+  updateBestUI();
+
+  if(isAdv) document.getElementById('ov-start-adv').classList.remove('hidden');
+  else      document.getElementById('ov-start-basic').classList.remove('hidden');
+}
+
+// ══════════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════════
+let selL=null,selR=null,matched=new Set(),wrongCnt=0,active=false;
+let t0=null,tiv=null;
+// basic
+let sL=[],sR=[];
+// adv
+let advScore=0,advCombo=0,advMaxCombo=0,advTimeLeft=30;
+let advPool=[],advActiveL=[],advActiveR=[];
+let advRoundMatched=0; // 현재 세트에서 맞힌 수
+let advTimerIv=null;
+
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+function stopAll(){
+  clearInterval(tiv); clearInterval(advTimerIv);
+  active=false;
+}
+
+// ══════════════════════════════════════════
+//  START
+// ══════════════════════════════════════════
+function startGame(mode){
+  hideAllOverlays();
+  selL=selR=null; matched=new Set(); wrongCnt=0; active=true;
+
+  if(mode==='basic'){
+    sL=shuffle(BASIC_PAIRS.map((p,i)=>({...p,idx:i})));
+    sR=shuffle(BASIC_PAIRS.map((p,i)=>({...p,idx:i})));
+    buildBasicCards();
+    t0=Date.now();
+    clearInterval(tiv);
+    tiv=setInterval(()=>{document.getElementById('timer').textContent=fmt(Math.floor((Date.now()-t0)/1000));},500);
+    document.getElementById('timer').textContent='00:00';
+    document.getElementById('score-display').textContent='0 / 8';
+  } else {
+    advScore=0; advCombo=0; advMaxCombo=0; advTimeLeft=30; advRoundMatched=0;
+    advPool=shuffle([...ADV_PAIRS]);
+    document.getElementById('timer').textContent='30';
+    document.getElementById('best-display').textContent='🏆 기록없음';
+    updateBestUI();
+    buildAdvCards();
+    startAdvTimer();
+  }
+}
+
+function resetGame(){
+  stopAll();
+  selL=selR=null; matched=new Set(); wrongCnt=0;
+  clearCards(); clearSVG();
+  document.getElementById('timer').textContent= currentMode==='basic'?'00:00':'30';
+  document.getElementById('score-display').textContent='0 / 8';
+  document.getElementById('combo-box').style.display='none';
+  document.getElementById('timebar').style.width='100%';
+  document.getElementById('timebar').classList.remove('danger');
+  hideAllOverlays();
+  updateBestUI();
+  if(currentMode==='basic') document.getElementById('ov-start-basic').classList.remove('hidden');
+  else                       document.getElementById('ov-start-adv').classList.remove('hidden');
+}
+
+// ══════════════════════════════════════════
+//  BASIC CARDS
+// ══════════════════════════════════════════
+function buildBasicCards(){
+  const cL=document.getElementById('col-left');
+  const cR=document.getElementById('col-right');
+  cL.innerHTML=''; cR.innerHTML='';
+  sL.forEach(item=>{
+    const d=mkCard('L'+item.idx, item.left, ()=>tap(d,'L',item.idx));
+    cL.appendChild(d);
+  });
+  sR.forEach(item=>{
+    const d=mkCard('R'+item.idx, item.right, ()=>tap(d,'R',item.idx));
+    cR.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════
+//  ADV CARDS — 4쌍씩 표시
+// ══════════════════════════════════════════
+const ADV_SLOTS = 4;
+
+function buildAdvCards(){
+  const cL=document.getElementById('col-left');
+  const cR=document.getElementById('col-right');
+  cL.innerHTML=''; cR.innerHTML='';
+  advActiveL=[]; advActiveR=[];
+
+  // pick 4 pairs from pool
+  const pairs = pickAdvPairs(ADV_SLOTS);
+  const rightShuffled = shuffle([...pairs]);
+
+  pairs.forEach((p,i)=>{
+    const lc=mkCard('AL'+i, p.left, ()=>advTap(lc,'L',i));
+    lc.dataset.pairid=i;
+    cL.appendChild(lc);
+    advActiveL.push({el:lc, pairid:i, text:p.left, rightText:p.right});
+  });
+  rightShuffled.forEach((p,i)=>{
+    const origIdx = pairs.indexOf(p);
+    const rc=mkCard('AR'+i, p.right, ()=>advTap(rc,'R',i));
+    rc.dataset.pairid=origIdx;
+    rc.dataset.slotid=i;
+    cR.appendChild(rc);
+    advActiveR.push({el:rc, slotid:i, pairid:origIdx, text:p.right});
+  });
+}
+
+function pickAdvPairs(n){
+  if(advPool.length < n){
+    advPool = [...advPool, ...shuffle([...ADV_PAIRS])];
+  }
+  return advPool.splice(0,n);
+}
+
+// ══════════════════════════════════════════
+//  ADV TIMER
+// ══════════════════════════════════════════
+function startAdvTimer(){
+  const bar=document.getElementById('timebar');
+  bar.style.width='100%';
+  bar.classList.remove('danger');
+  clearInterval(advTimerIv);
+  advTimerIv=setInterval(()=>{
+    advTimeLeft -= 0.1;
+    if(advTimeLeft<=0){advTimeLeft=0;}
+    const pct=Math.max(0,(advTimeLeft/30)*100);
+    bar.style.width=pct+'%';
+    document.getElementById('timer').textContent=Math.ceil(advTimeLeft)+'초';
+    if(advTimeLeft<=10) bar.classList.add('danger');
+    if(advTimeLeft<=0){clearInterval(advTimerIv);advDone();}
+  },100);
+}
+
+function penalizeTime(sec){
+  advTimeLeft = Math.max(0, advTimeLeft-sec);
+  // flash
+  const f=document.getElementById('pflash');
+  f.classList.add('show');
+  setTimeout(()=>f.classList.remove('show'),200);
+}
+
+// ══════════════════════════════════════════
+//  TAP HANDLERS
+// ══════════════════════════════════════════
+function tap(el,side,idx){
+  if(!active||matched.has(idx))return;
+  if(side==='L'){
+    if(selL!==null) document.getElementById('L'+selL)?.classList.remove('SL');
+    selL=idx; el.classList.add('SL');
+    clearTemp();
+    if(selR!==null) drawTemp('L'+idx,'R'+selR);
+  } else {
+    if(selR!==null) document.getElementById('R'+selR)?.classList.remove('SR');
+    selR=idx; el.classList.add('SR');
+    if(selL!==null){drawTemp('L'+selL,'R'+idx);setTimeout(checkBasic,80);}
+  }
+}
+
+function advTap(el,side,slotid){
+  if(!active)return;
+  if(side==='L'){
+    // desel prev
+    advActiveL.forEach(x=>x.el.classList.remove('SL'));
+    selL=slotid; el.classList.add('SL');
+    clearTemp();
+    if(selR!==null){
+      const rItem=advActiveR.find(x=>x.slotid===selR);
+      if(rItem) drawTemp(el.id, rItem.el.id);
+    }
+  } else {
+    advActiveR.forEach(x=>x.el.classList.remove('SR'));
+    selR=slotid; el.classList.add('SR');
+    if(selL!==null){
+      const lItem=advActiveL.find(x=>x.pairid===selL);
+      if(lItem){drawTemp(lItem.el.id, el.id);setTimeout(checkAdv,80);}
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+//  CHECK — BASIC
+// ══════════════════════════════════════════
+function checkBasic(){
+  if(selL===null||selR===null)return;
+  const lE=document.getElementById('L'+selL);
+  const rE=document.getElementById('R'+selR);
+  if(selL===selR){
+    matched.add(selL);
+    lE.classList.remove('SL'); rE.classList.remove('SR');
+    lE.classList.add('OK');    rE.classList.add('OK');
+    drawOK(lE.id, rE.id);
+    toast('정답! 🎉','ok');
+    document.getElementById('score-display').textContent=matched.size+' / 8';
+    selL=selR=null;
+    if(matched.size===BASIC_PAIRS.length) setTimeout(basicDone,550);
+  } else {
+    wrongCnt++;
+    lE.classList.add('NG'); rE.classList.add('NG');
+    toast('틀렸어요! 다시 눌러봐요 🔁','ng');
+    clearTemp();
+    setTimeout(()=>{lE.classList.remove('NG','SL');rE.classList.remove('NG','SR');selL=selR=null;},380);
+  }
+}
+
+// ══════════════════════════════════════════
+//  CHECK — ADV
+// ══════════════════════════════════════════
+function checkAdv(){
+  if(selL===null||selR===null)return;
+  const lItem=advActiveL.find(x=>x.pairid===selL);
+  const rItem=advActiveR.find(x=>x.slotid===selR);
+  if(!lItem||!rItem)return;
+
+  const correct = lItem.pairid === rItem.pairid;
+
+  if(correct){
+    advScore++;
+    advRoundMatched++;
+    advCombo++;
+    if(advCombo>advMaxCombo) advMaxCombo=advCombo;
+
+    lItem.el.classList.remove('SL'); rItem.el.classList.remove('SR');
+    lItem.el.classList.add('OK');    rItem.el.classList.add('OK');
+    drawOK(lItem.el.id, rItem.el.id);
+
+    // combo display
+    const cb=document.getElementById('combo-box');
+    cb.style.display='flex';
+    cb.textContent='🔥 '+advCombo+' 콤보!';
+
+    // score pop
+    const sp=document.getElementById('spop');
+    sp.textContent= advCombo>=3 ? '🔥 '+advCombo+' 콤보!':'✓ +1';
+    sp.className='score-pop show';
+    setTimeout(()=>sp.className='score-pop',700);
+
+    if(advCombo>=3) toast('🔥 '+advCombo+' 콤보!','combo');
+    else toast('정답! 🎉','ok');
+
+    selL=selR=null;
+
+    // 4쌍 모두 맞추면 새 세트 로드
+    if(advRoundMatched >= ADV_SLOTS){
+      setTimeout(loadNewAdvSet, 500);
+    }
+  } else {
+    advCombo=0;
+    document.getElementById('combo-box').textContent='🔥 0 콤보';
+    wrongCnt++;
+    lItem.el.classList.add('NG'); rItem.el.classList.add('NG');
+    penalizeTime(2);
+    toast('틀렸어요! ⏰ -2초','ng');
+    clearTemp();
+    setTimeout(()=>{
+      lItem.el.classList.remove('NG','SL');
+      rItem.el.classList.remove('SR','NG');
+      selL=selR=null;
+    },380);
+  }
+}
+
+// 4쌍 모두 맞춘 뒤 새 세트 통째로 교체
+function loadNewAdvSet(){
+  if(!active) return;
+  advRoundMatched=0;
+  selL=selR=null;
+  clearSVG();
+
+  const pairs = pickAdvPairs(ADV_SLOTS);
+  const rightShuffled = shuffle([...pairs]);
+
+  // 왼쪽 카드 교체
+  pairs.forEach((p, i)=>{
+    const old = advActiveL[i];
+    const lc = mkCard(old.el.id, p.left, ()=>advTap(lc,'L',i));
+    lc.classList.add('slide-in');
+    lc.dataset.pairid = i;
+    old.el.replaceWith(lc);
+    advActiveL[i] = {el:lc, pairid:i, text:p.left, rightText:p.right};
+  });
+
+  // 오른쪽 카드 교체 (섞어서)
+  rightShuffled.forEach((p, i)=>{
+    const origIdx = pairs.indexOf(p);
+    const old = advActiveR[i];
+    const rc = mkCard(old.el.id, p.right, ()=>advTap(rc,'R',i));
+    rc.classList.add('slide-in');
+    rc.dataset.pairid = origIdx;
+    rc.dataset.slotid = i;
+    old.el.replaceWith(rc);
+    advActiveR[i] = {el:rc, slotid:i, pairid:origIdx, text:p.right};
+  });
+
+  toast('🆕 새 문제 세트!','combo');
+}
+
+// ══════════════════════════════════════════
+//  CARD FACTORY
+// ══════════════════════════════════════════
+function mkCard(id, text, cb){
+  const d=document.createElement('div');
+  d.className='card'; d.id=id; d.textContent=text;
+  d.addEventListener('click',cb);
+  return d;
+}
+
+function clearCards(){
+  document.getElementById('col-left').innerHTML='';
+  document.getElementById('col-right').innerHTML='';
+}
+
+// ══════════════════════════════════════════
+//  SVG LINES
+// ══════════════════════════════════════════
+const svg=document.getElementById('svg');
+function clearSVG(){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function clearTemp(){document.getElementById('tmp')?.remove();}
+
+function dotPos(id, side){
+  const el=document.getElementById(id); if(!el)return null;
+  const r=el.getBoundingClientRect();
+  const a=document.getElementById('game-area').getBoundingClientRect();
+  return side==='L'
+    ?{x:r.right-a.left-1, y:r.top-a.top+r.height/2}
+    :{x:r.left-a.left+1,  y:r.top-a.top+r.height/2};
+}
+
+function sideOf(id){return (id.startsWith('L')||id.startsWith('AL'))?'L':'R';}
+
+function mkPath(a,b,col,w,op,dash,pid){
+  const mx=(a.x+b.x)/2;
+  const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d',`M${a.x},${a.y} C${mx},${a.y} ${mx},${b.y} ${b.x},${b.y}`);
+  p.setAttribute('stroke',col); p.setAttribute('stroke-width',w);
+  p.setAttribute('fill','none'); p.setAttribute('opacity',op);
+  p.setAttribute('stroke-linecap','round');
+  if(dash) p.setAttribute('stroke-dasharray',dash);
+  if(pid)  p.id=pid;
+  return p;
+}
+
+function drawTemp(lid, rid){
+  clearTemp();
+  const a=dotPos(lid,'L'), b=dotPos(rid,'R'); if(!a||!b)return;
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.id='tmp';
+  g.appendChild(mkPath(a,b,'#C9B3E8',12,0.2,null,null));
+  g.appendChild(mkPath(a,b,'#9B72CF',3,0.8,'8 5',null));
+  svg.appendChild(g);
+}
+
+function drawOK(lid, rid){
+  clearTemp();
+  const a=dotPos(lid,'L'), b=dotPos(rid,'R'); if(!a||!b)return;
+  svg.appendChild(mkPath(a,b,'#A5D6A7',18,0.22,null,null));
+  svg.appendChild(mkPath(a,b,'#FFFFFF',6,0.35,null,null));
+  svg.appendChild(mkPath(a,b,'#2E7D32',5,1,null,null));
+  const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+  const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx',mx); c.setAttribute('cy',my); c.setAttribute('r',7); c.setAttribute('fill','#2E7D32');
+  const cw=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  cw.setAttribute('cx',mx); cw.setAttribute('cy',my); cw.setAttribute('r',4); cw.setAttribute('fill','white');
+  svg.appendChild(c); svg.appendChild(cw);
+}
+
+// ══════════════════════════════════════════
+//  COMPLETE
+// ══════════════════════════════════════════
+function basicDone(){
+  stopAll(); active=false;
+  const el=Math.floor((Date.now()-t0)/1000);
+  const prev=getB(KEY_B);
+  const isNew=!prev||el<prev.secs;
+  if(isNew) setB(KEY_B,{secs:el,wrong:wrongCnt,date:today()});
+  const best=getB(KEY_B);
+
+  document.getElementById('bf-time').textContent=fmt(el);
+  document.getElementById('bf-wrong').textContent=wrongCnt+'번';
+
+  let grade,msg,emoji;
+  if(wrongCnt===0&&el<60){grade='🏆';msg='완벽해요! 틀린 것 없이 1분 안에 완성!';emoji='🎊';}
+  else if(wrongCnt<=2&&el<90){grade='⭐⭐';msg='아주 잘했어요!';emoji='🎉';}
+  else if(wrongCnt<=4){grade='⭐';msg='잘했어요! 다시 도전해볼까요?';emoji='😊';}
+  else{grade='💪';msg='포기하지 않고 완성! 대단해요!';emoji='👏';}
+
+  document.getElementById('bf-grade').textContent=grade;
+  document.getElementById('bf-msg').textContent=msg;
+  document.getElementById('done-emoji-basic').textContent=emoji;
+  document.getElementById('done-title-basic').innerHTML=isNew?'새 기록! <span class="newbadge">NEW 🎊</span>':'완성!';
+  document.getElementById('db-best-time').textContent=fmt(best.secs);
+  document.getElementById('db-best-detail').textContent='틀린 횟수 '+best.wrong+'번 · '+best.date;
+  setTimeout(()=>document.getElementById('rfill-basic').style.width='100%',100);
+  document.getElementById('ov-done-basic').classList.remove('hidden');
+  updateBestUI();
+}
+
+function advDone(){
+  stopAll(); active=false;
+  const prev=getB(KEY_A);
+  const isNew=!prev||advScore>prev.score;
+  if(isNew) setB(KEY_A,{score:advScore,wrong:wrongCnt,combo:advMaxCombo,date:today()});
+  const best=getB(KEY_A);
+
+  document.getElementById('af-score').textContent=advScore;
+  document.getElementById('af-combo').textContent=advMaxCombo+'콤보';
+  document.getElementById('af-wrong').textContent=wrongCnt+'번';
+
+  let grade,msg,emoji;
+  if(advScore>=10){grade='🏆';msg='전설! 10쌍 이상 완성!';emoji='🎊';}
+  else if(advScore>=7){grade='⭐⭐';msg='엄청 빠르네요!';emoji='🎉';}
+  else if(advScore>=4){grade='⭐';msg='좋아요! 다시 도전해봐요!';emoji='😊';}
+  else{grade='💪';msg='연습하면 더 잘 할 수 있어요!';emoji='👏';}
+
+  document.getElementById('af-grade').textContent=grade;
+  document.getElementById('af-msg').textContent=msg;
+  document.getElementById('done-emoji-adv').textContent=emoji;
+  document.getElementById('done-title-adv').innerHTML=isNew?'새 기록! <span class="newbadge">NEW 🎊</span>':'시간 종료!';
+  document.getElementById('da-best-time').textContent=best.score+'쌍';
+  document.getElementById('da-best-detail').textContent='최고 콤보 '+best.combo+' · 틀린 횟수 '+best.wrong+'번 · '+best.date;
+  setTimeout(()=>document.getElementById('rfill-adv').style.width='100%',100);
+  document.getElementById('ov-done-adv').classList.remove('hidden');
+  updateBestUI();
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function hideAllOverlays(){
+  ['ov-start-basic','ov-start-adv','ov-done-basic','ov-done-adv'].forEach(id=>{
+    document.getElementById(id).classList.add('hidden');
+  });
+}
+
+let tT=null;
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  clearTimeout(tT); tT=setTimeout(()=>t.className='toast',1600);
+}
+
+// ── INIT ──
+updateBestUI();
+</script>
+</body>
+</html>
