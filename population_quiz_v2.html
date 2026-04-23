@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>2단원 마무리 · 우리나라의 인구 분포</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf8f3;
+    --ink: #2b2420;
+    --ink-soft: #6a5f58;
+    --line: #e8ddd0;
+    --card: #ffffff;
+    --accent: #d65a3a;
+    --accent-soft: #fbe8e0;
+    --ok: #3f8a5c;
+    --ok-soft: #e3f1e8;
+    --bad: #c0392b;
+    --bad-soft: #fbe4e1;
+    --gold: #c8892a;
+    --gold-soft: #fff6e3;
+    --shadow: 0 4px 20px rgba(60, 40, 20, 0.08);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.55;
+    overscroll-behavior-y: none;
+  }
+  body {
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(214, 90, 58, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(200, 137, 42, 0.04) 0%, transparent 40%);
+  }
+
+  .screen { max-width: 860px; margin: 0 auto; padding: 24px 22px 140px; }
+
+  /* ===== 시작 화면 ===== */
+  .start-hero { text-align: center; padding: 56px 24px 40px; }
+  .start-hero .unit-tag {
+    display: inline-block;
+    font-family: 'Gaegu', sans-serif;
+    font-size: 22px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .start-hero h1 {
+    font-size: 38px;
+    margin: 18px 0 10px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+  .start-hero .subtitle {
+    color: var(--ink-soft);
+    font-size: 17px;
+    margin-bottom: 36px;
+  }
+  .start-info {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    max-width: 520px;
+    margin: 0 auto 32px;
+    box-shadow: var(--shadow);
+    text-align: left;
+  }
+  .start-info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; }
+  .start-info dt { font-weight: 700; color: var(--accent); font-size: 15px; }
+  .start-info dd { margin: 0; color: var(--ink); font-size: 15px; }
+  .start-info .tip {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px dashed var(--line);
+    font-size: 14px; color: var(--ink-soft);
+    grid-column: 1 / -1;
+    line-height: 1.7;
+  }
+  .start-info .tip strong { color: var(--accent); }
+
+  .name-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 18px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    font-family: inherit;
+    color: var(--ink);
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .name-input:focus { outline: none; border-color: var(--accent); }
+
+  /* ===== 버튼 ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 32px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+    min-height: 52px;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 4px 0 #a8422a;
+  }
+  .btn-primary:hover { background: #c14e30; }
+  .btn-primary:active { box-shadow: 0 1px 0 #a8422a; transform: translateY(3px); }
+  .btn-primary:disabled {
+    background: #d4c5b8; color: #f5ede4;
+    box-shadow: 0 4px 0 #b8a99c;
+    cursor: not-allowed;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1.5px solid var(--line);
+  }
+  .btn-ghost:hover { background: var(--card); }
+  .btn-submit {
+    background: var(--ok);
+    color: white;
+    box-shadow: 0 4px 0 #2c6843;
+  }
+  .btn-submit:hover { background: #368550; }
+  .btn-submit:active { box-shadow: 0 1px 0 #2c6843; transform: translateY(3px); }
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+
+  /* ===== 퀴즈 화면 ===== */
+  .progress-bar {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 14px 0 12px;
+    z-index: 10;
+    margin: -24px -22px 20px;
+    padding-left: 22px;
+    padding-right: 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .progress-meta .area-tag {
+    font-family: 'Gaegu', sans-serif;
+    font-size: 18px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .progress-meta .count {
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-meta .answered {
+    color: var(--ok);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .progress-track {
+    height: 6px;
+    background: var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    transition: width 0.4s ease;
+    border-radius: 3px;
+  }
+
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px 24px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+  .q-num {
+    font-family: 'Gaegu', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .q-type {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    background: var(--bg);
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+  .q-points {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 700;
+    background: var(--gold-soft);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .q-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    margin-top: 12px;
+    font-weight: 500;
+  }
+  .q-text .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--accent);
+    padding: 0 6px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ===== 선택지 ===== */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 16px;
+    min-height: 54px;
+    user-select: none;
+  }
+  .option:hover { border-color: #c8b9a8; background: #f7efe4; }
+  .option.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .option-letter {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .option.selected .option-letter {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .ox-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ox-btn {
+    padding: 22px;
+    font-size: 28px;
+    font-weight: 700;
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .ox-btn.o { color: var(--ok); }
+  .ox-btn.x { color: var(--bad); }
+  .ox-btn:hover { background: white; }
+  .ox-btn.selected.o { background: var(--ok-soft); border-color: var(--ok); }
+  .ox-btn.selected.x { background: var(--bad-soft); border-color: var(--bad); }
+
+  .short-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 17px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+    font-family: inherit;
+    color: var(--ink);
+    transition: border-color 0.2s;
+  }
+  .short-input:focus { outline: none; border-color: var(--accent); background: white; }
+
+  .long-input {
+    width: 100%;
+    min-height: 110px;
+    padding: 14px 18px;
+    font-size: 16px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+    font-family: inherit;
+    color: var(--ink);
+    resize: vertical;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  .long-input:focus { outline: none; border-color: var(--accent); background: white; }
+
+  /* ===== 힌트 영역 ===== */
+  .hint-area {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+  }
+  .hint-trigger {
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hint-trigger:hover { background: var(--gold-soft); }
+  .hint-trigger .warn {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin-left: 4px;
+  }
+  .hint-shown {
+    margin-top: 12px;
+    padding: 14px 18px;
+    background: var(--gold-soft);
+    border-left: 4px solid var(--gold);
+    border-radius: 8px;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .hint-shown .hint-label {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .hint-shown .hint-content {
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .hint-shown .chosung {
+    display: inline-block;
+    font-family: 'Gaegu', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 6px;
+    background: white;
+    padding: 4px 14px;
+    border-radius: 8px;
+    margin-left: 6px;
+  }
+  .hint-note {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* ===== 하단 바 ===== */
+  .action-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(253, 248, 243, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+    padding: 14px 22px;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    flex-wrap: wrap;
+  }
+  .action-bar .spacer { flex: 1; }
+  .action-bar .nav-mid {
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 0 8px;
+  }
+
+  /* ===== 제출 확인 모달 ===== */
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(43, 36, 32, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px 26px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal h2 { margin: 0 0 10px; font-size: 22px; }
+  .modal p { color: var(--ink-soft); font-size: 15px; margin: 0 0 20px; line-height: 1.6; }
+  .modal .unfinished {
+    background: var(--bad-soft);
+    border-left: 4px solid var(--bad);
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ===== 서술형 자기 점검 ===== */
+  .self-check-card {
+    background: var(--card);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .self-check-card .sc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .self-check-card .sc-num {
+    font-family: 'Gaegu', sans-serif;
+    font-size: 22px;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .self-check-card .sc-label {
+    font-weight: 700;
+    color: var(--gold);
+    font-size: 14px;
+    background: var(--gold-soft);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .self-check-card .sc-question {
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .self-check-card .sc-my-answer {
+    background: var(--bg);
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .self-check-card .sc-my-answer.empty { color: var(--ink-soft); font-style: italic; }
+  .sc-model {
+    background: var(--ok-soft);
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    border-left: 3px solid var(--ok);
+  }
+  .sc-model-label { font-size: 13px; color: var(--ok); font-weight: 700; margin-bottom: 4px; }
+  .sc-hint-used {
+    font-size: 13px;
+    color: var(--gold);
+    margin-bottom: 12px;
+    background: var(--gold-soft);
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .sc-btns-label {
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .sc-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sc-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    border: 2px solid var(--line);
+    background: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .sc-btn:hover { border-color: var(--gold); }
+  .sc-btn.selected[data-score="2"] { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+  .sc-btn.selected[data-score="1"] { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+  .sc-btn.selected[data-score="0"] { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+
+  /* ===== 결과 ===== */
+  .result-hero { text-align: center; padding: 30px 16px 20px; }
+  .result-hero .ribbon {
+    display: inline-block;
+    font-family: 'Gaegu', sans-serif;
+    font-size: 22px;
+    color: var(--gold);
+    background: var(--gold-soft);
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .score-big {
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin: 18px 0 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .score-big small { font-size: 28px; color: var(--ink-soft); font-weight: 600; }
+  .score-comment {
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .score-meta {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+  }
+  .score-meta .chip {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+  .score-meta .chip strong { color: var(--ink); }
+
+  .area-results {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin: 28px 0 20px;
+    box-shadow: var(--shadow);
+  }
+  .area-results h3, .review-list h3, .self-check-section-header {
+    margin: 0 0 18px;
+    font-size: 16px;
+    color: var(--ink-soft);
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+  .area-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 16px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .area-row:last-child { margin-bottom: 0; }
+  .area-name { font-weight: 600; font-size: 15px; }
+  .area-score {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 15px;
+  }
+  .area-bar {
+    grid-column: 1 / -1;
+    height: 8px;
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .area-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 4px;
+    transition: width 0.8s ease;
+  }
+
+  .review-list {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .review-item {
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .review-item:last-child { border-bottom: none; }
+  .review-item .q {
+    font-size: 15px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .review-item .a-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 14px;
+  }
+  .review-item .your-ans { color: var(--bad); }
+  .review-item .correct-ans { color: var(--ok); font-weight: 700; }
+  .review-item .reason-chip {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+    background: var(--gold-soft);
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .review-item .explain-mini {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    background: var(--bg);
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 640px) {
+    .screen { padding: 18px 14px 140px; }
+    .progress-bar { margin: -18px -14px 16px; padding-left: 14px; padding-right: 14px; }
+    .question-card, .self-check-card { padding: 20px 18px; }
+    .q-text { font-size: 17px; }
+    .start-hero h1 { font-size: 30px; }
+    .score-big { font-size: 60px; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ===== 시작 ===== -->
+<div id="start-screen" class="screen">
+  <div class="start-hero">
+    <span class="unit-tag">5학년 사회 · 2단원</span>
+    <h1>우리나라의 인구 분포</h1>
+    <p class="subtitle">단원에서 배운 내용을 확인해 봅시다</p>
+  </div>
+
+  <div class="start-info">
+    <dl>
+      <dt>문제 수</dt><dd>총 35문제</dd>
+      <dt>영역</dt><dd>인구 밀도 · 인구 분포 · 문제점 · 해결 노력</dd>
+      <dt>유형</dt><dd>OX · 선택형 · 빈칸 · 서술형</dd>
+      <dt>예상 시간</dt><dd>약 25~30분</dd>
+    </dl>
+    <div class="tip">
+      💡 <strong>모든 문제를 풀고 '제출하기'</strong>를 누르면 한꺼번에 채점해요.<br>
+      💡 <strong>막히는 문제</strong>는 힌트를 볼 수 있어요. 대신 점수가 조금 깎여요.
+    </div>
+  </div>
+
+  <div style="max-width: 500px; margin: 0 auto;">
+    <input type="text" id="name-input" class="name-input" placeholder="이름을 적어 주세요" maxlength="20" autocomplete="off">
+    <div style="text-align: center;">
+      <button class="btn btn-primary" id="start-btn" onclick="startQuiz()">시작하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 퀴즈 ===== -->
+<div id="quiz-screen" class="screen hidden">
+  <div class="progress-bar">
+    <div class="progress-meta">
+      <span class="area-tag" id="area-tag">영역</span>
+      <span class="answered" id="answered-count">0문제 풀이 완료</span>
+      <span class="count"><span id="current-num">1</span> / <span id="total-num">35</span></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width: 0%"></div></div>
+  </div>
+
+  <div id="question-container"></div>
+
+  <div class="action-bar">
+    <button class="btn btn-ghost" id="prev-btn" onclick="prevQuestion()">← 이전</button>
+    <div class="nav-mid" id="nav-indicator"></div>
+    <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">다음 →</button>
+    <button class="btn btn-submit hidden" id="submit-btn" onclick="confirmSubmit()">제출하기</button>
+  </div>
+</div>
+
+<!-- ===== 제출 확인 모달 ===== -->
+<div id="submit-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <h2>제출할까요?</h2>
+    <p>제출하면 정답을 확인할 수 있어요. 제출 후에는 답을 바꿀 수 없어요.</p>
+    <div id="unfinished-warning" class="unfinished hidden"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeSubmitModal()">더 풀래요</button>
+      <button class="btn btn-submit" onclick="submitQuiz()">제출할래요</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 서술형 자기 점검 화면 ===== -->
+<div id="self-check-screen" class="screen hidden">
+  <div class="start-hero" style="padding: 30px 16px 20px;">
+    <span class="unit-tag" style="background: var(--gold-soft); color: var(--gold);">서술형 스스로 점검</span>
+    <h1 style="font-size: 28px;">서술형을 스스로 점검해 봐요</h1>
+    <p class="subtitle" style="margin-bottom: 10px;">모범답안과 내 답을 비교해서 점수를 매겨 봐요.</p>
+  </div>
+  <div id="self-check-body"></div>
+  <div class="action-bar">
+    <div class="spacer"></div>
+    <button class="btn btn-submit" id="finalize-btn" onclick="finalizeResult()">결과 보기</button>
+  </div>
+</div>
+
+<!-- ===== 결과 ===== -->
+<div id="result-screen" class="screen hidden">
+  <div class="result-hero">
+    <span class="ribbon" id="result-ribbon">수고했어요!</span>
+    <div class="score-big"><span id="score-num">0</span><small>/<span id="score-total">35</span></small></div>
+    <div class="score-comment" id="score-comment"></div>
+    <div class="score-meta">
+      <span class="chip">정답 <strong id="correct-count">0</strong>문제</span>
+      <span class="chip">힌트 사용 <strong id="hint-count">0</strong>번</span>
+      <span class="chip">감점 <strong id="deduction">0</strong>점</span>
+    </div>
+  </div>
+
+  <div class="area-results">
+    <h3>영역별 결과</h3>
+    <div id="area-results-body"></div>
+  </div>
+
+  <div class="review-list" id="review-list-container">
+    <h3>다시 보기</h3>
+    <div id="review-list-body"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="location.reload()">처음부터 다시</button>
+    <button class="btn btn-primary" onclick="window.print()">결과 저장/인쇄</button>
+  </div>
+</div>
+
+<script>
+/* =================================================================
+   문제 데이터
+   type: ox | choice | blank | short | essay
+   area: 1~4
+   points: 문제당 기본 점수 (기본 1)
+   hint: 힌트 정보
+     - ox/choice: { type: 'text', content: '...' }  (선택지 줄여주는 힌트)
+     - blank/short: { type: 'chosung', content: '...', note: '...' }
+     - essay: { type: 'keywords', content: '...', note: '...' }
+   hintPenalty: 힌트 사용 시 감점 (기본 0.5)
+================================================================= */
+const AREAS = {
+  1: '인구 밀도와 분포',
+  2: '우리나라 인구 분포의 특성',
+  3: '인구 분포 불균형의 문제점',
+  4: '인구 분포 문제의 해결 노력'
+};
+
+const QUESTIONS = [
+  // ============ 영역 1 ============
+  { area: 1, type: 'blank',
+    q: '일정한 지역에 살고 있는 사람의 수를 ( ? )(이)라고 한다.',
+    answer: ['인구'],
+    hint: { type: 'chosung', content: 'ㅇㄱ', note: '2글자 단어예요.' },
+    explain: '인구는 일정한 지역에 살고 있는 사람의 수를 말해요.' },
+
+  { area: 1, type: 'blank',
+    q: '사람들이 모여 있거나 흩어져 있는 정도를 ( ? )(이)라고 한다.',
+    answer: ['인구 분포', '인구분포'],
+    hint: { type: 'chosung', content: 'ㅇㄱ ㅂㅍ', note: '앞 두 글자는 앞 문제와 같아요.' },
+    explain: '인구 분포는 사람들이 얼마나 모여 있거나 흩어져 있는지를 나타내요.' },
+
+  { area: 1, type: 'blank',
+    q: '일정한 넓이(1 km²) 안에 사는 사람의 수, 즉 인구가 모여 있는 정도를 ( ? )(이)라고 한다.',
+    answer: ['인구 밀도', '인구밀도'],
+    hint: { type: 'chosung', content: 'ㅇㄱ ㅁㄷ', note: '4글자 단어예요. "사람이 빽빽하다"의 "빽빽"에 해당하는 한자어가 들어가요.' },
+    explain: '인구 밀도 = 인구 ÷ 면적 으로 구할 수 있어요.' },
+
+  { area: 1, type: 'ox',
+    q: '대체로 도시가 발달한 지역에서 인구 밀도가 높게 나타난다.',
+    answer: 'O',
+    hint: { type: 'text', content: '서울·인천·경기 같은 도시 지역과 강원도의 산간 지역, 어느 쪽에 사람이 더 많이 모여 살까요?' },
+    explain: '일자리, 교통, 교육 시설이 많은 도시에 사람이 모이기 때문에 인구 밀도가 높아요.' },
+
+  { area: 1, type: 'choice',
+    q: '다음 중 인구 분포에 영향을 주는 환경이 아닌 것은?',
+    options: ['기후', '지형', '일자리', '학생들의 취미'],
+    answer: 3,
+    hint: { type: 'text', content: '인구 분포에 영향을 주는 환경은 크게 "자연환경"(기후·지형 등)과 "인문환경"(일자리·교통·교육 등)으로 나뉘어요. 이 둘 어디에도 속하지 않는 것을 골라 봐요.' },
+    explain: '인구 분포는 기후·지형 같은 자연환경과 교통·일자리·교육 같은 인문환경에 영향을 받아요.' },
+
+  { area: 1, type: 'choice',
+    q: '서울특별시와 강원특별자치도를 비교했을 때 옳은 설명은?',
+    options: [
+      '서울특별시는 면적이 강원특별자치도보다 넓다.',
+      '강원특별자치도는 인구 밀도가 서울보다 높다.',
+      '서울특별시는 면적에 비해 인구가 매우 많아 인구 밀도가 높다.',
+      '두 지역의 인구 밀도는 거의 비슷하다.'
+    ],
+    answer: 2,
+    hint: { type: 'text', content: '서울은 면적은 약 605 km²로 작은데 인구는 약 938만 명이에요. 강원은 반대로 면적이 넓은데 인구는 적어요.' },
+    explain: '서울은 면적(약 605 km²)에 비해 인구(약 938만 명)가 매우 많아서 인구 밀도가 약 15,506명/km²로 매우 높아요.' },
+
+  { area: 1, type: 'short',
+    q: '서울특별시와 강원특별자치도 중, 같은 넓이(1 km²) 안에 더 많은 사람이 살고 있는 지역은 어디일까요?',
+    answer: ['서울특별시', '서울'],
+    hint: { type: 'chosung', content: 'ㅅㅇㅌㅂㅅ', note: '인구 밀도가 더 높은 지역이에요.' },
+    explain: '서울특별시가 강원특별자치도보다 인구 밀도가 훨씬 높아요.' },
+
+  { area: 1, type: 'ox',
+    q: '인구 분포를 나타낼 때 지도에 색의 진하기를 다르게 표시하는데, 색이 진할수록 인구 밀도가 낮은 지역이다.',
+    answer: 'X',
+    hint: { type: 'text', content: '인구 분포 지도에서는 많이 모여 있을수록 색을 진하게, 적을수록 색을 연하게 표시해요.' },
+    explain: '색이 진할수록 인구 밀도가 높은 지역이에요. 교과서의 인구 분포 지도를 떠올려 봐요.' },
+
+  // ============ 영역 2 ============
+  { area: 2, type: 'choice',
+    q: '1960년대 이전, 우리나라의 인구 분포에 대한 설명으로 옳은 것은?',
+    options: [
+      '도시에 사람이 많이 모여 살았다.',
+      '벼농사 중심의 농업 사회여서 기후가 온화하고 평야가 발달한 지역에 인구가 많았다.',
+      '공업이 발달한 지역에 인구가 집중되었다.',
+      '수도권에 전체 인구의 절반이 살았다.'
+    ],
+    answer: 1,
+    hint: { type: 'text', content: '1960년대 이전은 "벼농사" 중심의 사회였어요. 벼농사를 짓기에 좋은 환경은 어떤 환경일까요?' },
+    explain: '1960년대 이전에는 벼농사 중심의 농업 사회여서 자연환경의 영향을 크게 받았어요.' },
+
+  { area: 2, type: 'ox',
+    q: '1960년대 이전 우리나라에서는 연평균 기온이 낮고 산지가 많은 지역에 인구 밀도가 높았다.',
+    answer: 'X',
+    hint: { type: 'text', content: '벼농사는 기후가 따뜻하고 평평한 땅에서 잘 되어요. 그런 지역에 사람이 많이 살았을까요, 산이 많은 지역에 많이 살았을까요?' },
+    explain: '반대예요. 기후가 온화하고 평야가 발달한 지역에 인구가 많았고, 산지가 많은 지역은 인구 밀도가 낮았어요.' },
+
+  { area: 2, type: 'blank',
+    q: '농업 중심의 사회에서 공업, 서비스업 중심으로 생산 활동이 변하는 현상을 ( ? )(이)라고 한다.',
+    answer: ['산업화'],
+    hint: { type: 'chosung', content: 'ㅅㅇㅎ', note: '3글자예요. "공업"과 관련된 단어예요.' },
+    explain: '산업화가 진행되면서 도시로 사람들이 이동하게 되었어요.' },
+
+  { area: 2, type: 'blank',
+    q: '주로 시골에서 여러 집이 모여 사는 곳을 ( ? )(이)라고 한다.',
+    answer: ['촌락'],
+    hint: { type: 'chosung', content: 'ㅊㄹ', note: '"도시"의 반대말이에요.' },
+    explain: '촌락의 반대되는 개념은 도시예요.' },
+
+  { area: 2, type: 'choice',
+    q: '1960년대 이후 우리나라 인구 분포가 크게 변화한 까닭은?',
+    options: [
+      '자연환경의 영향이 더 커졌기 때문',
+      '산업화가 진행되어 일자리, 교통 등 인문환경의 영향을 크게 받았기 때문',
+      '농업이 더욱 발달했기 때문',
+      '기후가 변했기 때문'
+    ],
+    answer: 1,
+    hint: { type: 'text', content: '1960년대 이후 큰 변화는 "공업이 발달하면서 도시가 커진 것"이에요.' },
+    explain: '산업화로 도시에 일자리가 많아지면서 촌락에서 도시로 사람들이 이동했어요.' },
+
+  { area: 2, type: 'ox',
+    q: '오늘날 우리나라 인구 100명 중 92명 정도가 도시에 살고 있다.',
+    answer: 'O',
+    hint: { type: 'text', content: '교과서에는 "인구 100명 중 92명 정도가 도시에 살고 있다"고 나와 있어요.' },
+    explain: '산업화 이후 도시로의 이동이 많아 대부분의 국민이 도시에 거주하고 있어요.' },
+
+  { area: 2, type: 'blank',
+    q: '서울특별시, 인천광역시, 경기도를 합쳐 이루어진 대도시권을 ( ? )(이)라고 한다.',
+    answer: ['수도권'],
+    hint: { type: 'chosung', content: 'ㅅㄷㄱ', note: '"수도"가 있는 지역 + 주변이에요.' },
+    explain: '수도권은 수도를 중심으로 이루어진 대도시권이에요.' },
+
+  { area: 2, type: 'choice',
+    q: '오늘날 우리나라 인구 분포의 특징으로 옳은 것은?',
+    options: [
+      '인구가 전국에 고르게 분포해 있다.',
+      '인구의 절반 정도가 수도권에 살고 있다.',
+      '촌락에 인구가 더 많이 산다.',
+      '강원도에 인구가 가장 많이 모여 있다.'
+    ],
+    answer: 1,
+    hint: { type: 'text', content: '2020년 이후 서울·인천·경기 세 지역을 합치면 우리나라 인구의 얼마가 될까요?' },
+    explain: '2020년 이후 수도권에 우리나라 인구의 절반 정도가 집중되어 있어요.' },
+
+  { area: 2, type: 'blank',
+    q: '인구를 나이, 성별 등의 기준으로 나누어 본 짜임새를 ( ? )(이)라고 한다.',
+    answer: ['인구 구조', '인구구조'],
+    hint: { type: 'chosung', content: 'ㅇㄱ ㄱㅈ', note: '유소년층, 청장년층, 노년층 같은 짜임새를 말해요.' },
+    explain: '인구 구조는 유소년층·청장년층·노년층의 비율 등으로 나타낼 수 있어요.' },
+
+  { area: 2, type: 'choice',
+    q: '수도권과 비수도권의 인구 구조 차이에 대한 설명으로 옳은 것은?',
+    options: [
+      '수도권은 노년층 비율이 높다.',
+      '비수도권은 청장년층 비율이 수도권보다 높다.',
+      '수도권은 청장년층이 많이 모여 있고, 비수도권은 노년층 비율이 상대적으로 높다.',
+      '두 지역의 인구 구조는 거의 같다.'
+    ],
+    answer: 2,
+    hint: { type: 'text', content: '청장년층(15~64세)이 일자리와 학교 때문에 수도권으로 많이 이동했어요. 그럼 비수도권에는 어떤 나이대가 많이 남아 있을까요?' },
+    explain: '일자리·교육 등을 위해 청장년층이 수도권으로 모이고, 비수도권은 청장년층이 빠져나가 노년층 비율이 높아져요.' },
+
+  { area: 2, type: 'essay', points: 2,
+    q: '오늘날 우리나라의 인구 분포가 과거(1960년대 이전)와 달라진 까닭을 써 봅시다.',
+    answer: '1960년대 이후 산업화가 진행되면서 도시에 공장과 회사가 늘어나 일자리가 많아졌다. 이에 따라 사람들이 일자리, 교육, 교통 등을 위해 촌락에서 도시로 이동하였기 때문에 인구가 도시(특히 수도권)에 집중되는 인구 분포로 바뀌게 되었다.',
+    hint: { type: 'keywords', content: '다음 세 가지를 꼭 넣어서 써 보세요: ① <b>산업화</b>로 도시에 <b>일자리</b>가 많아짐 ② <b>촌락에서 도시로</b> 이동 ③ 자연환경보다 <b>인문환경</b>의 영향이 커짐', note: '한 문장으로 짧게 쓰기보다 두세 문장으로 까닭과 결과를 나누어 써 보세요.' },
+    explain: '핵심: ① 산업화로 도시에 일자리 증가 ② 촌락에서 도시로 이동 ③ 인문환경의 영향이 커짐' },
+
+  // ============ 영역 3 ============
+  { area: 3, type: 'choice',
+    q: '수도권에 인구가 너무 많이 몰려서 생기는 문제가 아닌 것은?',
+    options: ['주택 부족과 주택 가격 상승', '쓰레기 문제와 환경 오염', '교통 혼잡과 시설 부족', '농작물 생산량 증가'],
+    answer: 3,
+    hint: { type: 'text', content: '사람이 너무 많이 모여서 생기는 "문제"를 찾는 거예요. 사람이 많이 모이면 "늘어나는 것"도 있지만, 그것이 모두 문제가 되는 건 아니에요.' },
+    explain: '농작물 생산량 증가는 수도권 과밀 문제와 관련이 없어요. 오히려 촌락의 일손 부족으로 생산에 어려움을 겪기도 해요.' },
+
+  { area: 3, type: 'ox',
+    q: '수도권에 인구가 지나치게 집중되면 교통 혼잡 문제가 나타난다.',
+    answer: 'O',
+    hint: { type: 'text', content: '출퇴근 시간의 서울 지하철이나 도로 상태를 떠올려 봐요.' },
+    explain: '도로에 차가 많아지고 지하철, 버스에 승객이 많아 혼잡해져요.' },
+
+  { area: 3, type: 'blank',
+    q: '거주지를 옮겨 지역으로 들어온 인구수에서 나간 인구수를 뺀 값을 ( ? )(이)라고 한다.',
+    answer: ['순이동'],
+    hint: { type: 'chosung', content: 'ㅅㅇㄷ', note: '"들어온 수 - 나간 수"의 결과를 말해요. 3글자예요.' },
+    explain: '순이동이 양수이면 들어온 사람이 더 많고, 음수이면 나간 사람이 더 많다는 뜻이에요.' },
+
+  { area: 3, type: 'choice',
+    q: '비수도권의 20대 청년들이 수도권으로 이동하는 주요 원인이 아닌 것은?',
+    options: ['취업', '학업(대학 진학)', '문화·의료 서비스 차이', '산을 좋아해서'],
+    answer: 3,
+    hint: { type: 'text', content: '한국은행이 분석한 주요 원인은 돈(임금), 공부(학업), 편의 시설이에요. 이와 관계없는 답을 골라요.' },
+    explain: '한국은행 분석에 따르면 주요 원인은 취업, 학업, 그리고 편의 시설·문화·의료 서비스 차이예요.' },
+
+  { area: 3, type: 'ox',
+    q: '사람들이 빠져나간 비수도권 지역에서는 빈집이 늘어나 환경 문제와 안전 문제가 생길 수 있다.',
+    answer: 'O',
+    hint: { type: 'text', content: '오래 비워 둔 집은 관리가 안 돼서 어떤 문제가 생길지 생각해 봐요.' },
+    explain: '방치된 빈집은 범죄와 안전 문제, 환경 문제로 이어질 수 있어요.' },
+
+  { area: 3, type: 'choice',
+    q: '비수도권 지역에서 나타나는 문제로 옳지 않은 것은?',
+    options: ['각종 시설 감소', '빈집 증가', '일자리 감소와 일손 부족', '주택 가격의 급격한 상승'],
+    answer: 3,
+    hint: { type: 'text', content: '주택 가격이 치솟는 것은 사람이 "몰리는" 지역의 문제예요. 비수도권은 반대 상황이에요.' },
+    explain: '주택 가격이 급격히 오르는 것은 수도권의 문제예요. 비수도권은 오히려 인구 감소로 집값이 떨어지거나 빈집이 늘어나요.' },
+
+  { area: 3, type: 'blank',
+    q: '신입생이 해마다 줄면서 1학년 ( ? )이/가 없는 초등학교가 늘어나는 현상이 비수도권에서 많이 나타난다.',
+    answer: ['신입생'],
+    hint: { type: 'chosung', content: 'ㅅㅇㅅ', note: '새로 입학하는 학생을 가리켜요. 3글자예요.' },
+    explain: '학생 수 감소로 폐교되는 학교도 늘어나고 있어요.' },
+
+  { area: 3, type: 'blank',
+    q: '인구가 줄거나 교통이 불편한 지역에서 신선 식품을 구하기 어려워지는 현상을 ( ? )(이)라고 한다.',
+    answer: ['식품 사막', '식품사막'],
+    hint: { type: 'chosung', content: 'ㅅㅍ ㅅㅁ', note: '물이 없는 "사막"처럼 신선 식품을 구할 수 없다는 뜻으로 지은 이름이에요.' },
+    explain: '차로 30분 넘게 이동해야 신선 식품을 살 수 있는 지역에서 나타나는 문제예요.' },
+
+  { area: 3, type: 'essay', points: 2,
+    q: '수도권과 비수도권 사이의 인구 분포 불균형이 계속되면 우리나라 발전에 어떤 영향을 줄지 써 봅시다.',
+    answer: '수도권은 인구가 너무 많아 주택, 교통, 환경 문제가 심해지고, 비수도권은 인구가 줄어 시설이 감소하고 일자리가 줄며 지역이 쇠퇴한다. 두 지역의 격차가 점점 커져서 국토가 균형 있게 발전하지 못하고, 결국 국가 경쟁력이 떨어질 수 있다.',
+    hint: { type: 'keywords', content: '다음 내용을 꼭 담아 써 보세요: ① <b>수도권</b>에서 생기는 문제(주택·교통·환경 등) ② <b>비수도권</b>에서 생기는 문제(시설 감소·빈집·일자리 감소 등) ③ 두 지역의 <b>격차</b>가 커지면 <b>국가 경쟁력</b>이 떨어질 수 있음', note: '수도권과 비수도권 양쪽 모두에서 나타나는 문제를 균형 있게 쓰는 게 중요해요.' },
+    explain: '핵심: ① 수도권 과밀 문제 ② 비수도권 쇠퇴 ③ 지역 격차 확대 ④ 국가 경쟁력 약화' },
+
+  // ============ 영역 4 ============
+  { area: 4, type: 'blank',
+    q: '한 나라가 경제, 기술, 사회, 정치 등 다양한 분야에서 다른 나라와 경쟁하는 힘을 ( ? )(이)라고 한다.',
+    answer: ['국가 경쟁력', '국가경쟁력'],
+    hint: { type: 'chosung', content: 'ㄱㄱ ㄱㅈㄹ', note: '"우리나라가 다른 나라보다 뛰어난 힘"이라는 뜻이에요.' },
+    explain: '인구 분포의 불균형은 국가 경쟁력을 떨어뜨릴 수 있어요.' },
+
+  { area: 4, type: 'choice',
+    q: '정부가 인구 분포 불균형을 해결하기 위해 하는 일이 아닌 것은?',
+    options: [
+      '공공 기관을 수도권 밖으로 옮김',
+      '혁신 도시를 만들어 기업을 끌어들임',
+      '고향 사랑 기부제를 시행함',
+      '수도권에 더 많은 공공 기관을 모음'
+    ],
+    answer: 3,
+    hint: { type: 'text', content: '정부는 수도권 집중을 "줄이려고" 노력하고 있어요. 그럼 수도권에 무엇을 더 모으는 건 이치에 맞을까요?' },
+    explain: '정부는 오히려 수도권에 몰려 있던 공공 기관을 전국 곳곳으로 옮기고 있어요.' },
+
+  { area: 4, type: 'blank',
+    q: '공공 기관의 이전을 계기로 지역의 새로운 성장 동력을 만드는 미래형 도시를 ( ? )(이)라고 한다.',
+    answer: ['혁신 도시', '혁신도시'],
+    hint: { type: 'chosung', content: 'ㅎㅅ ㄷㅅ', note: '"새롭게 바꾼다"는 뜻의 단어 + 도시예요.' },
+    explain: '혁신 도시를 만들어 기업과 일자리를 함께 늘리려는 정책이에요.' },
+
+  { area: 4, type: 'blank',
+    q: '고향이나 관심 지역에 기부하면 답례품과 세금 혜택을 주는 제도를 ( ? )(이)라고 한다.',
+    answer: ['고향 사랑 기부제', '고향사랑 기부제', '고향사랑기부제'],
+    hint: { type: 'chosung', content: 'ㄱㅎ ㅅㄹ ㄱㅂㅈ', note: '"고향"을 아끼는 마음으로 돈을 기부하는 제도예요.' },
+    explain: '지역 경제를 살리고 지방 자치 단체의 재정을 돕는 제도예요.' },
+
+  { area: 4, type: 'ox',
+    q: '우리나라는 수도권으로 인구를 더 모으기 위해 고향 사랑 기부제를 시행하고 있다.',
+    answer: 'X',
+    hint: { type: 'text', content: '"고향 사랑" 기부제의 이름부터 생각해 봐요. 수도권이 고향인 사람보다 지방이 고향인 사람이 많겠죠?' },
+    explain: '반대예요. 수도권 집중을 줄이고 지역을 살리기 위해 시행하는 제도예요.' },
+
+  { area: 4, type: 'choice',
+    q: '지역에서 인구를 끌어들이기 위해 하는 노력이 아닌 것은?',
+    options: [
+      '디지털 관광 주민증을 발급해 관광객을 늘림',
+      '작은 학교 살리기로 특별한 교육과정을 운영함',
+      '지역 기업을 없애고 공장을 철거함',
+      '주거·교육 환경 개선과 청년 지원'
+    ],
+    answer: 2,
+    hint: { type: 'text', content: '인구를 "끌어들이려면" 일자리와 살기 좋은 환경이 필요해요. 기업을 없애면 어떻게 될까요?' },
+    explain: '지역 기업을 없애는 건 오히려 인구 유출을 더 심하게 만들어요. 지역에서는 기업을 육성하고 일자리를 만드는 노력을 하고 있어요.' },
+
+  { area: 4, type: 'short',
+    q: '지역의 자원과 문화 특성에 혁신적인 생각을 결합해 새로운 상품이나 서비스를 만들어 지역에 활력을 불어넣는 사람을 무엇이라고 할까요?',
+    answer: ['로컬 크리에이터', '로컬크리에이터'],
+    hint: { type: 'chosung', content: 'ㄹㅋ ㅋㄹㅇㅇㅌ', note: '영어로 "지역"을 뜻하는 단어 + "창작자"를 뜻하는 단어예요.' },
+    explain: '로컬 크리에이터는 지역에 새로운 가치와 활력을 가져와 인구 분포의 불균형을 해결할 대안으로 주목받고 있어요.' },
+
+  { area: 4, type: 'essay', points: 2,
+    q: '인구 분포의 불균형을 해결하기 위해 내가 실천할 수 있는 방법을 한 가지 쓰고, 그 까닭을 설명해 봅시다.',
+    answer: '예시: 가족 여행을 수도권이 아닌 다른 지역으로 가서 그 지역의 식당과 가게를 이용한다. 왜냐하면 지역을 찾는 사람이 많아지면 그곳의 경제가 살아나고, 일자리가 생겨서 사람들이 떠나지 않고 계속 살 수 있기 때문이다.',
+    hint: { type: 'keywords', content: '다음 두 가지를 꼭 써 보세요: ① <b>구체적인 실천 방법</b>(예: 지역 여행, 지역 특산품 구매, 고향 사랑 기부제 참여, 지역 축제 관심 등) ② 그 방법이 <b>왜 인구 불균형 해결에 도움이 되는지</b> 까닭', note: '정답이 하나가 아니에요. 나만의 생각을 써 보세요.' },
+    explain: '실천 방법 + 그 방법이 왜 인구 불균형 해결에 도움이 되는지 설명하면 돼요.' },
+];
+
+// 각 문제에 기본 points 설정
+QUESTIONS.forEach(q => { if (!q.points) q.points = 1; });
+
+/* =================================================================
+   상태
+================================================================= */
+let studentName = '';
+let currentIdx = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let hintUsed = new Array(QUESTIONS.length).fill(false);
+let hintShown = new Array(QUESTIONS.length).fill(false);
+let essayScores = {}; // idx -> 0 | 1 | 2
+let submitted = false;
+const HINT_PENALTY_RATIO = 0.5; // 힌트 사용 시 점수의 50%만 받음
+
+/* =================================================================
+   시작
+================================================================= */
+document.getElementById('name-input').addEventListener('input', (e) => {
+  document.getElementById('start-btn').disabled = e.target.value.trim().length === 0;
+});
+document.getElementById('start-btn').disabled = true;
+document.getElementById('name-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !document.getElementById('start-btn').disabled) startQuiz();
+});
+
+function startQuiz() {
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) return;
+  studentName = name;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('total-num').textContent = QUESTIONS.length;
+  renderQuestion();
+}
+
+/* =================================================================
+   문제 렌더링
+================================================================= */
+function renderQuestion() {
+  const q = QUESTIONS[currentIdx];
+  const container = document.getElementById('question-container');
+
+  document.getElementById('current-num').textContent = currentIdx + 1;
+  document.getElementById('area-tag').textContent = AREAS[q.area];
+  document.getElementById('progress-fill').style.width = ((currentIdx + 1) / QUESTIONS.length * 100) + '%';
+  document.getElementById('answered-count').textContent =
+    `${countAnswered()}문제 풀이 완료`;
+
+  const typeLabel = {
+    'ox': 'O · X 문제',
+    'choice': '선택형',
+    'blank': '빈칸 채우기',
+    'short': '단답형',
+    'essay': '서술형'
+  }[q.type];
+
+  let inner = `
+    <div class="question-card">
+      <div class="q-header">
+        <div class="q-num">${currentIdx + 1}</div>
+        <span class="q-type">${typeLabel}</span>
+        ${q.points > 1 ? `<span class="q-points">${q.points}점</span>` : ''}
+      </div>
+      <div class="q-text">${formatQuestionText(q.q)}</div>
+  `;
+
+  if (q.type === 'ox') {
+    const sel = answers[currentIdx];
+    inner += `
+      <div class="ox-options">
+        <button class="ox-btn o ${sel === 'O' ? 'selected' : ''}" onclick="selectOX('O')">O</button>
+        <button class="ox-btn x ${sel === 'X' ? 'selected' : ''}" onclick="selectOX('X')">X</button>
+      </div>
+    `;
+  } else if (q.type === 'choice') {
+    const sel = answers[currentIdx];
+    inner += '<div class="options">';
+    q.options.forEach((opt, i) => {
+      const letter = ['①', '②', '③', '④', '⑤'][i];
+      inner += `
+        <div class="option ${sel === i ? 'selected' : ''}" onclick="selectChoice(${i})">
+          <div class="option-letter">${letter}</div>
+          <div>${opt}</div>
+        </div>
+      `;
+    });
+    inner += '</div>';
+  } else if (q.type === 'blank' || q.type === 'short') {
+    const val = answers[currentIdx] || '';
+    inner += `
+      <input type="text" class="short-input" id="answer-input"
+             value="${escapeHtml(val)}"
+             placeholder="답을 입력해 주세요"
+             oninput="updateAnswer(this.value)"
+             autocomplete="off">
+    `;
+  } else if (q.type === 'essay') {
+    const val = answers[currentIdx] || '';
+    inner += `
+      <textarea class="long-input" id="answer-input"
+                placeholder="생각을 자유롭게 써 주세요"
+                oninput="updateAnswer(this.value)">${escapeHtml(val)}</textarea>
+    `;
+  }
+
+  // 힌트 영역
+  if (q.hint) {
+    inner += '<div class="hint-area">';
+    if (!hintShown[currentIdx]) {
+      const penaltyText = q.type === 'essay'
+        ? `(힌트를 보면 이 문제는 최대 ${(q.points * HINT_PENALTY_RATIO)}점까지만 받을 수 있어요)`
+        : `(힌트를 보면 ${q.points * HINT_PENALTY_RATIO}점만 받을 수 있어요)`;
+      inner += `
+        <button class="hint-trigger" onclick="showHint()">
+          💡 힌트 보기
+          <span class="warn">${penaltyText}</span>
+        </button>
+      `;
+    } else {
+      inner += renderHintContent(q);
+    }
+    inner += '</div>';
+  }
+
+  inner += '</div>';
+  container.innerHTML = inner;
+
+  if ((q.type === 'blank' || q.type === 'short' || q.type === 'essay')) {
+    setTimeout(() => {
+      const input = document.getElementById('answer-input');
+      if (input && document.activeElement !== input) {
+        // 자동 포커스는 첫 렌더에만 (사용자 흐름을 방해하지 않도록)
+        if (!input.dataset.focused) {
+          input.dataset.focused = '1';
+        }
+      }
+    }, 50);
+  }
+
+  updateActionBar();
+}
+
+function renderHintContent(q) {
+  const h = q.hint;
+  let content = '';
+  if (h.type === 'chosung') {
+    content = `<div class="hint-content">초성 힌트: <span class="chosung">${h.content}</span></div>`;
+    if (h.note) content += `<div class="hint-note">✏️ ${h.note}</div>`;
+  } else if (h.type === 'keywords') {
+    content = `<div class="hint-content">${h.content}</div>`;
+    if (h.note) content += `<div class="hint-note">✏️ ${h.note}</div>`;
+  } else {
+    content = `<div class="hint-content">${h.content}</div>`;
+  }
+  return `
+    <div class="hint-shown">
+      <div class="hint-label">💡 힌트</div>
+      ${content}
+    </div>
+  `;
+}
+
+function showHint() {
+  hintUsed[currentIdx] = true;
+  hintShown[currentIdx] = true;
+  renderQuestion();
+}
+
+function formatQuestionText(text) {
+  return text.replace(/\(\s*\?\s*\)/g, '<span class="blank">　？　</span>');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function countAnswered() {
+  return answers.filter(a => {
+    if (a === null || a === undefined) return false;
+    if (typeof a === 'string' && a.trim() === '') return false;
+    return true;
+  }).length;
+}
+
+/* =================================================================
+   답 입력
+================================================================= */
+function selectOX(v) {
+  answers[currentIdx] = v;
+  renderQuestion();
+}
+function selectChoice(i) {
+  answers[currentIdx] = i;
+  renderQuestion();
+}
+function updateAnswer(val) {
+  answers[currentIdx] = val;
+  document.getElementById('answered-count').textContent = `${countAnswered()}문제 풀이 완료`;
+  updateActionBar();
+}
+
+/* =================================================================
+   이동
+================================================================= */
+function updateActionBar() {
+  const isLast = currentIdx === QUESTIONS.length - 1;
+  document.getElementById('prev-btn').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';
+
+  document.getElementById('nav-indicator').textContent = '';
+
+  if (isLast) {
+    document.getElementById('next-btn').classList.add('hidden');
+    document.getElementById('submit-btn').classList.remove('hidden');
+  } else {
+    document.getElementById('next-btn').classList.remove('hidden');
+    document.getElementById('submit-btn').classList.add('hidden');
+  }
+}
+
+function prevQuestion() {
+  if (currentIdx > 0) {
+    currentIdx--;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function nextQuestion() {
+  if (currentIdx < QUESTIONS.length - 1) {
+    currentIdx++;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+/* =================================================================
+   제출
+================================================================= */
+function confirmSubmit() {
+  const unfinished = [];
+  QUESTIONS.forEach((q, i) => {
+    const a = answers[i];
+    if (a === null || a === undefined || (typeof a === 'string' && a.trim() === '')) {
+      unfinished.push(i + 1);
+    }
+  });
+  const warn = document.getElementById('unfinished-warning');
+  if (unfinished.length > 0) {
+    warn.innerHTML = `⚠️ 아직 풀지 않은 문제가 있어요: <strong>${unfinished.join(', ')}번</strong>`;
+    warn.classList.remove('hidden');
+  } else {
+    warn.classList.add('hidden');
+  }
+  document.getElementById('submit-modal').classList.remove('hidden');
+}
+
+function closeSubmitModal() {
+  document.getElementById('submit-modal').classList.add('hidden');
+}
+
+function submitQuiz() {
+  document.getElementById('submit-modal').classList.add('hidden');
+  submitted = true;
+
+  // 서술형이 있으면 자기 점검 화면으로
+  const essayIdxs = QUESTIONS.map((q, i) => q.type === 'essay' ? i : -1).filter(i => i !== -1);
+  if (essayIdxs.length > 0) {
+    showSelfCheckScreen();
+  } else {
+    finalizeResult();
+  }
+}
+
+function showSelfCheckScreen() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('self-check-screen').classList.remove('hidden');
+  window.scrollTo({ top: 0 });
+
+  const body = document.getElementById('self-check-body');
+  body.innerHTML = '';
+
+  QUESTIONS.forEach((q, i) => {
+    if (q.type !== 'essay') return;
+    const myAns = answers[i];
+    const hintNotice = hintUsed[i] ?
+      `<div class="sc-hint-used">💡 이 문제는 힌트를 봤어요. 최대 ${(q.points * HINT_PENALTY_RATIO).toFixed(1)}점까지 받을 수 있어요.</div>` : '';
+
+    body.innerHTML += `
+      <div class="self-check-card">
+        <div class="sc-header">
+          <span class="sc-num">${i + 1}번</span>
+          <span class="sc-label">서술형 · ${q.points}점</span>
+        </div>
+        <div class="sc-question">${escapeHtml(q.q)}</div>
+        <div class="sc-my-answer ${(!myAns || !myAns.trim()) ? 'empty' : ''}">${myAns && myAns.trim() ? escapeHtml(myAns) : '(답을 쓰지 않음)'}</div>
+        <div class="sc-model">
+          <div class="sc-model-label">📖 모범답안</div>
+          ${escapeHtml(q.answer)}
+        </div>
+        ${hintNotice}
+        <div class="sc-btns-label">내 답을 스스로 점검해 봐요:</div>
+        <div class="sc-btns" data-idx="${i}">
+          <button class="sc-btn" data-score="2" onclick="selfCheck(${i}, 2)">✨ 잘 썼어요</button>
+          <button class="sc-btn" data-score="1" onclick="selfCheck(${i}, 1)">😊 조금 부족해요</button>
+          <button class="sc-btn" data-score="0" onclick="selfCheck(${i}, 0)">🤔 다시 공부할래요</button>
+        </div>
+      </div>
+    `;
+  });
+
+  updateFinalizeBtn();
+}
+
+function selfCheck(idx, score) {
+  essayScores[idx] = score;
+  // 버튼 표시 업데이트
+  const container = document.querySelector(`.sc-btns[data-idx="${idx}"]`);
+  container.querySelectorAll('.sc-btn').forEach(btn => {
+    btn.classList.remove('selected');
+    if (parseInt(btn.dataset.score) === score) btn.classList.add('selected');
+  });
+  updateFinalizeBtn();
+}
+
+function updateFinalizeBtn() {
+  const essayIdxs = QUESTIONS.map((q, i) => q.type === 'essay' ? i : -1).filter(i => i !== -1);
+  const allChecked = essayIdxs.every(i => essayScores[i] !== undefined);
+  document.getElementById('finalize-btn').disabled = !allChecked;
+}
+
+/* =================================================================
+   결과
+================================================================= */
+function calculateScore(idx) {
+  const q = QUESTIONS[idx];
+  const a = answers[idx];
+  const penalty = hintUsed[idx] ? HINT_PENALTY_RATIO : 1;
+
+  let correct = false;
+  let earned = 0;
+
+  if (q.type === 'ox') {
+    correct = (a === q.answer);
+    earned = correct ? q.points * penalty : 0;
+  } else if (q.type === 'choice') {
+    correct = (a === q.answer);
+    earned = correct ? q.points * penalty : 0;
+  } else if (q.type === 'blank' || q.type === 'short') {
+    if (a && typeof a === 'string') {
+      const normalized = a.trim().replace(/\s+/g, '');
+      correct = q.answer.some(ans => ans.replace(/\s+/g, '') === normalized);
+    }
+    earned = correct ? q.points * penalty : 0;
+  } else if (q.type === 'essay') {
+    const s = essayScores[idx] ?? 0;
+    // 2 = 만점, 1 = 절반, 0 = 0점
+    const baseRatio = s === 2 ? 1 : s === 1 ? 0.5 : 0;
+    earned = q.points * baseRatio * penalty;
+    correct = s === 2; // "잘 썼어요"만 정답으로 카운트
+  }
+
+  return { correct, earned, max: q.points };
+}
+
+function finalizeResult() {
+  document.getElementById('self-check-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  window.scrollTo({ top: 0 });
+
+  let totalEarned = 0;
+  let totalMax = 0;
+  let correctCount = 0;
+  let hintCountNum = 0;
+  let totalDeduction = 0;
+
+  const perQuestion = QUESTIONS.map((q, i) => {
+    const r = calculateScore(i);
+    totalEarned += r.earned;
+    totalMax += r.max;
+    if (r.correct) correctCount++;
+    if (hintUsed[i]) {
+      hintCountNum++;
+      // 감점: 정답 기준 최대 점수 - 실제 받은 점수 (정답일 때만 의미 있음)
+      // 단순히 "힌트를 안 썼다면 얼마를 받을 수 있었을까" 기준
+      const withoutPenalty = r.correct || (q.type === 'essay' && essayScores[i] > 0)
+        ? q.points * (q.type === 'essay' ? (essayScores[i] === 2 ? 1 : essayScores[i] === 1 ? 0.5 : 0) : 1)
+        : 0;
+      totalDeduction += (withoutPenalty - r.earned);
+    }
+    return { q, i, ...r };
+  });
+
+  const percent = totalMax > 0 ? (totalEarned / totalMax * 100) : 0;
+
+  document.getElementById('score-num').textContent = formatScore(totalEarned);
+  document.getElementById('score-total').textContent = totalMax;
+  document.getElementById('correct-count').textContent = correctCount;
+  document.getElementById('hint-count').textContent = hintCountNum;
+  document.getElementById('deduction').textContent = formatScore(totalDeduction);
+
+  const commentEl = document.getElementById('score-comment');
+  const ribbonEl = document.getElementById('result-ribbon');
+  if (percent >= 90) {
+    commentEl.textContent = `${studentName} 참 잘했어요! 단원 내용을 아주 잘 이해했네요.`;
+    ribbonEl.textContent = '✨ 훌륭해요!';
+  } else if (percent >= 75) {
+    commentEl.textContent = `${studentName}, 잘했어요! 몇 문제만 더 복습하면 완벽해요.`;
+    ribbonEl.textContent = '😊 잘했어요';
+  } else if (percent >= 60) {
+    commentEl.textContent = `${studentName}, 수고했어요. 틀린 문제를 다시 한번 살펴봐요.`;
+    ribbonEl.textContent = '🌱 조금 더!';
+  } else {
+    commentEl.textContent = `${studentName}, 괜찮아요. 틀린 부분을 교과서와 함께 다시 공부해 봐요.`;
+    ribbonEl.textContent = '📚 다시 도전!';
+  }
+
+  // 영역별
+  const areaStats = { 1: { e: 0, m: 0 }, 2: { e: 0, m: 0 }, 3: { e: 0, m: 0 }, 4: { e: 0, m: 0 } };
+  perQuestion.forEach(({ q, earned, max }) => {
+    areaStats[q.area].e += earned;
+    areaStats[q.area].m += max;
+  });
+
+  const areaBody = document.getElementById('area-results-body');
+  areaBody.innerHTML = '';
+  Object.keys(AREAS).forEach(k => {
+    const { e, m } = areaStats[k];
+    const pct = m > 0 ? (e / m * 100) : 0;
+    areaBody.innerHTML += `
+      <div class="area-row">
+        <span class="area-name">${AREAS[k]}</span>
+        <span class="area-score">${formatScore(e)} / ${m}</span>
+        <div class="area-bar"><div class="area-fill" style="width: ${pct}%"></div></div>
+      </div>
+    `;
+  });
+
+  // 다시 보기
+  const reviewBody = document.getElementById('review-list-body');
+  const wrongItems = perQuestion.filter(x => !x.correct || hintUsed[x.i]);
+
+  if (wrongItems.length === 0) {
+    document.getElementById('review-list-container').innerHTML =
+      '<h3>다시 보기</h3><p style="color: var(--ok); font-weight: 600; text-align: center; padding: 20px 0;">🎉 모든 문제를 힌트 없이 맞혔어요! 멋져요.</p>';
+  } else {
+    reviewBody.innerHTML = '';
+    wrongItems.forEach(({ q, i }) => {
+      const yourAns = answers[i];
+      let yourText = '';
+      let correctText = '';
+
+      if (q.type === 'ox') {
+        yourText = yourAns || '(답 없음)';
+        correctText = q.answer;
+      } else if (q.type === 'choice') {
+        const letters = ['①','②','③','④','⑤'];
+        yourText = yourAns !== null ? `${letters[yourAns]} ${q.options[yourAns]}` : '(답 없음)';
+        correctText = `${letters[q.answer]} ${q.options[q.answer]}`;
+      } else if (q.type === 'blank' || q.type === 'short') {
+        yourText = yourAns || '(답 없음)';
+        correctText = q.answer[0];
+      } else if (q.type === 'essay') {
+        yourText = yourAns ? (yourAns.length > 50 ? yourAns.slice(0, 50) + '...' : yourAns) : '(답 없음)';
+        correctText = '모범답안 참고';
+      }
+
+      const reasonChips = [];
+      if (!calculateScore(i).correct) reasonChips.push('<span class="reason-chip" style="background: var(--bad-soft); color: var(--bad);">오답</span>');
+      if (hintUsed[i]) reasonChips.push('<span class="reason-chip">힌트 사용</span>');
+
+      reviewBody.innerHTML += `
+        <div class="review-item">
+          <div class="q"><strong>${i + 1}.</strong> ${escapeHtml(q.q.length > 70 ? q.q.slice(0, 70) + '...' : q.q)} ${reasonChips.join(' ')}</div>
+          <div class="a-row">
+            <span class="your-ans">내 답: ${escapeHtml(yourText)}</span>
+            <span class="correct-ans">정답: ${escapeHtml(correctText)}</span>
+          </div>
+          <div class="explain-mini">💡 ${escapeHtml(q.explain)}</div>
+        </div>
+      `;
+    });
+  }
+}
+
+function formatScore(n) {
+  // 소수점이 있으면 1자리까지, 없으면 정수
+  if (n % 1 === 0) return String(n);
+  return n.toFixed(1);
+}
+</script>
+
+</body>
+</html>
