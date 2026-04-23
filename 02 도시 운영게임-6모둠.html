@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>도시 운영 게임 — 인구 이동 시뮬레이션</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+:root{
+  --bg:#0f1923;--bg2:#162030;--bg3:#1e2d40;--card:#1a2a3a;
+  --border:#2a3f55;--text:#e8f0f8;--muted:#7a9bb5;
+  --gold:#f5c842;--gold2:#e8a020;
+  --cs:#e74c3c;--cs2:#ff8f85;
+  --ci:#e67e22;--ci2:#ffaa44;
+  --cw:#2ecc71;--cw2:#55ee99;
+  --cj:#9b59b6;--cj2:#c077e0;
+  --cg:#1abc9c;--cg2:#2eeebb;
+  --cb:#3498db;--cb2:#5bc0ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;}
+.top-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 14px;height:50px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.gtitle{font-size:14px;font-weight:900;color:var(--gold);}
+.hright{display:flex;align-items:center;gap:7px;}
+.rbadge{background:var(--gold);color:#1a1a00;font-size:11px;font-weight:900;padding:3px 10px;border-radius:16px;}
+.plbl{font-size:11px;color:var(--muted);font-weight:700;}
+.btnr{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:11px;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;padding:4px 10px;cursor:pointer;}
+.btnr:active{background:rgba(255,255,255,.15);}
+.rdots{display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 0;flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);}
+.rdot{width:26px;height:5px;border-radius:3px;background:var(--border);transition:background .3s;position:relative;}
+.rdot span{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--muted);white-space:nowrap;}
+.rdot.done{background:var(--gold2);}.rdot.active{background:var(--gold);}
+.main{flex:1;display:flex;overflow:hidden;}
+.cpanel{width:50%;padding:7px 9px;display:flex;flex-direction:column;gap:5px;overflow:hidden;}
+.crow{flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:5px 9px;display:flex;align-items:center;gap:7px;position:relative;overflow:hidden;transition:border-color .3s;}
+.crow.hl{border-color:var(--gold);}
+.cemoji{font-size:17px;flex-shrink:0;}
+.cmeta{width:82px;flex-shrink:0;}
+.cname{font-size:12px;font-weight:900;}
+.cgrp{font-size:9px;color:var(--muted);}
+.cgoal{font-size:8.5px;font-weight:800;padding:1px 4px;border-radius:4px;margin-top:2px;display:inline-block;}
+.bwrap{flex:1;}
+.btrack{height:19px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;position:relative;}
+.bfill{height:100%;border-radius:5px;transition:width .7s cubic-bezier(.34,1.56,.64,1);}
+.bpop{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:900;color:white;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+.gtrack{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:2px;overflow:hidden;}
+.gfill{height:100%;border-radius:2px;transition:width .7s ease;}
+.gpct{font-size:8.5px;font-weight:800;margin-top:1px;}
+.dbadge{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:900;opacity:0;pointer-events:none;}
+.dbadge.show{animation:da .85s ease forwards;}
+.dbadge.pos{color:#55ee99;}.dbadge.neg{color:#ff6b6b;}
+@keyframes da{0%{opacity:1;transform:translateY(-50%) scale(1)}60%{opacity:1;transform:translateY(-75%) scale(1.2)}100%{opacity:0;transform:translateY(-105%) scale(.8)}}
+.rpanel{flex:1;display:flex;flex-direction:column;padding:7px 9px 7px 4px;gap:5px;overflow:hidden;}
+.stitle{font-size:10px;font-weight:900;color:var(--muted);letter-spacing:1px;flex-shrink:0;}
+.pcards{display:flex;flex-direction:column;gap:4px;flex:1;}
+.pcard{flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:5px 8px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;align-items:center;gap:7px;}
+.pcard:hover{background:var(--bg3);}
+.pcard.sel{border-color:var(--gold);background:rgba(245,200,66,.08);}
+.picon{font-size:17px;flex-shrink:0;}
+.ptxt{flex:1;}
+.pname{font-size:11px;font-weight:800;}
+.pdesc{font-size:9px;color:var(--muted);margin-top:1px;line-height:1.4;}
+.peff{font-size:9px;font-weight:800;padding:2px 5px;border-radius:6px;flex-shrink:0;}
+.ep{background:rgba(46,204,113,.2);color:#2ecc71;}
+.em{background:rgba(245,200,66,.15);color:var(--gold);}
+.csel{display:none;flex-direction:column;gap:4px;flex-shrink:0;}
+.csel.vis{display:flex;}
+.cseltitle{font-size:10px;font-weight:900;color:var(--gold);}
+.cbtns{display:flex;flex-wrap:wrap;gap:4px;}
+.cbtn{border:none;border-radius:6px;font-family:inherit;font-size:9.5px;font-weight:800;padding:4px 8px;cursor:pointer;color:white;transition:transform .1s;}
+.cbtn:active{transform:scale(.95);}
+.cfmbtn{background:var(--gold);color:#1a1000;border:none;border-radius:9px;font-family:inherit;font-size:13px;font-weight:900;padding:9px;cursor:pointer;flex-shrink:0;display:none;transition:transform .1s;}
+.cfmbtn.vis{display:block;}
+.cfmbtn:disabled{background:var(--border);color:var(--muted);}
+.cfmbtn:active{transform:scale(.97);}
+.overlay{position:fixed;inset:0;background:rgba(5,10,18,.93);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(6px);padding:14px;}
+.overlay.hidden{display:none;}
+.ocard{background:var(--bg2);border:1px solid var(--border);border-radius:17px;padding:20px 18px;max-width:560px;width:100%;text-align:center;max-height:94vh;overflow-y:auto;}
+.ocard h2{font-size:17px;font-weight:900;color:var(--gold);margin-bottom:5px;}
+.ocard p{font-size:11.5px;color:var(--muted);line-height:1.6;margin-bottom:11px;}
+.cigrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:11px;text-align:left;}
+.cicard{border-radius:8px;padding:7px 8px;border:1px solid var(--border);}
+.cihead{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.ciname{font-size:11px;font-weight:900;}
+.cipop{font-size:9px;color:var(--muted);}
+.cigoal{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:5px;margin-bottom:3px;display:inline-block;}
+.cistren{font-size:9px;color:var(--muted);line-height:1.5;}
+.pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:11px;}
+.pslot{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px;}
+.pslotgrp{font-size:10px;font-weight:900;color:var(--muted);margin-bottom:4px;}
+.pslotbtns{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:3px;}
+.pbtn{border:1px solid transparent;border-radius:5px;font-family:inherit;font-size:9px;font-weight:800;padding:2px 5px;cursor:pointer;transition:all .12s;}
+.pchosen{font-size:9.5px;font-weight:700;min-height:13px;}
+.evicon{font-size:44px;margin-bottom:6px;}
+.evtitle{font-size:15px;font-weight:900;margin-bottom:5px;}
+.evdesc{font-size:11.5px;color:var(--muted);margin-bottom:11px;line-height:1.6;}
+.eveffs{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:12px;}
+.evtag{font-size:11px;font-weight:800;padding:3px 9px;border-radius:14px;}
+.dbox{background:var(--bg3);border-radius:9px;padding:11px;margin-bottom:11px;text-align:left;}
+.dq{font-size:12px;font-weight:800;color:var(--gold);margin-bottom:6px;}
+.di{font-size:10.5px;color:var(--muted);margin-bottom:3px;line-height:1.5;}
+.rtabs{display:flex;gap:5px;margin-bottom:9px;}
+.rtab{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 4px;cursor:pointer;font-size:10px;font-weight:800;color:var(--muted);transition:all .15s;}
+.rtab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold);}
+.rtable{display:none;flex-direction:column;gap:4px;margin-bottom:11px;}
+.rtable.active{display:flex;}
+.rrow{display:flex;align-items:center;gap:7px;background:var(--bg3);border-radius:7px;padding:6px 9px;}
+.rrnk{font-size:14px;font-weight:900;width:20px;text-align:center;}
+.rnm{flex:1;text-align:left;}
+.rnmc{font-size:11px;font-weight:800;}
+.rnmg{font-size:9px;color:var(--muted);}
+.rbw{width:72px;}.rb{height:6px;border-radius:3px;transition:width .8s ease;}
+.rval{font-size:12px;font-weight:900;width:44px;text-align:right;}
+.rpct{font-size:10px;font-weight:800;width:38px;text-align:right;}
+.btnnext{background:var(--gold);color:#1a1000;border:none;border-radius:9px;font-family:inherit;font-size:13px;font-weight:900;padding:10px 24px;cursor:pointer;width:100%;transition:transform .1s;margin-top:2px;}
+.btnnext:active{transform:scale(.97);}
+.btnnext:disabled{background:var(--border);color:var(--muted);}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--bg3);border:1px solid var(--gold);color:var(--text);font-size:11.5px;font-weight:700;padding:6px 16px;border-radius:20px;z-index:200;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="gtitle">🏙️ 도시 운영 게임 — 인구 이동 시뮬레이션</div>
+  <div class="hright">
+    <div class="rbadge" id="rbadge">준비</div>
+    <div class="plbl" id="plbl">게임 시작 전</div>
+    <button class="btnr" onclick="confirmReset()">↺ 처음부터</button>
+  </div>
+</div>
+
+<div class="rdots">
+  <div class="rdot" id="rd0"><span>1라운드 교통</span></div>
+  <div class="rdot" id="rd1"><span>2라운드 일자리</span></div>
+  <div class="rdot" id="rd2"><span>3라운드 교육·문화</span></div>
+  <div class="rdot" id="rd3"><span>4라운드 환경·복지</span></div>
+  <div class="rdot" id="rd4"><span>5라운드 미래정책</span></div>
+</div>
+
+<div class="main">
+  <div class="cpanel" id="cpanel"></div>
+  <div class="rpanel">
+    <div class="stitle" id="stitle">정책 카드</div>
+    <div class="pcards" id="pcards"></div>
+    <div class="csel" id="csel">
+      <div class="cseltitle" id="cseltitle">어느 도시에 적용?</div>
+      <div class="cbtns" id="cbtns"></div>
+    </div>
+    <button class="cfmbtn" id="cfmbtn" onclick="confirmAll()">✅ 모든 모둠 선택 완료 → 결과 보기</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- INTRO -->
+<div class="overlay" id="ov-intro">
+  <div class="ocard">
+    <div style="font-size:36px;margin-bottom:5px">🏙️</div>
+    <h2>도시 운영 게임</h2>
+    <p>각 도시마다 <strong style="color:var(--gold)">목표가 달라요!</strong> 내 도시 특성을 살린 정책으로 목표를 달성하세요.<br>
+    5라운드 후 <strong style="color:#2ecc71">목표 달성률</strong>로 최종 순위가 결정됩니다.</p>
+    <div style="font-size:10px;font-weight:900;color:var(--muted);letter-spacing:1px;margin-bottom:6px;text-align:left">🏆 도시별 목표 & 특성</div>
+    <div class="cigrid" id="cigrid"></div>
+    <div style="font-size:10px;font-weight:900;color:var(--muted);letter-spacing:1px;margin-bottom:6px;text-align:left">📌 모둠별 도시 선택 (중복 불가)</div>
+    <div class="pgrid" id="pgrid"></div>
+    <div style="font-size:10.5px;color:var(--muted);background:var(--bg3);border-radius:8px;padding:9px;margin-bottom:11px;line-height:1.7;text-align:left">
+      매 라운드: 정책 3장 중 1장 → 내 도시에 적용<br>
+      <strong style="color:var(--gold)">도시 특성과 맞는 정책은 효과 2배 🔥</strong><br>
+      라운드 끝마다 이벤트 카드 등장! 최종 목표 달성률로 순위 결정
+    </div>
+    <button class="btnnext" id="startbtn" onclick="startGame()" disabled style="opacity:.4">
+      🚀 게임 시작! (6모둠 모두 선택 후 활성화)
+    </button>
+  </div>
+</div>
+
+<!-- EVENT -->
+<div class="overlay hidden" id="ov-event">
+  <div class="ocard">
+    <div class="evicon" id="evicon">⚡</div>
+    <div style="font-size:10px;font-weight:900;color:var(--muted);letter-spacing:1px;margin-bottom:4px">이벤트 발생!</div>
+    <div class="evtitle" id="evtitle"></div>
+    <div class="evdesc" id="evdesc"></div>
+    <div class="eveffs" id="eveffs"></div>
+    <button class="btnnext" id="evbtn">확인 →</button>
+  </div>
+</div>
+
+<!-- DISCUSS -->
+<div class="overlay hidden" id="ov-discuss">
+  <div class="ocard">
+    <div style="font-size:32px;margin-bottom:5px">💬</div>
+    <h2>잠깐! 생각해봐요</h2>
+    <div class="dbox" id="dbox"></div>
+    <button class="btnnext" id="dbtn">다음 라운드 →</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="overlay hidden" id="ov-result">
+  <div class="ocard">
+    <div style="font-size:36px;margin-bottom:5px">🏆</div>
+    <h2>게임 종료!</h2>
+    <p id="rsummary"></p>
+    <div class="rtabs">
+      <div class="rtab active" id="tab-a" onclick="showTab('a')">🎯 목표 달성률</div>
+      <div class="rtab" id="tab-p" onclick="showTab('p')">🏙️ 최종 인구수</div>
+      <div class="rtab" id="tab-g" onclick="showTab('g')">📈 인구 증가량</div>
+    </div>
+    <div class="rtable active" id="rt-a"></div>
+    <div class="rtable" id="rt-p"></div>
+    <div class="rtable" id="rt-g"></div>
+    <div class="dbox">
+      <div class="dq">🤔 함께 이야기해봐요</div>
+      <div class="di">① 목표를 달성한 도시와 못 한 도시의 차이는 무엇일까요?</div>
+      <div class="di">② 서울 인구가 줄어드는 게 왜 좋은 일일 수 있을까요?</div>
+      <div class="di">③ 현실에서 강릉·전주 같은 지방 도시가 인구를 늘리려면?</div>
+    </div>
+    <button class="btnnext" onclick="confirmReset()" style="margin-top:8px">↺ 다시 하기</button>
+  </div>
+</div>
+
+<script>
+const CDEF=[
+  {id:'seoul',   name:'서울', emoji:'🏙️', c:'var(--cs)', c2:'var(--cs2)', sp:12,
+   gt:'decrease', gv:10, gl:'인구 10만 이하로 줄이기',
+   gd:'서울은 과밀이 심각해요.\n인구를 줄여 집값·교통 혼잡을 해소하는 게 목표!',
+   str:['교육','기업'], sd:'교육·스타트업 효과 2배\n공장 유치는 역효과',
+   gc:'#e74c3c', gp:'rgba(231,76,60,.15)'},
+  {id:'incheon', name:'인천', emoji:'✈️', c:'var(--ci)', c2:'var(--ci2)', sp:7,
+   gt:'increase', gv:9,  gl:'인구 9만 이상으로 늘리기',
+   gd:'공항·항구를 활용한 물류 도시!\n교통 인프라 투자가 핵심이에요.',
+   str:['교통','물류'], sd:'교통·항만 정책 효과 2배\n문화 관광은 효과 절반',
+   gc:'#e67e22', gp:'rgba(230,126,34,.15)'},
+  {id:'suwon',   name:'수원', emoji:'🏗️', c:'var(--cw)', c2:'var(--cw2)', sp:6,
+   gt:'increase', gv:9,  gl:'인구 9만 이상으로 늘리기',
+   gd:'산업단지·반도체 기업이 강점!\n일자리 관련 정책에 집중하세요.',
+   str:['일자리','산업'], sd:'공장·산업단지 효과 2배\n자연환경 정책은 효과 절반',
+   gc:'#2ecc71', gp:'rgba(46,204,113,.15)'},
+  {id:'jeonju',  name:'전주', emoji:'🏯', c:'var(--cj)', c2:'var(--cj2)', sp:4,
+   gt:'increase', gv:7,  gl:'인구 7만 이상으로 늘리기',
+   gd:'한옥마을·음식 등 문화·관광이 강점!\n문화 정책과 살기 좋은 환경이 핵심.',
+   str:['문화','관광'], sd:'문화·관광·생태 정책 효과 2배\n대기업 공장은 이미지와 안 맞음',
+   gc:'#9b59b6', gp:'rgba(155,89,182,.15)'},
+  {id:'gangneung',name:'강릉',emoji:'🌊', c:'var(--cg)', c2:'var(--cg2)', sp:3,
+   gt:'increase', gv:6,  gl:'인구 6만 이상으로 늘리기',
+   gd:'바다·자연이 최고의 자원!\n재택근무 시대에 살기 좋은 환경을 만드세요.',
+   str:['자연','복지'], sd:'생태·복지·재택근무 효과 2배\n공장 유치 시 자연 파괴로 -',
+   gc:'#1abc9c', gp:'rgba(26,188,156,.15)'},
+  {id:'busan',   name:'부산', emoji:'⚓', c:'var(--cb)', c2:'var(--cb2)', sp:8,
+   gt:'increase', gv:11, gl:'인구 11만 이상으로 늘리기',
+   gd:'제2도시의 자존심! 항구·물류·관광으로\n서울 집중 인구를 분산시키는 역할.',
+   str:['교통','문화'], sd:'교통·문화 정책 효과 2배\n다양한 정책에 골고루 맞음',
+   gc:'#3498db', gp:'rgba(52,152,219,.15)'},
+];
+
+const PSM={ // policy → strengths
+  subway:['교통','물류'], highway:['교통','물류','산업'], airport:['교통','물류'],
+  factory:['일자리','산업'], startup:['기업','교육'], farming:['자연','관광'],
+  university:['교육','기업'], culture:['문화','관광','자연'], school:['교육'],
+  hospital:['복지'], eco:['자연','복지','관광'], housing:['복지'],
+  remote:['자연','복지'], gov:['기업','일자리'], smart:['교육','기업','산업'],
+};
+const SEOUL_REDUCE=['highway','culture','eco','remote','housing','farming'];
+
+const ROUNDS=[
+  {th:'🚄 교통', lb:'1라운드 — 교통'},
+  {th:'🏭 일자리', lb:'2라운드 — 일자리'},
+  {th:'🎓 교육·문화', lb:'3라운드 — 교육·문화'},
+  {th:'🌿 환경·복지', lb:'4라운드 — 환경·복지'},
+  {th:'🚀 미래 정책', lb:'5라운드 — 미래 정책'},
+];
+
+const POL=[
+  [{k:'subway', ico:'🚇',nm:'지하철 개통',    dc:'접근성↑ → 인구 유입\n서울은 집값 올라 추가 -',   ce:+3,se:-1,ae:0, el:'+3만 유입',ec:'ep'},
+   {k:'highway',ico:'🛣️',nm:'고속도로 건설',   dc:'교통 편리, 서울 분산 효과\n전체 도시에 소폭 영향',  ce:+2,se:-2,ae:-1,el:'내+2/전체-1',ec:'em'},
+   {k:'airport', ico:'✈️',nm:'공항·항만 확장',  dc:'물류·관광 인구 유입\n교통·물류 도시에 최적',    ce:+2,se:0, ae:0, el:'+2만 유입',ec:'ep'}],
+  [{k:'factory', ico:'🏭',nm:'대기업 공장 유치', dc:'일자리 급증, 타 도시 흡수\n자연 도시엔 역효과',   ce:+4,se:+1,ae:-1,el:'내+4/전체-1',ec:'ep'},
+   {k:'startup', ico:'💼',nm:'스타트업 단지',    dc:'청년층 유입\n교육·기업 도시에 최적',            ce:+3,se:+1,ae:0, el:'+3만 유입',ec:'ep'},
+   {k:'farming', ico:'🌾',nm:'친환경 농업 특화', dc:'고소득 농업 전환\n자연·관광 도시에 효과적',     ce:+1,se:-1,ae:+1,el:'내+1/전체+1',ec:'em'}],
+  [{k:'university',ico:'🎓',nm:'국립대학 설립', dc:'청년 인구 집중\n교육 도시에 최적',               ce:+3,se:+1,ae:0, el:'+3만 유입',ec:'ep'},
+   {k:'culture',  ico:'🎨',nm:'문화 관광 특구', dc:'관광객·이주민 증가\n문화·자연 도시에 최적',      ce:+2,se:-1,ae:0, el:'+2만 유입',ec:'ep'},
+   {k:'school',   ico:'📚',nm:'교육 특구 지정', dc:'학군 이사 가족 증가\n서울 유입, 지방 감소',      ce:+3,se:+2,ae:-1,el:'내+3/전체-1',ec:'em'}],
+  [{k:'hospital', ico:'🏥',nm:'종합병원 유치',  dc:'노년층 유입\n복지 도시에 최적',                  ce:+2,se:0, ae:0, el:'+2만 유입',ec:'ep'},
+   {k:'eco',      ico:'🌳',nm:'친환경 생태도시', dc:'삶의 질↑ → 이주 유발\n자연 도시 2배 효과',     ce:+2,se:-2,ae:+1,el:'내+2/전체+1',ec:'ep'},
+   {k:'housing',  ico:'🏠',nm:'저렴한 공공주택', dc:'서울 탈출 인구 흡수\n서울은 분산 효과로 -',    ce:+3,se:-2,ae:0, el:'+3만 유입',ec:'ep'}],
+  [{k:'remote',   ico:'💻',nm:'재택근무 특화',  dc:'자연 좋은 곳 이주 촉진\n자연·복지 도시 2배',    ce:+3,se:-2,ae:+1,el:'내+3/전체+1',ec:'ep'},
+   {k:'gov',      ico:'🏛️',nm:'공공기관 이전',  dc:'안정 일자리 대거 생성\n기업·일자리 도시에 최적', ce:+4,se:-2,ae:-1,el:'내+4/전체-1',ec:'ep'},
+   {k:'smart',    ico:'🌐',nm:'스마트 신도시',  dc:'첨단 인프라, 젊은층 유입\n교육·산업 도시에 최적', ce:+3,se:0, ae:0, el:'+3만 유입',ec:'ep'}],
+];
+
+const EVENTS=[
+  {ico:'📈',ti:'수도권 대기업 본사 이전!',dc:'대기업 본사가 서울로 몰리며 지방 인재들이 대거 상경했습니다.',
+   ef:[{id:'seoul',d:+2},{id:'incheon',d:+1},{id:'suwon',d:+1},{id:'jeonju',d:-1},{id:'gangneung',d:-1},{id:'busan',d:-1}]},
+  {ico:'🌊',ti:'동해안 자연재해 발생!',dc:'태풍 피해로 동해안 주민 일부가 다른 도시로 이동했습니다.',
+   ef:[{id:'gangneung',d:-2},{id:'busan',d:-1},{id:'seoul',d:+1},{id:'suwon',d:+1}]},
+  {ico:'🏠',ti:'수도권 집값 폭등!',dc:'서울 집값이 너무 비싸 많은 사람들이 주변 도시로 이동했습니다.',
+   ef:[{id:'seoul',d:-3},{id:'incheon',d:+2},{id:'suwon',d:+2},{id:'jeonju',d:+1}]},
+  {ico:'💻',ti:'재택근무 시대 도래!',dc:'코로나 이후 재택근무가 정착되며 지방 도시 인구가 늘기 시작했어요.',
+   ef:[{id:'jeonju',d:+2},{id:'gangneung',d:+2},{id:'busan',d:+1},{id:'seoul',d:-2}]},
+  {ico:'🚄',ti:'전국 고속철도 완전 개통!',dc:'어디서든 서울까지 1시간! 일부 지방 인구가 수도권으로 이동했습니다.',
+   ef:[{id:'seoul',d:+2},{id:'incheon',d:+1},{id:'jeonju',d:-1},{id:'gangneung',d:-1},{id:'busan',d:-1}]},
+];
+
+const DISCUSS=[
+  {q:'🚄 교통이 발달하면 항상 인구가 늘어날까요?',its:['고속도로가 생기면 오히려 서울로 빠져나갈 수도 있어요.','강릉에 KTX가 생긴 후 어떤 변화가 있었을지 생각해봐요.']},
+  {q:'🏭 일자리와 자연환경, 둘 다 가질 수 있을까요?',its:['공장이 들어오면 왜 자연환경 도시에 역효과가 날까요?','일자리와 환경이 충돌할 때 어떻게 해결할 수 있을까요?']},
+  {q:'🎓 교육 환경이 좋으면 이사를 올까요?',its:['학군 때문에 이사하는 현상은 왜 생길까요?','이 현상이 지방 도시에는 어떤 영향을 줄까요?']},
+  {q:'🌿 살기 좋은 환경이란 어떤 걸까요?',its:['자연 좋은 강릉 vs 일자리 많은 서울, 어디서 살고 싶어요?','인구가 줄면 그 지역에 어떤 문제가 생길까요?']},
+  {q:'🚀 미래에는 어디서 살고 싶어요?',its:['재택근무가 가능해지면 꼭 서울에 살 필요가 있을까요?','여러분이 어른이 되면 어느 도시에서 살 것 같아요?']},
+];
+
+let cities=[], round=0, phase='intro', selPol=null, cChoices={}, tMap={};
+
+function initState(){
+  cities=CDEF.map(c=>({...c,pop:c.sp,assignedGroup:null}));
+  round=0;phase='intro';selPol=null;cChoices={};tMap={};
+}
+function gc(id){return cities.find(c=>c.id===id);}
+function getAch(c){
+  if(c.gt==='decrease'){
+    const need=c.sp-c.gv; const done=Math.max(0,c.sp-c.pop);
+    return Math.min(100,Math.round(done/need*100));
+  } else {
+    const need=c.gv-c.sp; const done=Math.max(0,c.pop-c.sp);
+    return Math.min(100,Math.round(done/need*100));
+  }
+}
+function getBonus(city,key){
+  if(city.id==='seoul' && SEOUL_REDUCE.includes(key)) return true;
+  return (PSM[key]||[]).some(s=>city.str.includes(s));
+}
+function achColor(a){return a>=100?'#f5c842':a>=60?'#2ecc71':a>=30?'#e67e22':'#e74c3c';}
+
+// ── INTRO ──
+function buildCiGrid(){
+  const g=document.getElementById('cigrid'); g.innerHTML='';
+  CDEF.forEach(c=>{
+    g.innerHTML+=`<div class="cicard" style="background:${c.gp};border-color:${c.gc}">
+      <div class="cihead"><span style="font-size:17px">${c.emoji}</span>
+        <div><div class="ciname" style="color:${c.c2}">${c.name}</div>
+          <div class="cipop">시작 ${c.sp}만 명</div></div></div>
+      <div class="cigoal" style="background:${c.gp};color:${c.gc};border:1px solid ${c.gc}">
+        ${c.gt==='decrease'?'📉':'📈'} ${c.gl}</div>
+      <div class="cistren">💪 ${c.sd}</div></div>`;
+  });
+}
+function buildPGrid(){
+  const g=document.getElementById('pgrid'); g.innerHTML='';
+  ['1모둠','2모둠','3모둠','4모둠','5모둠','6모둠'].forEach(grp=>{
+    const cid=tMap[grp]; const cc=cid?CDEF.find(x=>x.id===cid):null;
+    g.innerHTML+=`<div class="pslot" style="border-color:${cc?cc.gc:'var(--border)'}">
+      <div class="pslotgrp">${grp}</div>
+      <div class="pslotbtns">${CDEF.map(c=>{
+        const taken=Object.entries(tMap).find(([gg,ci])=>ci===c.id&&gg!==grp);
+        const isCh=cid===c.id;
+        return `<button class="pbtn" onclick="pickCity('${grp}','${c.id}')"
+          style="background:${isCh?c.gc:'var(--bg)'};color:${isCh?'white':c.c2};
+          border-color:${c.gc};opacity:${taken?.25:1};pointer-events:${taken?'none':'auto'}">
+          ${c.emoji}${c.name}</button>`;
+      }).join('')}</div>
+      <div class="pchosen" style="color:${cc?cc.c2:'var(--muted)'}">
+        ${cc?`→ ${cc.emoji}${cc.name} ✓`:'선택하세요'}</div></div>`;
+  });
+}
+function pickCity(grp,cid){
+  if(Object.entries(tMap).find(([g,c])=>c===cid&&g!==grp)){showToast('이미 다른 모둠이 선택한 도시예요!');return;}
+  tMap[grp]=cid; buildPGrid();
+  const all=['1모둠','2모둠','3모둠','4모둠','5모둠','6모둠'].every(g=>tMap[g]);
+  const btn=document.getElementById('startbtn');
+  btn.disabled=!all; btn.style.opacity=all?'1':'0.4';
+  btn.textContent=all?'🚀 게임 시작!': `🚀 게임 시작! (${Object.keys(tMap).length}/6 선택)`;
+}
+function startGame(){
+  cities=CDEF.map(c=>{
+    const grp=Object.entries(tMap).find(([g,ci])=>ci===c.id);
+    return {...c,pop:c.sp,assignedGroup:grp?grp[0]:'?'};
+  });
+  document.getElementById('ov-intro').classList.add('hidden');
+  beginRound();
+}
+
+// ── CITY PANEL ──
+function buildCPanel(){
+  const panel=document.getElementById('cpanel'); panel.innerHTML='';
+  const maxP=Math.max(...cities.map(c=>c.pop),15);
+  cities.forEach(c=>{
+    const pct=Math.max(4,(c.pop/maxP)*100);
+    const a=getAch(c); const ac=achColor(a);
+    panel.innerHTML+=`<div class="crow" id="crow-${c.id}">
+      <div class="cemoji">${c.emoji}</div>
+      <div class="cmeta">
+        <div class="cname" style="color:${c.c2}">${c.name}</div>
+        <div class="cgrp">${c.assignedGroup||''}</div>
+        <div class="cgoal" style="background:${c.gp};color:${c.gc}">${c.gt==='decrease'?'📉':'📈'} 목표:${c.gv}만</div>
+      </div>
+      <div class="bwrap">
+        <div class="btrack"><div class="bfill" id="bf-${c.id}" style="width:${pct}%;background:${c.c}">
+          <span class="bpop" id="bp-${c.id}">${c.pop}만</span></div></div>
+        <div class="gtrack"><div class="gfill" id="gf-${c.id}" style="width:${a}%;background:${ac}"></div></div>
+        <div class="gpct" id="gp-${c.id}" style="color:${ac}">달성 ${a}%${a>=100?' 🎉':''}</div>
+      </div>
+      <div class="dbadge" id="db-${c.id}"></div></div>`;
+  });
+}
+function refreshBar(cid){
+  const c=gc(cid); const maxP=Math.max(...cities.map(x=>x.pop),15);
+  const pct=Math.max(4,(c.pop/maxP)*100);
+  const a=getAch(c); const ac=achColor(a);
+  const bf=document.getElementById('bf-'+cid), bp=document.getElementById('bp-'+cid);
+  const gf=document.getElementById('gf-'+cid), gp=document.getElementById('gp-'+cid);
+  if(bf)bf.style.width=pct+'%';
+  if(bp)bp.textContent=c.pop+'万';
+  if(gf){gf.style.width=a+'%';gf.style.background=ac;}
+  if(gp){gp.textContent=`달성 ${a}%${a>=100?' 🎉':''}`;gp.style.color=ac;}
+}
+function showDelta(cid,d){
+  const b=document.getElementById('db-'+cid); if(!b)return;
+  b.textContent=(d>0?'+':'')+d+'만';
+  b.className='dbadge show '+(d>0?'pos':'neg');
+  setTimeout(()=>b.className='dbadge',950);
+}
+function updateRdots(){
+  for(let i=0;i<5;i++){
+    const d=document.getElementById('rd'+i);
+    d.className='rdot'+(i<round?' done':i===round?' active':'');
+  }
+}
+
+// ── ROUND ──
+function beginRound(){
+  phase='policy'; selPol=null; cChoices={};
+  updateRdots();
+  document.getElementById('rbadge').textContent=(round+1)+'라운드';
+  document.getElementById('plbl').textContent=ROUNDS[round].th;
+  document.getElementById('stitle').textContent=ROUNDS[round].th+' — 정책 카드';
+  buildCPanel(); buildPolCards(); buildCityBtns();
+  document.getElementById('csel').classList.remove('vis');
+  document.getElementById('cfmbtn').classList.remove('vis');
+}
+function buildPolCards(){
+  const ct=document.getElementById('pcards'); ct.innerHTML='';
+  POL[round].forEach((p,i)=>{
+    ct.innerHTML+=`<div class="pcard" id="pc-${i}" onclick="selPolicy(${i})">
+      <div class="picon">${p.ico}</div>
+      <div class="ptxt"><div class="pname">${p.nm}</div>
+        <div class="pdesc">${p.dc.replace(/\n/g,'<br>')}</div></div>
+      <div class="peff ${p.ec}">${p.el}</div></div>`;
+  });
+}
+function buildCityBtns(){
+  const w=document.getElementById('cbtns'); w.innerHTML='';
+  cities.forEach(c=>{
+    const chosen=cChoices[c.id]!==undefined;
+    const pidx=cChoices[c.id]; const pol=chosen?POL[round][pidx]:null;
+    const bonus=chosen&&pol?getBonus(c,pol.k):false;
+    w.innerHTML+=`<button class="cbtn" id="cbtn-${c.id}"
+      style="background:${chosen?c.gc:'var(--bg3)'};color:${chosen?'white':c.c2};
+      border:1px solid ${c.gc};outline:${chosen?'2px solid white':'none'}"
+      onclick="assignCity('${c.id}')">
+      ${c.emoji}${c.name}${chosen?(bonus?' 🔥':' ✓'):''}</button>`;
+  });
+}
+function selPolicy(idx){
+  selPol=idx;
+  document.querySelectorAll('.pcard').forEach((el,i)=>el.classList.toggle('sel',i===idx));
+  const p=POL[round][idx];
+  document.getElementById('cseltitle').textContent=`📌 [${p.nm}] → 어느 모둠 도시에?`;
+  document.getElementById('csel').classList.add('vis');
+  buildCityBtns();
+}
+function assignCity(cid){
+  if(selPol===null){showToast('먼저 정책 카드를 선택하세요!');return;}
+  const city=gc(cid); const pol=POL[round][selPol];
+  const bonus=getBonus(city,pol.k);
+  cChoices[cid]=selPol;
+  cities.forEach(c=>document.getElementById('crow-'+c.id)?.classList.remove('hl'));
+  document.getElementById('crow-'+cid)?.classList.add('hl');
+  buildCityBtns();
+  const cnt=Object.keys(cChoices).length;
+  const btn=document.getElementById('cfmbtn');
+  btn.classList.add('vis');
+  if(cnt>=cities.length){
+    btn.disabled=false; btn.textContent='✅ 모든 모둠 선택 완료 → 결과 보기';
+    showToast('모든 모둠 선택 완료! 결과를 확인하세요.');
+  } else {
+    btn.disabled=true; btn.textContent=`✅ ${cnt}/${cities.length} 선택 → 나머지도 선택해요`;
+  }
+  if(bonus) showToast(`🔥 ${city.name} 특성과 딱 맞아요! 효과 2배!`);
+}
+function confirmAll(){
+  if(Object.keys(cChoices).length<cities.length){showToast('아직 선택 안 한 모둠이 있어요!');return;}
+  applyPolicies();
+}
+
+// ── APPLY ──
+function applyPolicies(){
+  const D={}; cities.forEach(c=>{D[c.id]=0;});
+  cities.forEach(c=>{
+    const pi=cChoices[c.id]; const pol=POL[round][pi];
+    const bonus=getBonus(c,pol.k); const mul=bonus?2:1;
+    D[c.id]+=(c.id==='seoul'?pol.se:pol.ce)*mul;
+  });
+  cities.forEach(c=>{
+    const pi=cChoices[c.id]; const pol=POL[round][pi];
+    if(pol.ae!==0) cities.forEach(o=>{if(o.id!==c.id)D[o.id]+=pol.ae;});
+  });
+  cities.forEach(c=>{
+    const np=Math.max(1,c.pop+D[c.id]); const act=np-c.pop;
+    c.pop=np;
+    setTimeout(()=>{refreshBar(c.id);if(act!==0)showDelta(c.id,act);},150);
+  });
+  setTimeout(()=>showEvent(),1000);
+}
+
+// ── EVENT ──
+function showEvent(){
+  const ev=EVENTS[round];
+  document.getElementById('evicon').textContent=ev.ico;
+  document.getElementById('evtitle').textContent=ev.ti;
+  document.getElementById('evdesc').textContent=ev.dc;
+  const ew=document.getElementById('eveffs'); ew.innerHTML='';
+  ev.ef.forEach(e=>{
+    const c=gc(e.id);
+    ew.innerHTML+=`<div class="evtag" style="background:${c.gp};color:${c.c2}">
+      ${c.emoji}${c.name} ${e.d>0?'+':''}${e.d}만</div>`;
+  });
+  document.getElementById('evbtn').onclick=()=>{
+    ev.ef.forEach(e=>{
+      const c=gc(e.id); if(!c)return;
+      const np=Math.max(1,c.pop+e.d); const act=np-c.pop;
+      c.pop=np; refreshBar(c.id); if(act!==0)showDelta(c.id,act);
+    });
+    document.getElementById('ov-event').classList.add('hidden');
+    showDiscuss();
+  };
+  document.getElementById('ov-event').classList.remove('hidden');
+}
+
+// ── DISCUSS ──
+function showDiscuss(){
+  const d=DISCUSS[round];
+  document.getElementById('dbox').innerHTML=`<div class="dq">${d.q}</div>`+
+    d.its.map(i=>`<div class="di">💬 ${i}</div>`).join('');
+  document.getElementById('dbtn').onclick=()=>{
+    document.getElementById('ov-discuss').classList.add('hidden');
+    round++; if(round>=5)showResult(); else beginRound();
+  };
+  document.getElementById('ov-discuss').classList.remove('hidden');
+}
+
+// ── RESULT ──
+function showResult(){
+  phase='result'; updateRdots();
+  document.getElementById('rbadge').textContent='완료!';
+  document.getElementById('plbl').textContent='게임 종료';
+  const M=['🥇','🥈','🥉','4위','5위','6위'];
+
+  // 달성률
+  const bA=[...cities].sort((a,b)=>getAch(b)-getAch(a));
+  const rA=document.getElementById('rt-a'); rA.innerHTML='';
+  bA.forEach((c,i)=>{
+    const a=getAch(c); const ac=achColor(a);
+    rA.innerHTML+=`<div class="rrow">
+      <div class="rrnk">${M[i]}</div><div style="font-size:15px">${c.emoji}</div>
+      <div class="rnm"><div class="rnmc" style="color:${c.c2}">${c.name}</div>
+        <div class="rnmg">${c.assignedGroup}</div></div>
+      <div class="rbw"><div class="rb" style="width:${a}%;background:${ac}"></div></div>
+      <div class="rpct" style="color:${ac}">${a}%</div>
+      <div class="rval" style="color:${c.c2}">${c.pop}만</div></div>`;
+  });
+
+  // 인구수
+  const bP=[...cities].sort((a,b)=>b.pop-a.pop);
+  const rP=document.getElementById('rt-p'); rP.innerHTML='';
+  const mP=bP[0].pop;
+  bP.forEach((c,i)=>{
+    rP.innerHTML+=`<div class="rrow">
+      <div class="rrnk">${M[i]}</div><div style="font-size:15px">${c.emoji}</div>
+      <div class="rnm"><div class="rnmc" style="color:${c.c2}">${c.name}</div>
+        <div class="rnmg">${c.assignedGroup}</div></div>
+      <div class="rbw"><div class="rb" style="width:${(c.pop/mP)*100}%;background:${c.c}"></div></div>
+      <div class="rval" style="color:${c.c2}">${c.pop}만</div></div>`;
+  });
+
+  // 증가량
+  const bG=[...cities].sort((a,b)=>(b.pop-b.sp)-(a.pop-a.sp));
+  const rG=document.getElementById('rt-g'); rG.innerHTML='';
+  const mG=Math.max(...bG.map(c=>Math.abs(c.pop-c.sp)),1);
+  bG.forEach((c,i)=>{
+    const chg=c.pop-c.sp; const col=chg>=0?'#2ecc71':'#e74c3c';
+    rG.innerHTML+=`<div class="rrow">
+      <div class="rrnk" style="color:${col}">${M[i]}</div><div style="font-size:15px">${c.emoji}</div>
+      <div class="rnm"><div class="rnmc" style="color:${c.c2}">${c.name}</div>
+        <div class="rnmg">${c.assignedGroup}</div></div>
+      <div class="rbw"><div class="rb" style="width:${Math.max(4,(Math.abs(chg)/mG)*100)}%;background:${col}"></div></div>
+      <div class="rval" style="color:${col}">${chg>=0?'+':''}${chg}만</div></div>`;
+  });
+
+  const w=bA[0]; const wa=getAch(w);
+  document.getElementById('rsummary').innerHTML=
+    `🎯 목표 달성률 1위: <strong style="color:${w.c2}">${w.name}(${w.assignedGroup})</strong> ${wa}% 달성!<br>
+    <span style="font-size:10px;color:var(--muted)">탭을 눌러 다양한 순위를 확인하세요.</span>`;
+
+  setTimeout(()=>{
+    document.querySelectorAll('.rtable .rb').forEach(b=>{
+      const ww=b.style.width; b.style.width='0'; setTimeout(()=>b.style.width=ww,80);
+    });
+  },150);
+  document.getElementById('ov-result').classList.remove('hidden');
+}
+
+function showTab(t){
+  ['a','p','g'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('active',x===t);
+    document.getElementById('rt-'+x).classList.toggle('active',x===t);
+  });
+}
+
+function confirmReset(){
+  if(phase==='intro')return;
+  if(confirm('처음부터 다시 시작할까요?'))resetGame();
+}
+function resetGame(){
+  document.querySelectorAll('.overlay').forEach(el=>el.classList.add('hidden'));
+  initState(); buildCiGrid(); buildPGrid(); buildCPanel();
+  document.getElementById('csel').classList.remove('vis');
+  document.getElementById('cfmbtn').classList.remove('vis');
+  document.getElementById('pcards').innerHTML='';
+  document.getElementById('rbadge').textContent='준비';
+  document.getElementById('plbl').textContent='게임 시작 전';
+  document.getElementById('stitle').textContent='정책 카드';
+  const btn=document.getElementById('startbtn');
+  btn.disabled=true; btn.style.opacity='0.4';
+  btn.textContent='🚀 게임 시작! (6모둠 모두 선택 후 활성화)';
+  updateRdots();
+  document.getElementById('ov-intro').classList.remove('hidden');
+}
+
+let tT=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show';
+  clearTimeout(tT); tT=setTimeout(()=>t.className='toast',2200);
+}
+
+initState(); buildCiGrid(); buildPGrid(); buildCPanel(); updateRdots();
+</script>
+</body>
+</html>
