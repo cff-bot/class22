@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우주 여행 — 빛보다 빠른 상상</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #06080f;
+    --surface: #0d1117;
+    --card: #111827;
+    --accent1: #7c9fff;
+    --accent2: #ff7eb3;
+    --accent3: #ffd166;
+    --accent4: #06d6a0;
+    --text: #e8eaf6;
+    --text-dim: #9aa5c4;
+    --border: rgba(124,159,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 17px;
+    line-height: 1.9;
+    overflow-x: hidden;
+  }
+
+  /* 별 배경 */
+  .stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease-in-out infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.1; transform: scale(0.8); }
+    to { opacity: 0.9; transform: scale(1.2); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  /* 헤더 */
+  .header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: fadeDown 1s ease forwards;
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header .tag {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--accent1);
+    border: 1px solid var(--accent1);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 30%, var(--accent1));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header .subtitle {
+    color: var(--text-dim);
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  /* 섹션 */
+  .section {
+    margin-bottom: 60px;
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeUp 0.8s ease forwards;
+  }
+  .section:nth-child(1) { animation-delay: 0.2s; }
+  .section:nth-child(2) { animation-delay: 0.4s; }
+  .section:nth-child(3) { animation-delay: 0.6s; }
+  .section:nth-child(4) { animation-delay: 0.8s; }
+  .section:nth-child(5) { animation-delay: 1.0s; }
+  .section:nth-child(6) { animation-delay: 1.2s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .section-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .section-num {
+    font-size: 12px;
+    color: var(--accent1);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  /* 글 카드 */
+  .story-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .story-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--stripe, linear-gradient(90deg, var(--accent1), var(--accent2)));
+  }
+
+  .story-card p {
+    color: #cdd4e8;
+    margin-bottom: 16px;
+  }
+  .story-card p:last-child { margin-bottom: 0; }
+
+  /* 강조 박스 */
+  .highlight-box {
+    background: rgba(124,159,255,0.08);
+    border-left: 3px solid var(--accent1);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-style: italic;
+    color: var(--accent1);
+    font-size: 15px;
+  }
+
+  .highlight-box.yellow {
+    background: rgba(255,209,102,0.08);
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+
+  .highlight-box.green {
+    background: rgba(6,214,160,0.08);
+    border-color: var(--accent4);
+    color: var(--accent4);
+  }
+
+  .highlight-box.pink {
+    background: rgba(255,126,179,0.08);
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  /* 숫자 강조 */
+  .big-number {
+    display: inline-block;
+    font-family: 'Noto Serif KR', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--accent3);
+    line-height: 1;
+  }
+
+  /* 정보 그리드 */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 500px) {
+    .info-grid { grid-template-columns: 1fr; }
+  }
+
+  .info-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .info-item .label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .info-item .value {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* 퀴즈 */
+  .quiz-section {
+    background: linear-gradient(135deg, rgba(124,159,255,0.1), rgba(255,126,179,0.05));
+    border: 1px solid rgba(124,159,255,0.3);
+    border-radius: 20px;
+    padding: 32px;
+    margin-top: 60px;
+  }
+
+  .quiz-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .quiz-item {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .quiz-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .quiz-q {
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .quiz-q .qnum {
+    color: var(--accent1);
+    font-weight: 700;
+    margin-right: 6px;
+  }
+
+  .quiz-answer {
+    background: rgba(6,214,160,0.1);
+    border: 1px solid rgba(6,214,160,0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--accent4);
+    display: none;
+    margin-top: 8px;
+  }
+
+  .quiz-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .quiz-btn:hover {
+    border-color: var(--accent4);
+    color: var(--accent4);
+  }
+
+  /* 분리선 */
+  .divider {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 20px;
+    letter-spacing: 8px;
+    margin: 40px 0;
+    opacity: 0.4;
+  }
+
+  /* 푸터 */
+  .footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- 별 배경 -->
+<div class="stars" id="stars"></div>
+
+<div class="container">
+
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="tag">✦ 우주 탐구 읽기 자료</div>
+    <h1>빛보다 빠른 상상<br>— 우주로 떠나는 여행</h1>
+    <p class="subtitle">블랙홀, 은하, 그리고 우리가 살고 있는 이 광대한 우주 이야기</p>
+  </div>
+
+  <!-- 1. 프롤로그 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🌌</div>
+      <div>
+        <div class="section-num">PROLOGUE</div>
+        <div class="section-title">밤하늘을 올려다보며</div>
+      </div>
+    </div>
+    <div class="story-card">
+      <p>어두운 밤, 도시의 불빛에서 멀리 떨어진 곳에 서서 하늘을 올려다본 적이 있나요? 눈에 보이는 별들 하나하나가 사실은 우리 태양처럼 거대한 별이라는 사실을 알고 있었나요?</p>
+      <p>지금 여러분이 보고 있는 그 별빛은 수백 년, 수천 년 전에 출발한 빛입니다. 어떤 별빛은 공룡이 살던 시대에 출발해서 지금에서야 우리 눈에 닿는 것도 있어요. 즉, 우리는 밤하늘을 볼 때마다 과거를 보고 있는 셈입니다.</p>
+      <div class="highlight-box">
+        💡 빛은 1초에 약 30만 킬로미터를 달립니다. 지구에서 달까지의 거리를 약 1.3초 만에 가로지르는 속도예요.
+      </div>
+      <p>자, 이제 상상력의 날개를 펼쳐볼까요? 우리가 빛의 속도로 날 수 있다면, 우주는 어떤 모습일까요?</p>
+    </div>
+  </div>
+
+  <!-- 2. 태양계 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">☀️</div>
+      <div>
+        <div class="section-num">CHAPTER 1</div>
+        <div class="section-title">우리의 집, 태양계</div>
+      </div>
+    </div>
+    <div class="story-card" style="--stripe: linear-gradient(90deg, #ffd166, #ff7eb3);">
+      <p>지구는 태양을 중심으로 도는 여덟 개의 행성 중 하나입니다. 태양에서 세 번째로 가까운 행성이 바로 우리가 사는 지구예요.</p>
+      <p>태양계의 크기를 실감하기 위해 이렇게 상상해봐요. 만약 태양을 농구공 크기로 줄인다면, 지구는 약 26미터 떨어진 곳에 있는 작은 모래알 크기입니다. 그리고 가장 먼 행성인 해왕성은 무려 1킬로미터나 떨어진 곳에 있어야 해요.</p>
+      <div class="highlight-box yellow">
+        🪐 태양계에서 가장 큰 행성은 목성입니다. 목성 안에 지구를 1,300개 이상 집어넣을 수 있어요!
+      </div>
+      <p>그런데 이 광대한 태양계도, 우리 은하 전체에 비하면 먼지보다 작은 점에 불과합니다. 우리 은하 안에는 태양과 같은 별이 무려 2,000억 개 이상 있거든요.</p>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="label">태양에서 지구까지</div>
+          <div class="value">약 1억 5천만 km</div>
+        </div>
+        <div class="info-item">
+          <div class="label">빛으로 가면</div>
+          <div class="value">약 8분 20초</div>
+        </div>
+        <div class="info-item">
+          <div class="label">태양계 행성 수</div>
+          <div class="value">8개</div>
+        </div>
+        <div class="info-item">
+          <div class="label">태양의 나이</div>
+          <div class="value">약 46억 년</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 은하 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🌀</div>
+      <div>
+        <div class="section-num">CHAPTER 2</div>
+        <div class="section-title">별들의 도시, 은하</div>
+      </div>
+    </div>
+    <div class="story-card" style="--stripe: linear-gradient(90deg, #7c9fff, #06d6a0);">
+      <p>은하는 수천억 개의 별이 중력으로 묶여 함께 움직이는 거대한 집단입니다. 우리 태양계가 속한 은하는 '우리 은하' 또는 '밀키웨이(Milky Way)'라고 불러요. 한국어로는 '은하수'라고도 하죠.</p>
+      <p>우리 은하의 모양은 위에서 보면 나선 모양인데, 마치 소용돌이치는 바람개비처럼 생겼어요. 태양계는 이 바람개비의 팔 중 하나인 '오리온 팔'이라는 곳에 자리 잡고 있습니다.</p>
+      <div class="highlight-box green">
+        🌟 우리 은하의 지름은 약 10만 광년입니다. 빛의 속도로 달려도 한쪽 끝에서 다른 쪽 끝까지 가는 데 10만 년이 걸린다는 뜻이에요!
+      </div>
+      <p>그리고 놀라운 사실이 있어요. 우주에는 이런 은하가 약 2조 개 이상 있다고 과학자들은 추정합니다. 2조는 2 뒤에 0이 12개나 붙는 숫자예요. 상상이 가나요?</p>
+      <p>우리 은하에서 가장 가까운 큰 은하는 '안드로메다 은하'입니다. 이 은하까지의 거리는 약 250만 광년. 빛의 속도로 달려도 250만 년이 걸려요. 그런데 이 두 은하는 지금 이 순간에도 서로를 향해 다가가고 있습니다. 약 37억 년 뒤에는 서로 합쳐질 것이라고 해요.</p>
+    </div>
+  </div>
+
+  <!-- 4. 블랙홀 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">⚫</div>
+      <div>
+        <div class="section-num">CHAPTER 3</div>
+        <div class="section-title">모든 것을 삼키는 블랙홀</div>
+      </div>
+    </div>
+    <div class="story-card" style="--stripe: linear-gradient(90deg, #ff7eb3, #7c9fff);">
+      <p>우주에서 가장 신비롭고 무서운 존재 중 하나는 바로 블랙홀입니다. 블랙홀은 말 그대로 '검은 구멍'인데, 엄청난 중력으로 주변의 모든 것을 빨아들이는 천체예요.</p>
+      <p>블랙홀은 어떻게 만들어질까요? 태양보다 훨씬 무거운 별이 수명을 다하면 엄청난 폭발을 일으킵니다. 이것을 '초신성 폭발'이라고 해요. 폭발 후 별의 중심 부분이 극도로 압축되어 엄청난 밀도를 가진 블랙홀이 됩니다.</p>
+      <div class="highlight-box pink">
+        🕳️ 블랙홀의 중력은 빛조차 탈출하지 못할 만큼 강합니다. 그래서 블랙홀 자체는 볼 수 없고, 주변의 빛이 휘어지는 것을 관측해서 존재를 알아낸답니다.
+      </div>
+      <p>2019년, 과학자들은 처음으로 블랙홀의 사진을 찍는 데 성공했습니다. '메시에 87(M87)'이라는 은하 중심에 있는 블랙홀이었는데, 지구에서 5,500만 광년이나 떨어진 곳에 있음에도 불구하고 전 세계 8개의 망원경을 동시에 사용해서 촬영에 성공했어요.</p>
+      <p>우리 은하의 중심에도 거대한 블랙홀이 있습니다. '궁수자리 A*'라고 불리는 이 블랙홀은 태양 질량의 400만 배나 된다고 해요. 하지만 걱정하지 마세요. 지구와는 2만 6천 광년이나 떨어져 있고, 블랙홀이 주변의 모든 것을 마구잡이로 빨아들이는 것은 아니거든요.</p>
+    </div>
+  </div>
+
+  <!-- 5. 우주의 탄생 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">💥</div>
+      <div>
+        <div class="section-num">CHAPTER 4</div>
+        <div class="section-title">우주는 어떻게 시작되었을까?</div>
+      </div>
+    </div>
+    <div class="story-card" style="--stripe: linear-gradient(90deg, #ffd166, #06d6a0);">
+      <p>138억 년 전, 우주는 존재하지 않았습니다. 공간도, 시간도, 물질도 없었어요. 그러다 갑자기 — 상상할 수 없을 만큼 뜨겁고 밀도 높은 한 점에서 모든 것이 시작됩니다. 이것을 '빅뱅(Big Bang)'이라고 해요.</p>
+      <p>빅뱅은 단순한 폭발이 아니었습니다. 공간 자체가 생겨나고, 팽창하기 시작한 거예요. 마치 풍선을 불었을 때 풍선 표면이 사방으로 늘어나는 것처럼요.</p>
+      <div class="highlight-box">
+        🌡️ 빅뱅 직후 우주의 온도는 약 1조 도가 넘었습니다. 그 뜨거운 혼돈 속에서 수소와 헬륨이 만들어지고, 이 원소들이 뭉쳐 별이 되고, 은하가 되었어요.
+      </div>
+      <p>그리고 우주는 지금도 팽창하고 있습니다. 멀리 있는 은하일수록 더 빠르게 우리에게서 멀어지고 있어요. 과학자들은 우주가 팽창하고 있다는 것을 1929년에 처음 발견했는데, 이것은 빅뱅 이론을 뒷받침하는 중요한 증거가 되었습니다.</p>
+      <p>우주의 나이가 138억 년이라면, 지구의 나이는 46억 년입니다. 인류가 지구에 나타난 것은 고작 20만 년 전의 일이에요. 우주의 역사 전체를 1년으로 압축하면, 인류는 12월 31일 마지막 몇 분 안에 나타난 셈입니다.</p>
+    </div>
+  </div>
+
+  <!-- 6. 우주 탐사 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">🚀</div>
+      <div>
+        <div class="section-num">CHAPTER 5</div>
+        <div class="section-title">인류의 우주 탐사</div>
+      </div>
+    </div>
+    <div class="story-card" style="--stripe: linear-gradient(90deg, #06d6a0, #7c9fff);">
+      <p>인류가 처음으로 우주에 인공위성을 쏘아 올린 것은 1957년이었습니다. 소련(지금의 러시아)이 발사한 '스푸트니크 1호'가 그 주인공이에요. 그로부터 불과 12년 뒤인 1969년, 미국의 아폴로 11호 우주선이 달에 착륙하면서 인류 역사상 처음으로 사람이 지구 밖 천체에 발을 딛게 됩니다.</p>
+      <p>그 순간 우주인 닐 암스트롱이 남긴 말은 지금도 유명해요. "한 사람에게는 작은 한 걸음이지만, 인류에게는 위대한 도약이다."</p>
+      <div class="highlight-box green">
+        🛸 현재 국제우주정거장(ISS)에는 여러 나라의 우주인들이 함께 생활하며 연구를 진행하고 있습니다. 지구 상공 약 400km에서 90분마다 지구를 한 바퀴 돌고 있어요.
+      </div>
+      <p>2021년에는 제임스 웹 우주망원경이 발사되었습니다. 이 망원경은 허블 우주망원경보다 훨씬 더 멀리 볼 수 있어서, 우주 탄생 초기인 135억 년 전의 모습도 관측할 수 있어요. 과학자들은 이 망원경을 통해 생명체가 살 수 있는 행성을 찾는 데도 도움을 받고 있습니다.</p>
+      <p>인류는 지금도 화성 탐사 로버를 보내고, 태양계 밖을 향해 탐사선을 날려보내고 있습니다. 1977년에 발사된 보이저 1호는 지금도 날아가고 있어요. 태양에서 230억 킬로미터 이상 떨어진 곳에서요. 지금 이 순간에도 인류의 이야기를 담은 황금 레코드판을 싣고 미지의 우주를 향해 나아가고 있습니다.</p>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- 퀴즈 -->
+  <div class="quiz-section">
+    <div class="quiz-title">🧠 읽고 나서 확인해봐요</div>
+
+    <div class="quiz-item">
+      <div class="quiz-q"><span class="qnum">Q1.</span> 밤하늘의 별빛이 과거의 빛인 이유는 무엇인가요?</div>
+      <button class="quiz-btn" onclick="toggleAnswer(this)">정답 확인</button>
+      <div class="quiz-answer">빛이 별에서 출발해 지구까지 도달하는 데 시간이 걸리기 때문입니다. 멀리 있는 별일수록 수백~수천 년 전에 출발한 빛이 지금 우리 눈에 닿는 것입니다.</div>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q"><span class="qnum">Q2.</span> 우리 태양계가 속한 은하의 이름은 무엇인가요?</div>
+      <button class="quiz-btn" onclick="toggleAnswer(this)">정답 확인</button>
+      <div class="quiz-answer">우리 은하(밀키웨이, 은하수)입니다. 태양계는 우리 은하의 '오리온 팔'이라는 곳에 위치해 있습니다.</div>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q"><span class="qnum">Q3.</span> 블랙홀에서 빛조차 탈출하지 못하는 이유는 무엇인가요?</div>
+      <button class="quiz-btn" onclick="toggleAnswer(this)">정답 확인</button>
+      <div class="quiz-answer">블랙홀의 중력이 너무 강하기 때문입니다. 빛도 탈출할 수 없을 만큼 강한 중력이 모든 것을 안으로 당기기 때문에 블랙홀 자체는 보이지 않습니다.</div>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q"><span class="qnum">Q4.</span> 빅뱅이란 무엇인가요? 한 문장으로 설명해보세요.</div>
+      <button class="quiz-btn" onclick="toggleAnswer(this)">정답 확인</button>
+      <div class="quiz-answer">약 138억 년 전, 극도로 뜨겁고 밀도 높은 한 점에서 공간과 시간, 물질이 동시에 생겨나며 우주가 시작된 사건입니다.</div>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q"><span class="qnum">Q5.</span> 이 글을 읽고 우주에 대해 가장 신기하거나 놀라웠던 사실을 하나 골라 이유와 함께 써보세요.</div>
+      <button class="quiz-btn" onclick="toggleAnswer(this)">예시 답안</button>
+      <div class="quiz-answer">예: 우주에 은하가 2조 개 이상 있다는 사실이 가장 놀라웠습니다. 우리 은하에만 별이 2,000억 개인데, 그런 은하가 2조 개나 있다는 것은 상상조차 하기 어렵기 때문입니다. 우주의 크기에 비하면 인간은 정말 작은 존재라는 생각이 들었습니다.</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>🌠 우주는 아직도 우리가 모르는 것들로 가득합니다. 오늘의 궁금증이 미래의 우주 탐험가를 만듭니다.</p>
+  </div>
+
+</div>
+
+<script>
+  // 별 생성
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 200; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    star.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      top: ${Math.random() * 100}%;
+      left: ${Math.random() * 100}%;
+      --d: ${Math.random() * 4 + 2}s;
+      animation-delay: ${Math.random() * 4}s;
+      opacity: ${Math.random() * 0.6 + 0.1};
+    `;
+    starsEl.appendChild(star);
+  }
+
+  // 퀴즈 토글
+  function toggleAnswer(btn) {
+    const ans = btn.nextElementSibling;
+    if (ans.style.display === 'block') {
+      ans.style.display = 'none';
+      btn.textContent = btn.textContent.includes('숨기기') ? '정답 확인' : '예시 답안';
+    } else {
+      ans.style.display = 'block';
+      btn.textContent = '숨기기';
+    }
+  }
+</script>
+</body>
+</html>
