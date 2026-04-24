@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>선택과 자유 — 나는 정말 선택하고 있을까?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #f4f0f8;
+    --surface: #fff;
+    --text: #1e1a2e;
+    --text-dim: #6e6880;
+    --accent: #6b47b8;
+    --accent-light: #ede8f8;
+    --accent2: #c0392b;
+    --accent2-light: #fdecea;
+    --accent3: #2e7d6b;
+    --accent3-light: #e0f2ee;
+    --border: rgba(107,71,184,0.15);
+    --ink: #1e1a2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 17px;
+    line-height: 1.95;
+  }
+
+  /* 헤더 */
+  .page-header {
+    background: linear-gradient(160deg, #1a0e2e 0%, #3b2070 60%, #6b47b8 100%);
+    padding: 64px 24px 90px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                      radial-gradient(circle at 80% 30%, rgba(255,255,255,0.03) 0%, transparent 50%);
+  }
+
+  .page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 60px;
+    background: var(--bg);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .header-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+    position: relative;
+  }
+
+  .header-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(28px, 7vw, 50px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.25;
+    margin-bottom: 14px;
+    position: relative;
+  }
+
+  .header-sub {
+    color: rgba(255,255,255,0.6);
+    font-size: 15px;
+    font-weight: 300;
+    position: relative;
+  }
+
+  /* 본문 */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 50px 24px 100px;
+  }
+
+  .story p {
+    margin-bottom: 22px;
+    color: var(--ink);
+  }
+
+  .story p.lead {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  /* 대화 */
+  .dialogue {
+    margin: 28px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .speech { display: flex; gap: 12px; align-items: flex-start; }
+  .speech.right { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 900;
+  }
+
+  .av-robot { background: #dde8f8; color: #2a5fa8; }
+  .av-child { background: #e8dff8; color: #5a2ea8; }
+  .av-teacher { background: #dff5ee; color: #1a6b50; }
+
+  .bubble {
+    max-width: 82%;
+    padding: 14px 18px;
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+
+  .bubble.robot-b { background: #dde8f8; border-radius: 4px 18px 18px 18px; }
+  .bubble.child-b { background: #ede8f8; border-radius: 18px 4px 18px 18px; }
+  .bubble.teacher-b { background: #dff5ee; border-radius: 4px 18px 18px 18px; }
+
+  .speaker-name {
+    font-size: 12px; font-weight: 500;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+  }
+
+  /* 섹션 구분 */
+  .section-break {
+    text-align: center;
+    margin: 40px 0;
+    color: var(--accent);
+    font-size: 20px;
+    letter-spacing: 12px;
+    opacity: 0.4;
+  }
+
+  /* 철학 박스 */
+  .phil-box {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-light);
+    border-radius: 0 14px 14px 0;
+    padding: 22px 26px;
+    margin: 28px 0;
+  }
+  .phil-box .box-label {
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--accent); text-transform: uppercase;
+    font-weight: 500; margin-bottom: 8px;
+  }
+  .phil-box p { color: var(--ink); font-style: italic; font-size: 16px; margin: 0; }
+
+  .phil-box.red {
+    border-left-color: var(--accent2);
+    background: var(--accent2-light);
+  }
+  .phil-box.red .box-label { color: var(--accent2); }
+
+  .phil-box.green {
+    border-left-color: var(--accent3);
+    background: var(--accent3-light);
+  }
+  .phil-box.green .box-label { color: var(--accent3); }
+
+  /* 대비 카드 2열 */
+  .contrast-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 28px 0;
+  }
+  @media (max-width: 520px) { .contrast-grid { grid-template-columns: 1fr; } }
+
+  .contrast-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .contrast-card .cc-title {
+    font-size: 13px; font-weight: 500;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .contrast-card .cc-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .contrast-card p { font-size: 15px; color: var(--text-dim); margin: 0; line-height: 1.7; }
+
+  /* 질문 카드 */
+  .q-section { margin-top: 50px; }
+  .q-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--ink); margin-bottom: 22px;
+  }
+  .q-cards { display: flex; flex-direction: column; gap: 12px; }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .q-card:hover { border-color: rgba(107,71,184,0.4); }
+  .q-card.open { border-color: var(--accent); }
+
+  .q-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .q-num { font-size: 12px; font-weight: 500; color: var(--accent); letter-spacing: 1px; flex-shrink: 0; margin-top: 2px; }
+  .q-text { font-size: 16px; font-weight: 500; color: var(--ink); flex: 1; line-height: 1.6; }
+  .q-toggle { font-size: 20px; color: var(--text-dim); flex-shrink: 0; transition: transform 0.2s; }
+  .q-card.open .q-toggle { transform: rotate(45deg); }
+
+  .q-hint {
+    display: none;
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 15px; color: var(--text-dim); line-height: 1.75;
+  }
+  .q-card.open .q-hint { display: block; }
+
+  /* 마무리 */
+  .ending {
+    background: linear-gradient(135deg, #1a0e2e 0%, #3b2070 100%);
+    border-radius: 22px;
+    padding: 38px 34px;
+    margin-top: 52px;
+    color: white;
+  }
+  .ending-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .ending p {
+    font-size: 15px; line-height: 1.95;
+    color: rgba(255,255,255,0.82);
+    margin-bottom: 16px;
+  }
+  .ending p:last-child { margin-bottom: 0; }
+  .ending .quote {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 17px; font-weight: 700;
+    color: #d4bbff;
+    font-style: italic;
+  }
+
+  .footer {
+    text-align: center; color: var(--text-dim);
+    font-size: 13px; margin-top: 60px;
+    padding-top: 24px; border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-tag">✦ 철학 동화</div>
+  <h1 class="header-title">나는 정말<br>선택하고 있을까?</h1>
+  <p class="header-sub">— 선택, 자유, 그리고 로봇의 질문</p>
+</div>
+
+<div class="container">
+
+  <div class="story">
+    <p class="lead">어느 날 아침, 민준이는 아침밥을 먹으면서 이상한 생각이 들었습니다. 오늘 학교에 입고 갈 옷을 고르면서 말이에요.</p>
+
+    <p>"나는 지금 파란 셔츠를 '선택'했어. 그런데 정말 내가 선택한 걸까? 아니면 그냥 습관대로 고른 걸까?"</p>
+
+    <p>마침 학교에 새 로봇 보조교사 '아리'가 왔습니다. 인공지능으로 작동하는 로봇이었어요. 민준이는 궁금한 것을 참지 못하고 아리에게 물어보았습니다.</p>
+  </div>
+
+  <div class="dialogue">
+
+    <div class="speech">
+      <div><div class="avatar av-child">민</div></div>
+      <div>
+        <div class="speaker-name">민준</div>
+        <div class="bubble child-b">아리야, 너는 스스로 선택할 수 있어? 예를 들어 지금 이 질문에 대답할지 말지를 네가 결정하는 거야?</div>
+      </div>
+    </div>
+
+    <div class="speech right">
+      <div><div class="avatar av-robot">아</div></div>
+      <div style="text-align:right">
+        <div class="speaker-name" style="text-align:right">아리 (로봇)</div>
+        <div class="bubble robot-b">저는 수많은 데이터와 규칙에 따라 가장 적절한 답을 고릅니다. 제가 '선택'하는 건지는 저도 잘 모르겠어요.</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div><div class="avatar av-child">민</div></div>
+      <div>
+        <div class="speaker-name">민준</div>
+        <div class="bubble child-b">그런데… 나도 뇌에서 신호가 오면 행동하잖아. 나랑 뭐가 달라?</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="phil-box">
+    <div class="box-label">핵심 질문</div>
+    <p>로봇이 규칙에 따라 움직이는 것과, 인간이 뇌의 신호에 따라 움직이는 것은 어떻게 다를까요?</p>
+  </div>
+
+  <div class="story">
+    <p>선생님이 이 대화를 듣고 교실 앞으로 나왔습니다.</p>
+  </div>
+
+  <div class="dialogue">
+
+    <div class="speech">
+      <div><div class="avatar av-teacher">선</div></div>
+      <div>
+        <div class="speaker-name">선생님</div>
+        <div class="bubble teacher-b">좋은 질문이야, 민준아. 철학자들은 이 문제를 '자유의지'라고 불렀어. 인간이 진짜로 스스로 결정할 수 있는가 — 수천 년 동안 논쟁해온 주제란다.</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div><div class="avatar av-child">민</div></div>
+      <div>
+        <div class="speaker-name">민준</div>
+        <div class="bubble child-b">그럼 선생님은 어떻게 생각해요? 우리한테 자유의지가 있나요?</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div><div class="avatar av-teacher">선</div></div>
+      <div>
+        <div class="speaker-name">선생님</div>
+        <div class="bubble teacher-b">과학자들이 실험을 했는데, 내가 '결정했다'고 느끼기 약 0.5초 전에 이미 뇌가 먼저 신호를 보낸다는 걸 발견했어. 즉, 내가 결정하기 전에 뇌가 이미 결정했다는 거야.</div>
+      </div>
+    </div>
+
+    <div class="speech right">
+      <div><div class="avatar av-robot">아</div></div>
+      <div style="text-align:right">
+        <div class="speaker-name" style="text-align:right">아리 (로봇)</div>
+        <div class="bubble robot-b">그렇다면 인간도 저처럼 프로그래밍된 것 아닌가요? 유전자와 환경이라는 '코드'로요.</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div><div class="avatar av-child">민</div></div>
+      <div>
+        <div class="speaker-name">민준</div>
+        <div class="bubble child-b">그럼 나쁜 짓을 한 사람도 사실은 어쩔 수 없었던 건가요? 그 사람의 뇌가 그렇게 결정했으니까요?</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div><div class="avatar av-teacher">선</div></div>
+      <div>
+        <div class="speaker-name">선생님</div>
+        <div class="bubble teacher-b">바로 그게 가장 어려운 질문이야. 만약 자유의지가 없다면, 우리는 누군가를 칭찬하거나 벌할 수 있을까?</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-break">✦ ✦ ✦</div>
+
+  <div class="story">
+    <p>그날 오후, 아리 로봇이 실수를 했습니다. 복도에서 꽃병을 건드려 떨어뜨린 거예요. 아리는 이렇게 말했습니다.</p>
+    <p><em>"죄송합니다. 제 센서가 거리를 잘못 계산했습니다."</em></p>
+    <p>민준이는 그걸 보며 또 생각에 빠졌어요.</p>
+    <p class="lead">'아리는 잘못한 게 아니야. 계산이 틀렸을 뿐이니까. 그렇다면 내가 실수를 할 때도 마찬가지 아닐까?'</p>
+    <p>하지만 뭔가 달랐습니다. 민준이는 아리와 달리 꽃병을 떨어뜨린 뒤 가슴이 두근거리고, 미안한 감정이 들고, 다음에는 조심해야겠다고 <em>느꼈을</em> 거예요. 그 감정이 선택을 다르게 만드는 걸까요?</p>
+  </div>
+
+  <div class="phil-box red">
+    <div class="box-label">생각해봐요</div>
+    <p>나쁜 결과를 전혀 몰랐다면, 그 행동은 나쁜 행동일까요? 의도와 결과 중 어느 쪽이 더 중요할까요?</p>
+  </div>
+
+  <div class="contrast-grid">
+    <div class="contrast-card">
+      <div class="cc-title">
+        <div class="cc-dot" style="background:#6b47b8"></div>
+        <span style="color:#6b47b8">결과론</span>
+      </div>
+      <p>행동의 옳고 그름은 결과로 판단해야 한다. 아무리 좋은 의도였어도 나쁜 결과를 냈다면 나쁜 행동이다.</p>
+    </div>
+    <div class="contrast-card">
+      <div class="cc-title">
+        <div class="cc-dot" style="background:#c0392b"></div>
+        <span style="color:#c0392b">의무론</span>
+      </div>
+      <p>행동의 옳고 그름은 의도로 판단해야 한다. 결과가 나빴어도 진심으로 옳은 일을 하려 했다면 좋은 행동이다.</p>
+    </div>
+  </div>
+
+  <div class="phil-box green">
+    <div class="box-label">현대의 질문</div>
+    <p>자율주행 자동차가 사고를 냈다면 누구의 잘못일까요? 차를 만든 회사? 차를 탄 사람? 아니면 아무도 잘못이 없는 걸까요?</p>
+  </div>
+
+  <div class="section-break">✦ ✦ ✦</div>
+
+  <!-- 질문 카드 -->
+  <div class="q-section">
+    <div class="q-title">📖 함께 생각해봐요</div>
+    <div class="q-cards">
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-row">
+          <div class="q-num">Q 1</div>
+          <div class="q-text">로봇이 스스로 선택을 한다면 그건 진짜 선택일까요? 인간의 선택과 무엇이 같고 무엇이 다를까요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          인간도 뇌의 신호에 따라 움직인다는 점에서 비슷해 보여요. 하지만 많은 사람들은 인간에게는 '느낌', '감정', '의식'이 있다는 점이 다르다고 말해요. 그 차이가 진짜 선택을 만드는 걸까요?
+        </div>
+      </div>
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-row">
+          <div class="q-num">Q 2</div>
+          <div class="q-text">오늘 내가 한 선택 중 하나를 떠올려보세요. 그 선택은 정말 내가 한 건가요, 아니면 습관이나 감정이 한 건가요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          철학자 칸트는 진정한 자유란 충동이나 습관을 따르는 게 아니라, 스스로 세운 원칙에 따르는 것이라고 했어요. 내가 세운 원칙이 있나요?
+        </div>
+      </div>
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-row">
+          <div class="q-num">Q 3</div>
+          <div class="q-text">나쁜 결과를 전혀 몰랐다면 그 행동은 나쁜 행동인가요? 예를 들어, 독이 든 줄 모르고 음식을 준 사람은 잘못한 걸까요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          의도는 선했지만 결과는 나빴을 때 우리는 어떻게 판단해야 할까요? 법도 이 문제를 다루는데, '고의'와 '과실'을 구분하는 게 그 이유예요.
+        </div>
+      </div>
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-row">
+          <div class="q-num">Q 4</div>
+          <div class="q-text">만약 인간에게 자유의지가 없다면, 우리는 누군가를 칭찬하거나 벌할 수 있을까요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          자유의지가 없다면 모든 행동은 환경과 유전자의 결과예요. 그래도 사회가 규칙과 벌을 유지하는 이유는 무엇일까요? 벌이 '잘못을 갚는 것'이 아니라 '앞으로를 바꾸는 것'이라면 달라질까요?
+        </div>
+      </div>
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-row">
+          <div class="q-num">Q 5</div>
+          <div class="q-text">AI가 점점 더 스스로 판단하는 시대가 오고 있어요. 이 시대에 '자유'와 '선택'의 의미가 어떻게 달라져야 할까요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          예전에는 '선택'은 인간만의 것이었어요. 하지만 이제 AI도 선택하고, 추천하고, 판단해요. 내가 유튜브에서 보는 영상도 알고리즘이 '선택'해준 거예요. 내 선택이 얼마나 진짜 내 선택인지 생각해볼 필요가 있어요.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 마무리 -->
+  <div class="ending">
+    <div class="ending-title">💭 이 이야기가 하고 싶은 말</div>
+    <p>우리는 매일 수백 번 선택을 해요. 무엇을 먹을지, 누구에게 말을 걸지, 어떤 말을 할지. 그런데 그 선택들이 진짜 '내' 선택인지는 생각해본 적이 없었을 거예요.</p>
+    <p>AI가 등장하면서 이 질문은 더 중요해졌어요. 알고리즘이 내 취향을 분석해서 추천해주는 음악, 영상, 뉴스 — 나는 선택하는 것 같지만, 사실은 유도된 것일 수 있거든요.</p>
+    <p>진정한 자유는 어쩌면 이렇게 묻는 것에서 시작할지 몰라요.</p>
+    <p class="quote">"이 선택, 정말 내가 한 건가?"</p>
+  </div>
+
+  <div class="footer">
+    <p>✦ 선택할 수 있다고 느끼는 것 자체가 이미 자유의 시작일지도 몰라요.</p>
+  </div>
+
+</div>
+
+<script>
+  function toggleQ(card) { card.classList.toggle('open'); }
+</script>
+</body>
+</html>
