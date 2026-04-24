@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html class="light" lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>5학년 1학기 수학 정원 학습지</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Lexend:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#9b9e98",
+                        "surface": "#f8faf3",
+                        "secondary-fixed-dim": "#f3ccbf",
+                        "on-primary-fixed-variant": "#00691a",
+                        "primary": "#006f1d",
+                        "tertiary": "#ac2d5e",
+                        "on-error": "#fff7f6",
+                        "secondary-container": "#ffdbce",
+                        "error": "#aa371c",
+                        "surface-tint": "#006f1d",
+                        "on-secondary-fixed-variant": "#72554b",
+                        "on-tertiary-fixed-variant": "#81013e",
+                        "surface-variant": "#dee4da",
+                        "error-dim": "#821a01",
+                        "surface-container-highest": "#dee4da",
+                        "outline": "#767d73",
+                        "inverse-primary": "#91f78e",
+                        "on-surface-variant": "#5a6158",
+                        "tertiary-fixed": "#ff9bb7",
+                        "primary-container": "#91f78e",
+                        "surface-bright": "#f8faf3",
+                        "on-error-container": "#671200",
+                        "on-secondary-fixed": "#533930",
+                        "background": "#f8faf3",
+                        "on-surface": "#2e342d",
+                        "on-tertiary-fixed": "#480020",
+                        "secondary-fixed": "#ffdbce",
+                        "primary-fixed-dim": "#83e881",
+                        "primary-fixed": "#91f78e",
+                        "on-primary-fixed": "#00480f",
+                        "primary-dim": "#006118",
+                        "surface-container-low": "#f2f5ed",
+                        "on-tertiary": "#fff7f7",
+                        "tertiary-fixed-dim": "#ff84aa",
+                        "tertiary-dim": "#9c1f52",
+                        "on-primary-container": "#005e17",
+                        "surface-container": "#ebefe6",
+                        "on-background": "#2e342d",
+                        "inverse-surface": "#0c0f0b",
+                        "secondary": "#75584e",
+                        "on-tertiary-container": "#710035",
+                        "on-secondary": "#fff7f5",
+                        "on-secondary-container": "#674b41",
+                        "tertiary-container": "#ff9bb7",
+                        "error-container": "#fa7150",
+                        "surface-dim": "#d5dcd0",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e5eae0",
+                        "outline-variant": "#adb4aa",
+                        "secondary-dim": "#684d43",
+                        "on-primary": "#eaffe2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "3xl": "2rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Lexend", "sans-serif"],
+                        "label": ["Lexend", "sans-serif"],
+                        "math": ["Crimson Pro", "serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Lexend', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .math-text { font-family: 'Crimson Pro', serif; }
+        
+        .worksheet-bg {
+            background-image: repeating-linear-gradient(transparent, transparent 31px, #e5eae0 31px, #e5eae0 32px);
+            background-position: 0 40px;
+        }
+
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            line-height: 1.1;
+            font-size: 0.85em;
+            margin: 0 0.1em;
+            font-family: 'Lexend', 'Plus Jakarta Sans', sans-serif;
+        }
+        .frac-num {
+            border-bottom: 1.5px solid currentColor;
+            padding: 0 0.2em;
+        }
+        .frac-den {
+            padding: 0 0.2em;
+        }
+        .mixed-frac {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+        .mixed-frac > span:first-child {
+            margin-right: 0.15em;
+            font-size: 1.1em;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+            50% { transform: scale(1.1) translateY(-10px); }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .plant-pop { animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #adb4aa; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #767d73; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex flex-col antialiased h-screen overflow-hidden">
+
+    <header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-xl bg-surface-container-low shadow-sm shadow-emerald-900/5 lg:w-[calc(100%-18rem)] lg:left-72">
+        <div class="text-2xl font-black text-emerald-900 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary lg:hidden" style="font-variation-settings: 'FILL' 1;">spa</span>
+            <span class="lg:hidden font-headline">수학 정원</span>
+            <span class="hidden lg:block text-on-surface font-headline font-bold" id="topbar-title">5학년 1학기 수학 정원</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="w-10 h-10 rounded-full hover:bg-emerald-50 flex items-center justify-center text-emerald-800 transition-colors" title="학습 가이드">
+                <span class="material-symbols-outlined">eco</span>
+            </button>
+            <button onclick="openNameModal()" class="w-10 h-10 rounded-full hover:bg-emerald-50 flex items-center justify-center text-emerald-800 transition-colors lg:hidden" title="학생 정보 설정">
+                <span class="material-symbols-outlined">person</span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="hidden lg:flex flex-col w-72 h-screen p-6 fixed left-0 top-0 z-50 bg-stone-50 rounded-r-[2rem] shadow-xl shadow-stone-900/5 border-r border-stone-100 overflow-y-auto">
+        <div class="flex items-center gap-2 mb-8 mt-2">
+            <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+            <span class="text-2xl font-black text-emerald-800 font-headline">수학 정원</span>
+        </div>
+        
+        <div class="flex items-center gap-4 mb-8 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10 shadow-sm">
+            <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-inner font-bold text-xl shrink-0">
+                학생
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1 cursor-pointer group" onclick="openNameModal()" title="이름 변경하기">
+                    <p class="font-headline font-bold text-on-surface truncate" id="profile-name-display">5학년 학생</p>
+                    <span class="material-symbols-outlined text-sm text-outline group-hover:text-primary transition-colors shrink-0">edit</span>
+                </div>
+                <p class="text-xs text-on-surface-variant font-medium">로컬 저장소 활성화됨</p>
+            </div>
+        </div>
+        
+        <ul class="flex-1 space-y-2 font-label text-sm font-medium">
+            <li>
+                <button onclick="navTo('units')" id="nav-units-desk" class="w-full flex items-center gap-3 bg-emerald-100 text-emerald-900 rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_max_dots</span>
+                    내 정원 (단원 선택)
+                </button>
+            </li>
+            <li>
+                <button onclick="navTo('stages')" id="nav-stages-desk" class="w-full flex items-center gap-3 text-stone-600 p-4 hover:bg-stone-200 rounded-2xl transition-all">
+                    <span class="material-symbols-outlined">menu_book</span>
+                    성장 지도 (학습지)
+                </button>
+            </li>
+            <li>
+                <button onclick="navTo('rewards')" id="nav-rewards-desk" class="w-full flex items-center gap-3 text-stone-600 p-4 hover:bg-stone-200 rounded-2xl transition-all">
+                    <span class="material-symbols-outlined">military_tech</span>
+                    나의 보상
+                </button>
+            </li>
+        </ul>
+
+        <div class="mt-auto pt-6">
+            <button onclick="navTo('units')" class="mb-3 w-full py-4 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold shadow-sm shadow-primary/20 hover:opacity-90 transition-opacity">
+                새 단원 심기
+            </button>
+            <button onclick="resetAllData()" class="w-full py-3 rounded-xl bg-error-container/50 text-error font-bold hover:bg-error-container hover:text-on-error-container transition-colors text-sm flex items-center justify-center gap-2 border border-error/20">
+                <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+                전체 기록 초기화
+            </button>
+        </div>
+    </nav>
+
+    <div class="flex flex-1 pt-20 h-screen overflow-hidden lg:pl-72 bg-surface">
+        <main id="main-scroll-area" class="flex-1 overflow-y-auto w-full relative pb-32 lg:pb-16 scroll-smooth">
+            
+            <div id="screen-units" class="p-6 md:p-10 lg:p-12 max-w-6xl mx-auto w-full">
+                <div class="mb-12">
+                    <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-on-surface mb-3 tracking-tight">내 정원 (Garden)</h2>
+                    <p class="text-lg text-on-surface-variant font-medium">원하는 단원을 선택하여 수학의 씨앗을 심어보세요.</p>
+                </div>
+                <div id="garden-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                </div>
+            </div>
+
+            <div id="screen-stages" class="hidden p-6 md:p-10 lg:p-12 max-w-6xl mx-auto w-full">
+                <div class="mb-6 flex justify-between items-center">
+                    <button onclick="navTo('units')" class="flex items-center gap-2 text-primary font-medium hover:bg-surface-container-low px-4 py-2 rounded-xl transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        정원 지도로 돌아가기
+                    </button>
+                    <button onclick="resetCurrentUnit()" class="flex items-center gap-2 text-on-surface-variant text-sm bg-surface-variant/50 hover:bg-surface-variant px-3 py-1.5 rounded-lg transition-colors" title="현재 단원의 학습 기록을 초기화합니다.">
+                        <span class="material-symbols-outlined text-[16px]">refresh</span>
+                        현재 단원 초기화
+                    </button>
+                </div>
+                <div class="mb-10">
+                    <h2 id="stages-unit-title" class="text-4xl md:text-5xl font-headline font-extrabold text-on-surface mb-2 tracking-tight">단원 이름</h2>
+                    <p class="text-lg text-on-surface-variant font-medium">학습지 단계를 통과하며 식물을 성장시키세요.</p>
+                </div>
+                <div id="stages-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                </div>
+            </div>
+
+            <div id="screen-rewards" class="hidden p-6 md:p-10 lg:p-12 max-w-6xl mx-auto w-full">
+                <div class="mb-12">
+                    <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-on-surface mb-3 tracking-tight">나의 보상</h2>
+                    <p class="text-lg text-on-surface-variant font-medium">지금까지 가꾼 수학 정원의 결실을 한눈에 확인해보세요.</p>
+                </div>
+                <div id="rewards-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
+                </div>
+            </div>
+
+            <div id="screen-quiz" class="hidden w-full relative">
+            </div>
+
+        </main>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 lg:hidden bg-white/90 backdrop-blur-md rounded-t-[1.5rem] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-emerald-100/20">
+        <button onclick="navTo('units')" id="nav-units-mob" class="flex flex-col items-center justify-center bg-emerald-100 text-emerald-800 rounded-2xl px-5 py-2 font-label text-[10px] font-semibold transition-all">
+            <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">potted_plant</span>
+            정원
+        </button>
+        <button onclick="navTo('stages')" id="nav-stages-mob" class="flex flex-col items-center justify-center text-stone-500 px-5 py-2 hover:bg-emerald-50 rounded-2xl transition-all font-label text-[10px] font-semibold">
+            <span class="material-symbols-outlined mb-1">school</span>
+            학습
+        </button>
+        <button onclick="navTo('rewards')" id="nav-rewards-mob" class="flex flex-col items-center justify-center text-stone-500 px-5 py-2 hover:bg-emerald-50 rounded-2xl transition-all font-label text-[10px] font-semibold">
+            <span class="material-symbols-outlined mb-1">military_tech</span>
+            보상
+        </button>
+    </nav>
+
+    <div id="result-modal" class="fixed inset-0 bg-inverse-surface/60 backdrop-blur-sm flex items-center justify-center hidden z-[100] p-4">
+        <div class="bg-surface-container-lowest rounded-[2.5rem] p-8 md:p-10 max-w-md w-full shadow-2xl text-center transform transition-all border border-outline-variant/20 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-primary-container/20 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="text-7xl mb-6 plant-pop inline-block filter drop-shadow-md" id="result-emoji">🌱</div>
+            <h2 id="result-score" class="text-3xl font-headline font-extrabold text-on-surface mb-3">8문제 중 6문제 정답!</h2>
+            <div id="result-badge" class="inline-block px-5 py-2 rounded-full text-sm font-bold mb-8 bg-primary-container text-on-primary-container shadow-sm">
+                통과 / 성장 완료
+            </div>
+            
+            <div class="bg-surface rounded-2xl p-6 mb-8 text-left border border-outline-variant/40 shadow-inner relative z-10">
+                <p class="text-xs text-primary font-bold mb-2 uppercase tracking-widest">선생님의 조언</p>
+                <p id="result-feedback" class="text-on-surface-variant leading-relaxed font-medium">
+                    피드백 내용이 들어갑니다.
+                </p>
+            </div>
+
+            <button id="result-modal-btn" class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold py-4 rounded-xl transition-transform active:scale-95 shadow-lg shadow-primary/20 text-lg relative z-10">
+                틀린 문제 다시 풀기
+            </button>
+        </div>
+    </div>
+
+    <div id="name-modal" class="fixed inset-0 bg-inverse-surface/60 backdrop-blur-sm flex items-center justify-center hidden z-[110] p-4">
+        <div class="bg-surface-container-lowest rounded-3xl p-8 max-w-sm w-full shadow-2xl transform transition-all border border-outline-variant/20">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-on-surface">학생 정보 설정</h3>
+                <button onclick="closeNameModal()" class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            
+            <label class="block text-sm font-bold text-on-surface-variant mb-2">이름 (표시용)</label>
+            <input type="text" id="name-input" class="w-full px-4 py-3 bg-surface border-2 border-outline-variant/40 rounded-xl focus:border-primary focus:ring-0 mb-6 font-bold text-lg" placeholder="예: 홍길동" maxlength="10">
+            
+            <div class="flex gap-3 mb-8">
+                <button onclick="closeNameModal()" class="flex-1 py-3 rounded-xl bg-surface-container-high text-on-surface font-bold hover:bg-outline-variant/30 transition-colors">취소</button>
+                <button onclick="saveName()" class="flex-1 py-3 rounded-xl bg-primary text-on-primary font-bold hover:opacity-90 transition-opacity">저장</button>
+            </div>
+
+            <div class="pt-4 border-t border-outline-variant/20 lg:hidden">
+                <p class="text-xs text-on-surface-variant mb-2 text-center">교사용 관리 메뉴</p>
+                <button onclick="resetAllData(); closeNameModal();" class="w-full py-3 rounded-xl bg-error-container/30 text-error font-bold hover:bg-error-container hover:text-on-error-container transition-colors text-sm flex items-center justify-center gap-2 border border-error/20">
+                    <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+                    전체 기록 초기화
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind JIT Safelist Hack
+        // bg-primary/20 border-primary/20 bg-primary-container bg-primary-container/20 bg-primary-container/30 bg-primary-container/40 text-on-primary-container from-primary to-primary-container text-primary bg-primary text-white bg-primary/10
+        // bg-tertiary/20 border-tertiary/20 bg-tertiary-container bg-tertiary-container/20 bg-tertiary-container/30 bg-tertiary-container/40 text-on-tertiary-container from-tertiary to-tertiary-container text-tertiary bg-tertiary text-white bg-tertiary/10
+
+        const STORAGE_KEY = 'math_garden_hybrid_v2';
+        let appState = {
+            studentName: '5학년 학생',
+            progress: {} 
+        };
+
+        const stageInfo = [
+            { id: 'seed', icon: 'eco', title: '씨앗 단계', sub: '기초 학습지', emoji: '🌰', theme: 'primary', color: 'text-primary' },
+            { id: 'sprout', icon: 'psychiatry', title: '새싹 단계', sub: '기본 학습지', emoji: '🌱', theme: 'primary', color: 'text-primary' },
+            { id: 'fruit', icon: 'local_florist', title: '열매 단계', sub: '심화 학습지', emoji: '🌷', theme: 'tertiary', color: 'text-tertiary' }
+        ];
+
+        let failCounts = [];
+
+        function getFeedback(stageIndex, correctCount, totalCount) {
+            const isPerfect = correctCount === totalCount;
+            const isGood = correctCount >= totalCount - 2; 
+            if (stageIndex === 0) {
+                if (isPerfect || isGood) return "가장 기초가 되는 개념을 정확히 잘 이해하고 있군요. 훌륭해요. 이대로 새싹까지 도전해봐요.";
+                else return "개념을 다시 확인해 볼 필요가 있어요. 포기하지 말고 교과서를 참고하며 다시 도전해 보세요.";
+            } else if (stageIndex === 1) { 
+                if (isPerfect || isGood) return "기본기를 탄탄하게 잘 다졌습니다. 이 정도 실력이면 다음 단계도 거뜬할 거예요.";
+                else return "헷갈리는 개념이 있나봐요. 틀린 문제를 확인하고 해설을 보며 점검해 보세요.";
+            } else { 
+                if (isPerfect || isGood) return "대단합니다. 심화 문제까지 완벽하게 풀어냈어요. 친구들에게 설명해 주어도 될 실력입니다.";
+                else return "어려운 문장제 문제라서 이해하기 힘들었을 수 있어요. 고민해 본 시간 자체가 실력 향상에 큰 도움이 됩니다.";
+            }
+        }
+
+        const gardenData = [
+            {
+                id: 1, title: '1. 자연수의 혼합 계산', currentLevel: 0,
+                worksheets: [
+                    { questions: [{ q: '15 + 5 - 3 =', a: '17', exp: '앞에서부터 차례대로 계산해요. 15+5=20이고, 20에서 3을 빼면 17이에요.' }, { q: '4 × 5 =', a: '20', exp: '구구단 4단을 외워보세요. 4×5=20이에요.' }, { q: '20 - 10 ÷ 2 =', a: '15', exp: '나눗셈을 먼저 계산해요. 10÷2=5이고, 20-5=15예요.' }, { q: '30 + 10 - 5 =', a: '35', exp: '앞에서부터 30+10=40이고, 40-5=35예요.' }, { q: '12 × 2 + 5 =', a: '29', exp: '곱셈을 먼저 해요. 12×2=24, 24+5=29예요.' }, { q: '50 - 5 × 4 =', a: '30', exp: '곱셈 먼저. 5×4=20이고, 50-20=30이에요.' }, { q: '24 ÷ 4 + 6 =', a: '12', exp: '나눗셈 먼저. 24÷4=6이고, 6+6=12예요.' }, { q: '18 + 12 - 10 =', a: '20', exp: '18+12=30이고, 30-10=20이에요.' }] },
+                    { questions: [{ q: '(15 + 5) × 2 =', a: '40', exp: '괄호 안을 가장 먼저 계산해요. 15+5=20, 20×2=40이에요.' }, { q: '30 ÷ (2 + 3) =', a: '6', exp: '괄호 안을 먼저. 2+3=5, 30÷5=6이에요.' }, { q: '40 - (10 + 5) =', a: '25', exp: '괄호 먼저. 10+5=15, 40-15=25예요.' }, { q: '(20 - 8) × 3 =', a: '36', exp: '괄호 먼저. 20-8=12, 12×3=36이에요.' }, { q: '5 × (12 - 4) =', a: '40', exp: '괄호 먼저. 12-4=8, 5×8=40이에요.' }, { q: '60 ÷ (15 - 5) =', a: '6', exp: '괄호 먼저. 15-5=10, 60÷10=6이에요.' }, { q: '(8 + 4) ÷ 3 =', a: '4', exp: '괄호 먼저. 8+4=12, 12÷3=4예요.' }, { q: '100 - (20 + 30) =', a: '50', exp: '괄호 먼저 계산하면 50이에요. 100-50=50.' }] },
+                    { questions: [{ q: '20 + 8 × 2 - 5 =', a: '31', exp: '곱셈 먼저. 8×2=16. 그 다음 차례대로 20+16=36, 36-5=31이에요.' }, { q: '50 - 12 ÷ 3 + 4 =', a: '50', exp: '나눗셈 먼저. 12÷3=4. 차례대로 50-4=46, 46+4=50이에요.' }, { q: '(15 + 5) × 2 - 10 =', a: '30', exp: '괄호(20) -> 곱셈(20×2=40) -> 뺄셈(40-10=30) 순서로 계산해요.' }, { q: '30 ÷ (2 + 3) × 4 =', a: '24', exp: '괄호(5) -> 나눗셈(30÷5=6) -> 곱셈(6×4=24) 순서예요.' }, { q: '100 - (20 + 5 × 4) =', a: '60', exp: '괄호 안에서도 곱셈 먼저. 5×4=20, 20+20=40. 100-40=60이에요.' }, { q: '(40 - 10) ÷ 5 + 8 =', a: '14', exp: '괄호(30) -> 나눗셈(30÷5=6) -> 덧셈(6+8=14)이에요.' }, { q: '20kg 쇠막대에 25kg 원판 4개와 10kg 원판 2개를 끼웠습니다. 전체 무게는 몇 kg입니까?', a: '140', exp: '식: 20 + 25×4 + 10×2 = 20 + 100 + 20 = 140kg입니다.' }, { q: '50 ÷ (10 - 5) × 3 =', a: '30', exp: '괄호(5) -> 나눗셈(50÷5=10) -> 곱셈(10×3=30)입니다.' }] }
+                ]
+            },
+            {
+                id: 2, title: '2. 약수와 배수', currentLevel: 0,
+                worksheets: [
+                    { questions: [{ q: '10의 약수는 모두 몇 개입니까?', a: '4', exp: '10을 나누어떨어지게 하는 수는 1, 2, 5, 10으로 총 4개예요.' }, { q: '4의 배수 중 두 번째로 작은 수는 무엇입니까?', a: '8', exp: '4의 배수는 4, 8, 12 이므로 두 번째는 8이에요.' }, { q: '15의 약수 중 가장 큰 수는 무엇입니까?', a: '15', exp: '어떤 수의 약수 중 가장 큰 수는 항상 자기 자신이에요.' }, { q: '7의 배수 중 30보다 작은 수는 모두 몇 개입니까?', a: '4', exp: '7, 14, 21, 28로 총 4개예요.' }, { q: '8과 12의 공약수 중 가장 작은 수는 무엇입니까?', a: '1', exp: '모든 수의 공약수 중 가장 작은 수는 항상 1이에요.' }, { q: '6과 9의 공배수 중 가장 작은 수는 무엇입니까?', a: '18', exp: '6과 9가 공통으로 가장 먼저 만나는 배수는 18이에요.' }, { q: '24의 약수 중 5보다 큰 수는 모두 몇 개입니까?', a: '4', exp: '24의 약수 중 6, 8, 12, 24로 4개예요.' }, { q: '10과 15의 최대공약수는 무엇입니까?', a: '5', exp: '10과 15를 공통으로 나누어떨어지게 하는 가장 큰 수는 5예요.' }] },
+                    { questions: [{ q: '18과 24의 최대공약수는 무엇입니까?', a: '6', exp: '최대공약수는 6이에요.' }, { q: '12와 16의 최소공배수는 무엇입니까?', a: '48', exp: '최소공배수는 48이에요.' }, { q: '어떤 두 수의 최대공약수가 8일 때, 공약수는 모두 몇 개입니까?', a: '4', exp: '공약수는 최대공약수(8)의 약수와 같아요. 1, 2, 4, 8로 4개예요.' }, { q: '5로 나누어도, 6으로 나누어도 나누어떨어지는 수 중 가장 작은 수는 무엇입니까?', a: '30', exp: '5와 6의 최소공배수를 구하는 문제예요. 5×6=30입니다.' }, { q: '사과 24개와 귤 36개를 똑같이 나누어 주려고 합니다. 최대 몇 명에게 줄 수 있습니까?', a: '12', exp: '24와 36의 최대공약수를 구해요. 정답은 12명이에요.' }, { q: '14와 21의 최소공배수는 최대공약수의 몇 배입니까?', a: '6', exp: '최대공약수 7, 최소공배수 42예요. 42 ÷ 7 = 6배입니다.' }, { q: '15와 25의 최소공배수는 무엇입니까?', a: '75', exp: '최소공배수는 75입니다.' }, { q: '1부터 50까지의 수 중에서 8의 배수는 모두 몇 개입니까?', a: '6', exp: '50 안에는 8이 6번 들어갑니다. (8×6=48)' }] },
+                    { questions: [{ q: '가로 12cm, 세로 16cm인 직사각형을 남김없이 가장 큰 정사각형으로 자를 때 한 변의 길이는 몇 cm입니까?', a: '4', exp: '12와 16의 최대공약수인 4cm입니다.' }, { q: '8분마다 출발 버스와 12분마다 출발 버스가 오전 9시에 같이 출발했습니다. 다음번에 다시 같이 출발하는 시각은 9시 몇 분입니까?', a: '24', exp: '8과 12의 최소공배수인 24분 뒤에 다시 동시에 만나요.' }, { q: '톱니 24개짜리와 36개짜리가 맞물려 돌 때 처음 톱니가 다시 맞물리려면 24개짜리는 최소 몇 바퀴 돌아야 합니까?', a: '3', exp: '최소공배수 72칸. 24개짜리가 72칸 돌려면 72÷24=3바퀴입니다.' }, { q: '연필 45자루와 지우개 60개를 남김없이 똑같이 나누어 줍니다. 한 친구가 받는 연필과 지우개는 합하여 몇 개입니까?', a: '7', exp: '학생 수는 15명. 한 명당 연필 3자루 + 지우개 4개 = 7개예요.' }, { q: '어떤 수로 38을 나누면 2가 남고, 50을 나누어도 2가 남습니다. 이런 수 중 가장 큰 수는 무엇입니까?', a: '12', exp: '나머지를 뺀 36과 48의 최대공약수인 12입니다.' }, { q: '6, 8, 12 중 어느 수로 나누어도 3이 남는 두 자리 수 중에서 가장 작은 수는 무엇입니까?', a: '27', exp: '세 수의 최소공배수 24에 나머지 3을 더한 27이 정답입니다.' }, { q: '두 수의 곱이 240이고 최대공약수가 4일 때 최소공배수는 무엇입니까?', a: '60', exp: '240 ÷ 4 = 60입니다.' }, { q: '15, 20, 25의 최소공배수는 무엇입니까?', a: '300', exp: '정답은 300입니다.' }] }
+                ]
+            },
+            {
+                id: 3, title: '3. 규칙과 대응', currentLevel: 0,
+                worksheets: [
+                    { questions: [{ q: '자전거 1대에는 바퀴가 2개 있습니다. 자전거 4대의 바퀴는 모두 몇 개입니까?', a: '8', exp: '4 × 2 = 8입니다.' }, { q: '사각형 1개를 만들려면 성냥개비 4개가 필요합니다. 사각형 5개를 만들려면 몇 개 필요합니까?', a: '20', exp: '5 × 4 = 20입니다.' }, { q: '1분에 3L씩 물이 나옵니다. 5분 동안 받은 물의 양은 몇 L입니까?', a: '15', exp: '5 × 3 = 15L입니다.' }, { q: '철수는 동생보다 3살 많습니다. 동생이 8살이면 철수는 몇 살입니까?', a: '11', exp: '8 + 3 = 11살입니다.' }, { q: '의자 1개에는 다리가 4개 있습니다. 의자 6개의 다리는 모두 몇 개입니까?', a: '24', exp: '6 × 4 = 24개입니다.' }, { q: '한 상자에 사과가 10개씩 들어있습니다. 3상자에 들어있는 사과는 몇 개입니까?', a: '30', exp: '3 × 10 = 30개입니다.' }, { q: '네잎클로버 7개에 있는 잎은 모두 몇 장입니까?', a: '28', exp: '7 × 4 = 28장입니다.' }, { q: '오각형의 변의 수는 삼각형의 변의 수보다 몇 개 더 많습니까?', a: '2', exp: '5 - 3 = 2개입니다.' }] },
+                    { questions: [{ q: '변의 수 = 정삼각형의 수 × ▢ 입니다. ▢ 안에 알맞은 수는 무엇입니까?', a: '3', exp: '정삼각형은 변이 3개이므로 3입니다.' }, { q: '4살 차이가 나는 형제가 있습니다. 형이 15살이면 동생은 몇 살입니까?', a: '11', exp: '15 - 4 = 11살입니다.' }, { q: '500원짜리 아이스크림을 8개 샀습니다. 모두 얼마입니까?', a: '4000', exp: '8 × 500 = 4000원입니다.' }, { q: '기차 1량에 60명이 탑니다. 5량일 때 탈 수 있는 최대 인원은 몇 명입니까?', a: '300', exp: '5 × 60 = 300명입니다.' }, { q: '어떤 수에 7을 더하면 동그라미가 됩니다. 어떤 수가 15일 때 동그라미는 얼마입니까?', a: '22', exp: '15 + 7 = 22입니다.' }, { q: '어떤 수에 4를 곱하면 별이 됩니다. 별이 36일 때 어떤 수는 얼마입니까?', a: '9', exp: '36 ÷ 4 = 9입니다.' }, { q: '1시간에 80km를 달립니다. 4시간 동안 달린 거리는 몇 km입니까?', a: '320', exp: '4 × 80 = 320km입니다.' }, { q: '한 변이 1cm인 정사각형을 1개, 2개 일렬로 이어 붙일 때 둘레는 4cm, 6cm가 됩니다. 5개 이어붙일 때의 둘레는 몇 cm입니까?', a: '12', exp: '정사각형 수 × 2 + 2 규칙입니다. 5 × 2 + 2 = 12cm입니다.' }] },
+                    { questions: [{ q: '바둑돌을 1층에 1개, 2층에 4개, 3층에 9개 놓습니다. 5층에는 바둑돌이 모두 몇 개 필요합니까?', a: '25', exp: '층수 × 층수 규칙. 5 × 5 = 25개입니다.' }, { q: '길이가 20cm인 양초가 1시간에 2cm씩 탑니다. 4시간 후에 남은 양초의 길이는 몇 cm입니까?', a: '12', exp: '탄 길이는 8cm. 남은 것은 20 - 8 = 12cm입니다.' }, { q: '동전 1개 무게는 5g입니다. 전체 무게 500g, 빈 저금통 100g일 때 동전은 몇 개입니까?', a: '80', exp: '동전 무게 400g. 400 ÷ 5 = 80개입니다.' }, { q: '3분에 2km를 달리는 자동차가 15분 동안 달린 거리는 몇 km입니까?', a: '10', exp: '시간이 5배가 되었으므로 2 × 5 = 10km입니다.' }, { q: '성냥개비로 정사각형을 길게 이어 만듭니다. 사각형 1개에 4개, 2개에 7개, 3개에 10개가 필요합니다. 10개일 때는 몇 개 필요합니까?', a: '31', exp: '사각형 개수 × 3 + 1. 10 × 3 + 1 = 31개입니다.' }, { q: '이기면 3칸, 지면 1칸 내려갑니다. 5번 이기고 2번 졌다면 총 몇 칸 올라갔습니까?', a: '13', exp: '15칸 오르고 2칸 내려가므로 13칸입니다.' }, { q: '첫째 날 2개, 둘째 날 4개, 셋째 날 6개씩 모읍니다. 열째 날에 모은 구슬은 몇 개입니까?', a: '20', exp: '날짜 × 2 = 구슬 개수. 20개입니다.' }, { q: '10m 길에 2m 간격으로 양끝까지 나무를 심으려면 몇 그루 필요합니까?', a: '6', exp: '간격 수(5) + 1 = 6그루입니다.' }] }
+                ]
+            },
+            {
+                id: 4, title: '4. 약분과 통분', currentLevel: 0,
+                worksheets: [
+                    { questions: [{ q: '2/4 를 기약분수로 나타내시오. (형식: 1/2)', a: '1/2', exp: '2로 나누면 1/2입니다.' }, { q: '3/9 을 기약분수로 나타내시오.', a: '1/3', exp: '3으로 나누면 1/3입니다.' }, { q: '1/2 의 분모 분자에 3을 곱했습니다. 분자는 얼마입니까?', a: '3', exp: '분자 1에 3을 곱해 3입니다.' }, { q: '4/8 와 크기가 같고 분모가 2인 분수의 분자는 얼마입니까?', a: '1', exp: '분자 4를 4로 나누면 1입니다.' }, { q: '6/10 을 기약분수로 만들 때 나누어야 하는 수는 무엇입니까?', a: '2', exp: '최대공약수 2로 나눕니다.' }, { q: '12/18 를 6으로 약분하였을 때 분자는 얼마입니까?', a: '2', exp: '12 ÷ 6 = 2입니다.' }, { q: '5/15 를 기약분수로 나타내었을 때 분모는 얼마입니까?', a: '3', exp: '5로 약분하면 분모는 3입니다.' }, { q: '8/24 을 분모가 3인 분수로 나타내었을 때 분자는 얼마입니까?', a: '1', exp: '분자 8을 8로 나누어 1입니다.' }] },
+                    { questions: [{ q: '1/2 과 1/3 을 공통분모 6으로 통분할 때, 1/2 의 분자는 얼마입니까?', a: '3', exp: '3/6이 되므로 3입니다.' }, { q: '3/4 과 5/6 를 통분할 때 가장 작은 공통분모는 얼마입니까?', a: '12', exp: '4와 6의 최소공배수는 12입니다.' }, { q: '8/12 을 기약분수로 나타내었을 때, 분자와 분모의 합은 얼마입니까?', a: '5', exp: '2/3가 되므로 2+3=5입니다.' }, { q: '24/36 를 기약분수로 나타내었을 때, 분모는 얼마입니까?', a: '3', exp: '12로 약분하면 2/3. 분모는 3입니다.' }, { q: '5/8 와 7/12 의 가장 작은 공통분모는 얼마입니까?', a: '24', exp: '최소공배수는 24입니다.' }, { q: '2/3 와 3/4 중에서 더 큰 분수를 기약분수로 쓰시오.', a: '3/4', exp: '8/12과 9/12이므로 3/4이 큽니다.' }, { q: '15/25 를 기약분수로 나타내었을 때 분자는 얼마입니까?', a: '3', exp: '3/5이 되므로 3입니다.' }, { q: '4/7 와 5/9 를 통분할 때 4/7 의 분자가 36이 되었습니다. 5/9 의 분자는 얼마가 됩니까?', a: '35', exp: '공통분모가 63이므로 5/9는 35/63이 됩니다.' }] },
+                    { questions: [{ q: '분모가 12인 진분수 중에서 기약분수는 모두 몇 개입니까?', a: '4', exp: '1, 5, 7, 11로 4개입니다.' }, { q: '18/42 을 기약분수로 나타낸 후, 분모에서 분자를 뺀 값은 얼마입니까?', a: '4', exp: '3/7이므로 7-3=4입니다.' }, { q: '3/5, 2/3, 7/10 중에서 가장 큰 분수의 분자는 얼마입니까?', a: '7', exp: '통분하면 7/10이 가장 큽니다.' }, { q: '3/4 보다 크고 5/6 보다 작은 분수 중 분모가 24인 분수의 분자는 얼마입니까?', a: '19', exp: '18/24과 20/24 사이의 19/24입니다.' }, { q: '어떤 분수의 분모 분자에 3을 곱해 12/15 가 되었습니다. 처음 분수를 기약분수로 나타낼 때 합은 얼마입니까?', a: '9', exp: '처음 분수 4/5. 4+5=9입니다.' }, { q: '1/4 보다 크고 1/2 보다 작은 분수 중 분모가 16인 분수는 몇 개입니까?', a: '3', exp: '4/16과 8/16 사이의 3개입니다.' }, { q: '48/60 을 약분한 분수 중에서 분모가 두 번째로 작은 분수의 분모는 얼마입니까?', a: '10', exp: '가장 작은 것은 기약분수(분모5), 두 번째는 8/10(분모10)입니다.' }, { q: '1/3 과 1/2 사이에 있는 분수 중 분모가 12인 분수의 분자는 얼마입니까?', a: '5', exp: '4/12와 6/12 사이의 5/12입니다.' }] }
+                ]
+            },
+            {
+                id: 5, title: '5. 분수의 덧셈과 뺄셈', currentLevel: 0,
+                worksheets: [
+                    { questions: [{ q: '1/4 + 2/4 의 분자는 얼마입니까?', a: '3', exp: '1+2=3입니다.' }, { q: '5/7 - 2/7 의 분자는 얼마입니까?', a: '3', exp: '5-2=3입니다.' }, { q: '2/4 + 1/4 의 분자는 얼마입니까?', a: '3', exp: '2+1=3입니다.' }, { q: '5/6 - 1/3 을 기약분수로 나타내었을 때 분자는 얼마입니까?', a: '1', exp: '3/6을 약분하면 1/2입니다.' }, { q: '3/8 + 1/8 을 기약분수로 나타내었을 때 분모는 얼마입니까?', a: '2', exp: '4/8을 약분하면 1/2. 분모는 2입니다.' }, { q: '7/10 - 3/10 을 기약분수로 나타내었을 때 분자는 얼마입니까?', a: '2', exp: '4/10 약분하면 2/5입니다.' }, { q: '1/3 + 1/6 을 기약분수로 나타내었을 때 분자는 얼마입니까?', a: '1', exp: '3/6 약분하면 1/2입니다.' }, { q: '1 - 2/5 의 분자는 얼마입니까?', a: '3', exp: '5/5 - 2/5 = 3/5입니다.' }] },
+                    { questions: [{ q: '1/2 + 1/3 을 기약분수로 쓰시오.', a: '5/6', exp: '통분하면 3/6 + 2/6 = 5/6입니다.' }, { q: '3/4 - 1/3 을 기약분수로 쓰시오.', a: '5/12', exp: '9/12 - 4/12 = 5/12입니다.' }, { q: '2/5 + 1/2 을 기약분수로 쓰시오.', a: '9/10', exp: '4/10 + 5/10 = 9/10입니다.' }, { q: '4/5 - 1/4 을 기약분수로 쓰시오.', a: '11/20', exp: '16/20 - 5/20 = 11/20입니다.' }, { q: '1과 1/3 + 2/3 은 자연수로 얼마입니까?', a: '2', exp: '1과 3/3은 2입니다.' }, { q: '2과 1/2 - 1과 1/4 의 자연수 부분은 얼마입니까?', a: '1', exp: '2 - 1 = 1입니다.' }, { q: '3/8 + 5/6 을 대분수로 나타내었을 때 자연수는 얼마입니까?', a: '1', exp: '29/24이므로 1과 5/24입니다.' }, { q: '3/4 L에서 1/2 L를 마셨을 때 남은 양을 분모가 4인 분수로 바꿀 때 분자는 얼마입니까?', a: '1', exp: '1/4이므로 분자는 1입니다.' }] },
+                    { questions: [{ q: '2와 3/4 + 1과 5/6 을 12 분모의 대분수로 나타낼 때 분자는 얼마입니까?', a: '7', exp: '4와 7/12이 됩니다.' }, { q: '4와 1/3 - 1과 4/5 의 대분수 자연수 부분은 얼마입니까?', a: '2', exp: '빌려오면 3 - 1 = 2입니다.' }, { q: '어떤 수에 1/4 을 더해야 할 것을 잘못 빼서 1/3 이 되었습니다. 바르게 계산한 결과의 기약분수 분자는 얼마입니까?', a: '5', exp: '어떤 수는 7/12. 바르게 계산하면 10/12. 약분하면 5/6입니다.' }, { q: '5m 끈에서 1과 1/2m 사용 후 또 1과 3/4m 썼습니다. 남은 끈의 대분수 합은 얼마입니까?', a: '7', exp: '1과 3/4m 남습니다. 3+4=7.' }, { q: '▢ - 1과 3/8 = 2와 5/6 일 때 ▢의 기약대분수 분자는 얼마입니까?', a: '5', exp: '4와 5/24이므로 5입니다.' }, { q: '1/2 에 1/3 넣고 1/4 썼을 때 남은 기약분수의 합은 얼마입니까?', a: '19', exp: '7/12이므로 7+12=19입니다.' }, { q: '3/4 + 2/5 - 1/2 의 기약분수 분자는 얼마입니까?', a: '13', exp: '13/20이므로 13입니다.' }, { q: '3과 1/5 kg 밀가루 중 1과 1/2 kg 썼습니다. 남은 기약대분수 합은 얼마입니까?', a: '17', exp: '1과 7/10 남습니다. 7+10=17.' }] }
+                ]
+            },
+            {
+                id: 6, title: '6. 다각형의 둘레와 넓이', currentLevel: 0,
+                worksheets: [
+                    { questions: [{ q: '한 변 5cm 정사각형의 둘레는 몇 cm입니까?', a: '20', exp: '5 × 4 = 20입니다.' }, { q: '가로 6cm, 세로 4cm 직사각형의 둘레는 몇 cm입니까?', a: '20', exp: '(6+4) × 2 = 20입니다.' }, { q: '한 변 7cm 정사각형의 넓이는 몇 cm²입니까?', a: '49', exp: '7 × 7 = 49입니다.' }, { q: '가로 8cm, 세로 5cm 직사각형의 넓이는 몇 cm²입니까?', a: '40', exp: '8 × 5 = 40입니다.' }, { q: '밑변 6cm, 높이 4cm 평행사변형 넓이는 몇 cm²입니까?', a: '24', exp: '6 × 4 = 24입니다.' }, { q: '밑변 8cm, 높이 5cm 삼각형 넓이는 몇 cm²입니까?', a: '20', exp: '8 × 5 ÷ 2 = 20입니다.' }, { q: '대각선 6cm, 4cm 마름모 넓이는 몇 cm²입니까?', a: '12', exp: '6 × 4 ÷ 2 = 12입니다.' }, { q: '윗변 4cm, 아랫변 6cm, 높이 5cm 사다리꼴 넓이는 몇 cm²입니까?', a: '25', exp: '(4+6) × 5 ÷ 2 = 25입니다.' }] },
+                    { questions: [{ q: '둘레 36cm 정사각형의 한 변은 몇 cm입니까?', a: '9', exp: '36 ÷ 4 = 9입니다.' }, { q: '넓이 48cm², 가로 8cm 직사각형 세로는 몇 cm입니까?', a: '6', exp: '48 ÷ 8 = 6입니다.' }, { q: '넓이 30cm², 밑변 6cm 삼각형의 높이는 몇 cm입니까?', a: '10', exp: '30 × 2 ÷ 6 = 10입니다.' }, { q: '대각선 10cm, 8cm 마름모 넓이는 몇 cm²입니까?', a: '40', exp: '10 × 8 ÷ 2 = 40입니다.' }, { q: '윗변 5cm, 아랫변 7cm, 높이 4cm 사다리꼴 넓이는 몇 cm²입니까?', a: '24', exp: '12 × 4 ÷ 2 = 24입니다.' }, { q: '둘레 24cm 직사각형의 가로 7cm일 때 넓이는 몇 cm²입니까?', a: '35', exp: '세로 5cm이므로 35입니다.' }, { q: '밑변 12cm 평행사변형 넓이 96cm²일 때 높이는 몇 cm입니까?', a: '8', exp: '96 ÷ 12 = 8입니다.' }, { q: '넓이 50cm² 마름모 한 대각선 10cm일 때 다른 대각선은 몇 cm입니까?', a: '10', exp: '50 × 2 ÷ 10 = 10입니다.' }] },
+                    { questions: [{ q: '윗변 8cm, 높이 6cm, 넓이 42cm² 사다리꼴의 아랫변은 몇 cm입니까?', a: '6', exp: '42 × 2 ÷ 6 - 8 = 6입니다.' }, { q: '15m×10m 밭에 폭 2m 십자 길을 냈습니다. 밭 넓이는 몇 m²입니까?', a: '104', exp: '13 × 8 = 104m²입니다.' }, { q: '둘레 40cm 색종이 가로가 세로보다 4cm 깁니다. 넓이는 몇 cm²입니까?', a: '96', exp: '가로 12, 세로 8이므로 넓이는 96입니다.' }, { q: '대각선 12cm, 16cm 마름모 꽃밭 넓이는 몇 cm²입니까?', a: '96', exp: '12 × 16 ÷ 2 = 96입니다.' }, { q: '사다리꼴 윗변과 아랫변을 2배 늘리면 넓이는 몇 배가 됩니까?', a: '2', exp: '더한 값이 2배 되므로 전체 넓이도 2배입니다.' }, { q: '넓이 64cm² 정사각형의 둘레는 몇 cm입니까?', a: '32', exp: '한 변이 8cm이므로 둘레는 32cm입니다.' }, { q: '밑변 10cm, 높이 8cm 삼각형과 넓이가 같은 평행사변형 밑변이 5cm면 높이는 몇 cm입니까?', a: '8', exp: '삼각형 넓이 40. 평행사변형 높이 40 ÷ 5 = 8입니다.' }, { q: '둘레 30cm 정오각형 2개를 붙인 다각형의 둘레는 몇 cm입니까?', a: '48', exp: '변이 8개 노출되므로 8 × 6 = 48cm입니다.' }] }
+                ]
+            }
+        ];
+
+        let activeUnitIndex = -1;
+        let activeWorksheetIndex = -1;
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                appState = JSON.parse(saved);
+                gardenData.forEach(unit => {
+                    if (appState.progress[unit.id] !== undefined) {
+                        unit.currentLevel = appState.progress[unit.id];
+                    }
+                });
+            } else {
+                appState = { studentName: '5학년 학생', progress: {} };
+            }
+            updateNameDisplay(appState.studentName);
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        function saveProgressLocal(unitId, newLevel) {
+            appState.progress[unitId] = newLevel;
+            saveState();
+        }
+
+        function resetAllData() {
+            if (confirm("모든 학습 기록과 이름을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
+        function resetCurrentUnit() {
+            if (activeUnitIndex === -1) return;
+            const unit = gardenData[activeUnitIndex];
+            if (confirm(`현재 단원(${unit.title})의 기록을 초기화하시겠습니까?`)) {
+                unit.currentLevel = 0;
+                saveProgressLocal(unit.id, 0);
+                showToast('현재 단원의 기록이 초기화되었습니다.');
+                renderStages();
+                document.getElementById('main-scroll-area').scrollTop = 0;
+            }
+        }
+
+        function openNameModal() {
+            document.getElementById('name-input').value = appState.studentName === '5학년 학생' ? '' : appState.studentName;
+            document.getElementById('name-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('name-input').focus(), 100);
+        }
+
+        function closeNameModal() {
+            document.getElementById('name-modal').classList.add('hidden');
+        }
+
+        function saveName() {
+            let newName = document.getElementById('name-input').value.trim();
+            if (!newName) newName = '5학년 학생';
+            
+            appState.studentName = newName;
+            saveState();
+            updateNameDisplay(newName);
+            closeNameModal();
+            showToast('학생 정보가 안전하게 저장되었습니다.');
+        }
+
+        function updateNameDisplay(name) {
+            const profileDisplay = document.getElementById('profile-name-display');
+            if (profileDisplay) profileDisplay.innerText = name;
+            
+            const wsNameFields = document.querySelectorAll('.student-name-field');
+            wsNameFields.forEach(el => el.innerText = name);
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-stone-800 text-white px-6 py-3 rounded-full shadow-lg z-[100] transition-opacity duration-300 opacity-0 font-label text-sm font-bold whitespace-nowrap';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function navTo(screenId) {
+            document.getElementById('screen-units').classList.add('hidden');
+            document.getElementById('screen-stages').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-rewards').classList.add('hidden');
+
+            ['desk', 'mob'].forEach(type => {
+                document.getElementById(`nav-units-${type}`).className = type === 'desk' 
+                    ? 'w-full flex items-center gap-3 text-stone-600 p-4 hover:bg-stone-200 rounded-2xl transition-all'
+                    : 'flex flex-col items-center justify-center text-stone-500 px-5 py-2 hover:bg-emerald-50 rounded-2xl transition-all font-label text-[10px] font-semibold';
+                document.getElementById(`nav-stages-${type}`).className = type === 'desk'
+                    ? 'w-full flex items-center gap-3 text-stone-600 p-4 hover:bg-stone-200 rounded-2xl transition-all'
+                    : 'flex flex-col items-center justify-center text-stone-500 px-5 py-2 hover:bg-emerald-50 rounded-2xl transition-all font-label text-[10px] font-semibold';
+                document.getElementById(`nav-rewards-${type}`).className = type === 'desk'
+                    ? 'w-full flex items-center gap-3 text-stone-600 p-4 hover:bg-stone-200 rounded-2xl transition-all'
+                    : 'flex flex-col items-center justify-center text-stone-500 px-5 py-2 hover:bg-emerald-50 rounded-2xl transition-all font-label text-[10px] font-semibold';
+            });
+
+            if (screenId === 'units') {
+                document.getElementById('topbar-title').innerText = '5학년 1학기 수학 정원';
+                document.getElementById('screen-units').classList.remove('hidden');
+                document.getElementById('nav-units-desk').className = 'w-full flex items-center gap-3 bg-emerald-100 text-emerald-900 rounded-2xl p-4 transition-all';
+                document.getElementById('nav-units-mob').className = 'flex flex-col items-center justify-center bg-emerald-100 text-emerald-800 rounded-2xl px-5 py-2 font-label text-[10px] font-semibold transition-all';
+                renderUnits();
+            } else if (screenId === 'stages') {
+                if (activeUnitIndex === -1) {
+                    showToast('내 정원(Garden)에서 단원을 먼저 선택해주세요.');
+                    navTo('units');
+                    return;
+                }
+                const unit = gardenData[activeUnitIndex];
+                document.getElementById('topbar-title').innerText = unit.title;
+                document.getElementById('screen-stages').classList.remove('hidden');
+                document.getElementById('nav-stages-desk').className = 'w-full flex items-center gap-3 bg-emerald-100 text-emerald-900 rounded-2xl p-4 transition-all';
+                document.getElementById('nav-stages-mob').className = 'flex flex-col items-center justify-center bg-emerald-100 text-emerald-800 rounded-2xl px-5 py-2 font-label text-[10px] font-semibold transition-all';
+                renderStages();
+            } else if (screenId === 'rewards') {
+                document.getElementById('topbar-title').innerText = '나의 보상';
+                document.getElementById('screen-rewards').classList.remove('hidden');
+                document.getElementById('nav-rewards-desk').className = 'w-full flex items-center gap-3 bg-emerald-100 text-emerald-900 rounded-2xl p-4 transition-all';
+                document.getElementById('nav-rewards-mob').className = 'flex flex-col items-center justify-center bg-emerald-100 text-emerald-800 rounded-2xl px-5 py-2 font-label text-[10px] font-semibold transition-all';
+                renderRewards();
+            }
+            document.getElementById('main-scroll-area').scrollTop = 0;
+        }
+
+        function renderRewards() {
+            const grid = document.getElementById('rewards-grid');
+            grid.innerHTML = '';
+
+            gardenData.forEach((unit) => {
+                const lvl = unit.currentLevel;
+                const card = document.createElement('div');
+                card.className = 'bg-surface-container-lowest rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-outline-variant/20 flex flex-col items-center text-center transition-transform hover:-translate-y-1';
+                
+                if (lvl === 0) {
+                    card.innerHTML = `
+                        <div class="w-20 h-20 rounded-full bg-surface-variant flex items-center justify-center mb-4 opacity-40">
+                            <span class="material-symbols-outlined text-4xl text-on-surface-variant">lock</span>
+                        </div>
+                        <h3 class="font-bold text-on-surface-variant opacity-60 break-keep">${unit.title.substring(3)}</h3>
+                        <p class="text-xs text-on-surface-variant opacity-60 mt-2">아직 씨앗을 심지 않았어요</p>
+                    `;
+                } else {
+                    const info = stageInfo[lvl - 1];
+                    card.innerHTML = `
+                        <div class="w-20 h-20 rounded-full bg-${info.theme}-container/40 flex items-center justify-center mb-4 shadow-inner relative">
+                            <span class="text-4xl plant-pop">${info.emoji}</span>
+                            <div class="absolute -inset-2 bg-${info.theme}-container/20 rounded-full blur-md -z-10"></div>
+                        </div>
+                        <h3 class="font-bold text-on-surface break-keep">${unit.title.substring(3)}</h3>
+                        <div class="mt-3 bg-${info.theme}-container/30 px-3 py-1 rounded-full inline-block">
+                            <span class="text-xs font-extrabold ${info.color}">${info.title} 달성</span>
+                        </div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function renderUnits() {
+            const grid = document.getElementById('garden-grid');
+            grid.innerHTML = '';
+
+            gardenData.forEach((unit, index) => {
+                const progressPct = Math.round((unit.currentLevel / 3) * 100);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-surface-container-lowest rounded-[2rem] p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] shadow-inverse-surface/5 flex flex-col relative overflow-hidden group hover:shadow-[0_8px_40px_rgb(0,111,29,0.08)] transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border border-transparent hover:border-primary/20';
+                card.onclick = () => {
+                    activeUnitIndex = index;
+                    navTo('stages');
+                };
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6 relative">
+                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-primary-container/30 flex items-center justify-center text-on-primary-container font-headline text-2xl font-extrabold shadow-inner">
+                            ${index + 1}
+                        </div>
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-surface-variant text-on-surface-variant">
+                            ${unit.currentLevel}/3 완료
+                        </span>
+                    </div>
+                    <h3 class="font-headline text-xl font-bold text-on-surface mb-2 break-keep leading-tight">${unit.title.substring(3)}</h3>
+                    
+                    <div class="mt-auto pt-8">
+                        <div class="flex justify-between text-xs text-on-surface-variant font-bold mb-3 uppercase tracking-wider">
+                            <span>진행률</span>
+                            <span class="text-primary">${progressPct}%</span>
+                        </div>
+                        <div class="h-2.5 w-full bg-surface-variant rounded-full overflow-hidden shadow-inner">
+                            <div class="h-full bg-gradient-to-r from-primary to-primary-fixed rounded-full transition-all duration-700 ease-out" style="width: ${progressPct}%"></div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderStages() {
+            const unit = gardenData[activeUnitIndex];
+            document.getElementById('stages-unit-title').innerText = unit.title;
+            
+            const grid = document.getElementById('stages-grid');
+            grid.innerHTML = '';
+
+            unit.worksheets.forEach((ws, wsIndex) => {
+                const info = stageInfo[wsIndex];
+                const isCompleted = unit.currentLevel > wsIndex;
+                const isActive = unit.currentLevel === wsIndex;
+
+                let cardHTML = '';
+
+                if (isActive) {
+                    cardHTML = `
+                        <div class="bg-surface-container-lowest rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 border border-${info.theme}/20 cursor-pointer" onclick="openWorksheet(${wsIndex})">
+                            <div class="absolute -right-12 -top-12 w-32 h-32 bg-${info.theme}-container/20 rounded-full blur-2xl group-hover:bg-${info.theme}-container/30 transition-all"></div>
+                            <div class="flex justify-between items-start mb-6 relative">
+                                <div class="w-16 h-16 rounded-2xl bg-${info.theme}-container/40 flex items-center justify-center ${info.color} shadow-sm">
+                                    <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">${info.icon}</span>
+                                </div>
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-${info.theme}-container text-on-${info.theme}-container shadow-sm">도전 가능</span>
+                            </div>
+                            <h3 class="font-headline text-2xl font-extrabold text-on-surface mb-1">${info.title}</h3>
+                            <p class="text-on-surface-variant text-sm mb-8 font-label">${info.sub}</p>
+                            
+                            <div class="mt-auto mb-8 relative">
+                                <div class="flex justify-between text-xs text-on-surface-variant font-bold mb-3 uppercase"><span>진행률</span><span>0/8</span></div>
+                                <div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden shadow-inner"></div>
+                            </div>
+                            <button class="w-full bg-gradient-to-r from-${info.theme} to-${info.theme}-container text-white font-headline font-bold py-3.5 px-6 rounded-xl shadow-md transition-all">
+                                학습지 풀기
+                            </button>
+                        </div>
+                    `;
+                } else if (isCompleted) {
+                    cardHTML = `
+                        <div class="bg-${info.theme}-container/10 rounded-[2rem] p-8 flex flex-col relative overflow-hidden transition-all duration-300 border border-${info.theme}/20 cursor-pointer hover:-translate-y-1 hover:shadow-lg" onclick="openWorksheet(${wsIndex})">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="w-16 h-16 rounded-2xl bg-${info.theme}/20 flex items-center justify-center ${info.color}">
+                                    <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">${info.icon}</span>
+                                </div>
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-${info.theme} text-white">성장 완료</span>
+                            </div>
+                            <h3 class="font-headline text-2xl font-extrabold text-on-surface mb-1">${info.title}</h3>
+                            <p class="text-on-surface-variant text-sm mb-8 font-label">${info.sub}</p>
+                            
+                            <div class="mt-auto mb-8">
+                                <div class="flex justify-between text-xs text-on-surface-variant font-bold mb-3 uppercase"><span>진행률</span><span class="${info.color}">8/8</span></div>
+                                <div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden shadow-inner"><div class="h-full bg-${info.theme} w-full"></div></div>
+                            </div>
+                            <button class="w-full bg-surface-container-highest text-on-surface-variant font-headline font-bold py-3.5 px-6 rounded-xl hover:bg-outline-variant/30 transition-colors">
+                                다시 복습하기
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    cardHTML = `
+                        <div class="bg-surface-container-low rounded-[2rem] p-8 opacity-70 flex flex-col relative overflow-hidden transition-all duration-300 cursor-not-allowed border border-outline-variant/10" onclick="showToast('이전 단계의 학습지를 먼저 통과해야 합니다.')">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="w-16 h-16 rounded-2xl bg-surface-variant flex items-center justify-center text-on-surface-variant opacity-60">
+                                    <span class="material-symbols-outlined text-4xl">${info.icon}</span>
+                                </div>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-surface-variant text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-[14px]">lock</span> 잠김
+                                </span>
+                            </div>
+                            <h3 class="font-headline text-2xl font-extrabold text-on-surface mb-1 opacity-60">${info.title}</h3>
+                            <p class="text-on-surface-variant text-sm mb-8 font-label opacity-60">${info.sub}</p>
+                            
+                            <div class="mt-auto mb-8 opacity-60">
+                                <div class="flex justify-between text-xs text-on-surface-variant font-bold mb-3 uppercase"><span>진행률</span><span>0/8</span></div>
+                                <div class="h-2 w-full bg-surface-dim rounded-full overflow-hidden shadow-inner"></div>
+                            </div>
+                            <button class="w-full bg-surface-variant text-on-surface-variant font-headline font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 pointer-events-none">
+                                이전 단계 필요
+                            </button>
+                        </div>
+                    `;
+                }
+
+                const cardContainer = document.createElement('div');
+                cardContainer.innerHTML = cardHTML;
+                grid.appendChild(cardContainer.firstElementChild);
+            });
+        }
+
+        function openWorksheet(wsIndex) {
+            activeWorksheetIndex = wsIndex;
+            const unit = gardenData[activeUnitIndex];
+            const ws = unit.worksheets[wsIndex];
+            const info = stageInfo[wsIndex];
+            
+            failCounts = new Array(ws.questions.length).fill(0);
+            
+            document.getElementById('topbar-title').innerText = `${unit.title} - ${info.title}`;
+            const quizContainer = document.getElementById('screen-quiz');
+            let contentHTML = '';
+
+            const backActionHTML = `
+                <div class="mb-6 flex items-center">
+                    <button onclick="closeWorksheet()" class="flex items-center gap-2 text-${info.theme} font-medium hover:bg-surface-container-low px-4 py-2 rounded-xl transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        학습지 선택으로 돌아가기
+                    </button>
+                </div>
+            `;
+
+            function formatMathText(text) {
+                let parsed = text.replace(/(\d+)\s*과\s*(\d+)\/(\d+)/g, '<span class="mixed-frac"><span>$1</span><span class="frac"><span class="frac-num">$2</span><span class="frac-den">$3</span></span></span>');
+                parsed = parsed.replace(/(\d+)\/(\d+)/g, '<span class="frac"><span class="frac-num">$1</span><span class="frac-den">$2</span></span>');
+                return parsed;
+            }
+
+            let questionsHTML = '';
+            ws.questions.forEach((qObj, i) => {
+                const isEquation = qObj.q.trim().endsWith('=');
+                const qTextRaw = isEquation ? qObj.q.replace('=', '').trim() : qObj.q;
+                const qText = formatMathText(qTextRaw);
+                
+                const isBoss = (i === 7) && (wsIndex === 2);
+                const wrapperClass = isBoss 
+                    ? `bg-tertiary-container/10 -mx-4 md:-mx-8 p-4 md:p-8 rounded-xl border-l-4 border-l-tertiary border-y border-r border-tertiary/10 shadow-sm relative mb-4` 
+                    : `mb-8 pb-8 border-b border-stone-200 last:border-0 last:pb-0 relative`;
+                const bossIcon = isBoss 
+                    ? `<div class="absolute -left-3 md:-left-5 top-5 md:top-9"><span class="material-symbols-outlined text-tertiary text-lg" style="font-variation-settings:'FILL' 1">star</span></div>` 
+                    : '';
+                const numberColor = isBoss ? 'text-tertiary' : `text-${info.theme}`;
+
+                const expHTML = `
+                    <div id="exp-container-${i}" class="hidden mt-4 p-4 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-200 text-sm md:text-base font-medium break-keep animate-fade-in">
+                        <span class="font-bold flex items-center gap-1 mb-1 text-emerald-700"><span class="material-symbols-outlined text-[18px]">lightbulb</span> 선생님의 해설</span>
+                        ${qObj.exp}
+                    </div>
+                `;
+
+                if (isEquation) {
+                    questionsHTML += `
+                        <div class="${wrapperClass}">
+                            ${bossIcon}
+                            <div class="flex flex-wrap items-center gap-4">
+                                <span class="font-bold text-xl ${numberColor} min-w-[1.5rem]">${i + 1}.</span>
+                                <span class="text-xl md:text-2xl font-math text-stone-900 tracking-wider break-keep flex items-center gap-2">${qText} =</span>
+                                <input class="w-32 md:w-40 border-b-2 border-stone-400 border-t-0 border-l-0 border-r-0 bg-transparent focus:ring-0 focus:border-${info.theme} text-xl text-center text-${info.theme} font-bold px-2 py-1 transition-colors" type="text" id="answer-input-${i}" placeholder="정답"/>
+                            </div>
+                            ${expHTML}
+                        </div>
+                    `;
+                } else {
+                    questionsHTML += `
+                        <div class="${wrapperClass}">
+                            ${bossIcon}
+                            <div class="flex gap-4 items-start mb-4">
+                                <span class="font-bold text-xl ${numberColor} min-w-[1.5rem] mt-0.5">${i + 1}.</span>
+                                <p class="text-lg md:text-xl font-medium text-stone-800 break-keep leading-relaxed">${qText}</p>
+                            </div>
+                            <div class="flex justify-end items-center gap-3 pr-2 md:pr-4">
+                                <span class="text-stone-500 font-bold shrink-0">정답:</span>
+                                <input class="w-32 md:w-40 border-b-2 border-stone-400 border-t-0 border-l-0 border-r-0 bg-transparent focus:ring-0 focus:border-${info.theme} text-xl text-center text-${info.theme} font-bold px-2 py-1 transition-colors" type="text" id="answer-input-${i}" placeholder="정답"/>
+                            </div>
+                            ${expHTML}
+                        </div>
+                    `;
+                }
+            });
+
+            if (wsIndex === 0) {
+                contentHTML = `
+                    <div class="p-6 md:p-10 pb-32 lg:pb-16 max-w-4xl mx-auto">
+                        ${backActionHTML}
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                            <div>
+                                <h1 class="text-4xl md:text-5xl font-black text-on-surface font-headline mb-2">${unit.title} - ${info.title}</h1>
+                                <p class="text-on-surface-variant text-lg">씨앗이 자랄 수 있도록 아래 문제들에 물을 주세요.</p>
+                            </div>
+                            <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container-low flex items-center gap-6 shrink-0 min-w-[280px]">
+                                <div class="w-16 h-16 bg-surface-container flex items-center justify-center rounded-full relative">
+                                    <span class="material-symbols-outlined text-4xl text-secondary" style="font-variation-settings: 'FILL' 1;">potted_plant</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <span class="font-bold text-on-surface">성장 진행률</span>
+                                        <span class="text-sm text-primary font-medium" id="progress-text-0">0/8 해결</span>
+                                    </div>
+                                    <div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary rounded-full transition-all duration-500" id="progress-bar-0" style="width: 5%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-md shadow-lg border border-stone-200 p-8 md:p-12 mb-10 relative worksheet-bg">
+                            <div class="flex justify-between border-b-2 border-stone-800 pb-4 mb-8">
+                                <div class="flex gap-4 items-end">
+                                    <span class="font-bold text-stone-800">이름:</span>
+                                    <div class="border-b border-stone-400 w-32 md:w-48 text-center text-lg font-bold text-stone-800 pb-0.5"><span class="student-name-field"></span></div>
+                                </div>
+                                <div class="flex gap-4 items-end">
+                                    <span class="font-bold text-stone-800">날짜:</span>
+                                    <div class="border-b border-stone-400 w-24 md:w-32"></div>
+                                </div>
+                            </div>
+                            <div class="mb-8">
+                                <h3 class="text-2xl font-bold text-stone-800 mb-2">${info.sub}</h3>
+                                <p class="text-stone-600 italic">안내: 빈칸에 알맞은 수를 넣고, 서술형 문제는 정답란에 답을 작성하세요.</p>
+                                <p class="text-stone-600 italic font-bold mt-1">※ 정답 입력 방법: 진분수는 1/2, 대분수는 1과 1/2 처럼 띄어쓰기를 넣거나 붙여서 편하게 입력하세요.</p>
+                            </div>
+                            
+                            <div class="space-y-2 mb-8">
+                                ${questionsHTML}
+                            </div>
+                            
+                            <div class="absolute bottom-8 right-8 opacity-5 pointer-events-none hidden md:block">
+                                <span class="material-symbols-outlined text-9xl text-primary" style="font-variation-settings: 'FILL' 1;">eco</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center pb-8">
+                            <button onclick="submitWorksheet()" class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold py-4 px-12 rounded-[1.5rem] shadow-lg shadow-primary/20 hover:-translate-y-1 transition-transform flex items-center gap-3 text-lg">
+                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+                                씨앗에 물 주기 (제출)
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (wsIndex === 1) {
+                contentHTML = `
+                    <div class="p-6 md:p-10 pb-32 lg:pb-16 max-w-5xl mx-auto">
+                        ${backActionHTML}
+                        <section class="mb-12 bg-surface-container-low rounded-xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+                            <div class="absolute -right-12 -top-12 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"></div>
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-surface-container flex items-center justify-center shadow-inner shrink-0">
+                                        <span class="material-symbols-outlined text-primary text-5xl md:text-6xl" data-icon="eco">eco</span>
+                                    </div>
+                                    <div>
+                                        <h2 class="font-headline text-2xl font-bold text-on-surface mb-2">새싹 단계 진행률</h2>
+                                        <p class="text-on-surface-variant mb-4 hidden md:block">기본 개념을 다지는 문제들입니다. 차근차근 풀어보세요.</p>
+                                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full text-sm font-semibold" id="progress-text-1">
+                                            <span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+                                            0/8 해결
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="bg-white rounded-sm border border-stone-300 shadow-sm p-8 md:p-12 mx-auto w-full text-stone-900">
+                            <div class="border-b-2 border-stone-800 pb-6 mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                                <div>
+                                    <h3 class="text-2xl font-bold uppercase tracking-widest text-stone-900 mb-1">${info.sub}</h3>
+                                    <p class="text-stone-600 italic text-lg">${unit.title}</p>
+                                    <p class="text-stone-600 italic font-bold mt-2 text-sm">※ 정답 입력 방법: 진분수는 1/2, 대분수는 1과 1/2 처럼 입력하세요.</p>
+                                </div>
+                                <div class="space-y-3 w-full md:w-64 text-lg">
+                                    <div class="flex items-end">
+                                        <span class="mr-2 text-stone-700 font-bold">이름:</span>
+                                        <div class="flex-1 border-b border-stone-400 text-center text-lg font-bold text-stone-800 pb-0.5"><span class="student-name-field"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                ${questionsHTML}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-12 flex justify-end pb-8">
+                            <button onclick="submitWorksheet()" class="py-4 px-10 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-2 text-lg shadow-lg">
+                                <span class="material-symbols-outlined" data-icon="save">save</span>
+                                새싹 가꾸기 (제출)
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentHTML = `
+                    <div class="p-6 md:p-10 pb-32 lg:pb-16 max-w-4xl mx-auto">
+                        ${backActionHTML}
+                        <header class="mb-12 relative">
+                            <div class="absolute -top-10 -left-10 w-48 h-48 bg-tertiary-container/30 rounded-full blur-3xl -z-10"></div>
+                            <div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl -z-10"></div>
+                            <div class="flex flex-col justify-between gap-6">
+                                <div>
+                                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tertiary-container text-on-tertiary-container text-sm font-semibold mb-4 shadow-sm">
+                                        <span class="material-symbols-outlined text-[18px]" data-icon="nutrition">nutrition</span>
+                                        열매 단계 도전
+                                    </div>
+                                    <h1 class="font-headline text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight mb-2">${unit.title}</h1>
+                                    <p class="text-on-surface-variant text-lg">마지막 심화 문제를 풀고 정원에 열매를 맺게 해주세요.</p>
+                                </div>
+                            </div>
+                        </header>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 md:p-12 mb-12 max-w-3xl mx-auto relative">
+                            <div class="border-b-2 border-stone-800 pb-4 mb-8 flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
+                                <div>
+                                    <h2 class="font-headline font-bold text-2xl text-stone-800">${info.sub}</h2>
+                                    <p class="text-stone-500 text-sm mt-1">서술형 문제의 풀이 과정을 명확히 생각하며 풀어보세요.</p>
+                                    <p class="text-stone-500 font-bold mt-1 text-sm">※ 정답 입력 방법: 진분수는 1/2, 대분수는 1과 1/2 처럼 입력하세요.</p>
+                                </div>
+                                <div class="flex items-end gap-6 w-full md:w-auto mt-4 md:mt-0">
+                                    <div class="flex flex-1 md:flex-none items-end gap-2">
+                                        <span class="text-stone-700 font-bold mb-1">이름:</span>
+                                        <div class="border-b border-stone-400 w-full md:w-32 text-center text-lg font-bold text-stone-800 pb-0.5"><span class="student-name-field"></span></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm text-stone-500 uppercase tracking-widest font-semibold">진행</div>
+                                        <div class="font-serif text-2xl text-stone-800 border-b border-stone-300 inline-block min-w-[3rem] text-center" id="score-header-text">?/8</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                ${questionsHTML}
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4 pb-8">
+                            <button onclick="submitWorksheet()" class="bg-gradient-to-r from-tertiary to-tertiary-dim text-on-tertiary px-10 py-4 rounded-[1.5rem] font-bold text-lg shadow-[0_8px_20px_rgba(172,45,94,0.3)] hover:shadow-[0_12px_25px_rgba(172,45,94,0.4)] transition-all duration-300 active:scale-95 flex items-center gap-3">
+                                <span class="material-symbols-outlined" data-icon="nutrition" data-weight="fill">nutrition</span>
+                                정답 수확하기 (제출)
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            quizContainer.innerHTML = contentHTML;
+
+            document.getElementById('screen-stages').classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            
+            updateNameDisplay(appState.studentName);
+            document.getElementById('main-scroll-area').scrollTop = 0;
+            
+            setTimeout(() => {
+                const firstInput = document.getElementById('answer-input-0');
+                if(firstInput) firstInput.focus();
+            }, 100);
+        }
+
+        function closeWorksheet() {
+            if(confirm('문제 풀이를 그만두시겠습니까? 풀고 있던 답안은 보관되지 않습니다.')) {
+                navTo('stages');
+            }
+        }
+
+        function submitWorksheet() {
+            const unit = gardenData[activeUnitIndex];
+            const ws = unit.worksheets[activeWorksheetIndex];
+            const total = ws.questions.length;
+            let correctCount = 0;
+            let allCorrect = true;
+
+            for (let i = 0; i < total; i++) {
+                const inputEl = document.getElementById(`answer-input-${i}`);
+                if (!inputEl) continue;
+                
+                if (inputEl.readOnly) {
+                    correctCount++;
+                    continue; 
+                }
+
+                const rawUserAnswer = inputEl.value.trim();
+                const userAnswer = rawUserAnswer.replace(/\s+/g, ''); 
+                const correctAnswer = ws.questions[i].a.replace(/\s+/g, '');
+
+                if (userAnswer === '') {
+                    allCorrect = false;
+                    continue; 
+                }
+
+                if (userAnswer === correctAnswer) {
+                    correctCount++;
+                    inputEl.readOnly = true;
+                    inputEl.classList.remove('border-stone-400', 'border-error', 'text-error', 'bg-error/5');
+                    inputEl.classList.add('border-primary', 'text-primary', 'bg-primary/10', 'pointer-events-none');
+                } else {
+                    allCorrect = false;
+                    failCounts[i]++;
+                    inputEl.classList.remove('border-stone-400');
+                    inputEl.classList.add('border-error', 'text-error', 'bg-error/5');
+                    
+                    if (failCounts[i] >= 3) {
+                        const expContainer = document.getElementById(`exp-container-${i}`);
+                        if(expContainer) expContainer.classList.remove('hidden');
+                    }
+                }
+            }
+
+            const pct = Math.max(5, (correctCount / total) * 100);
+            
+            if (activeWorksheetIndex === 2) {
+                const pt = document.getElementById(`progress-text-2`);
+                if(pt) pt.innerText = `8개 중 ${correctCount}개 수확함`;
+            } else {
+                const pb = document.getElementById(`progress-bar-${activeWorksheetIndex}`);
+                if(pb) pb.style.width = `${pct}%`;
+                const pt = document.getElementById(`progress-text-${activeWorksheetIndex}`);
+                if(pt) pt.innerHTML = `<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span> ${correctCount}/8 해결`;
+            }
+            
+            const st = document.getElementById('score-header-text');
+            if(st) st.innerText = `${correctCount}/8`;
+
+            const isPassed = correctCount >= Math.floor(total / 2); 
+            const feedbackText = getFeedback(activeWorksheetIndex, correctCount, total);
+            const info = stageInfo[activeWorksheetIndex];
+
+            const emojiEl = document.getElementById('result-emoji');
+            const scoreEl = document.getElementById('result-score');
+            const badgeEl = document.getElementById('result-badge');
+            const modalBtn = document.getElementById('result-modal-btn');
+            
+            scoreEl.innerText = `${total}문제 중 ${correctCount}문제 정답.`;
+            document.getElementById('result-feedback').innerText = feedbackText;
+
+            if (isPassed) {
+                emojiEl.innerText = info.emoji;
+                badgeEl.innerText = '통과 / 성장 완료';
+                badgeEl.className = `inline-block px-5 py-2 rounded-full text-sm font-extrabold mb-8 bg-${info.theme}-container text-on-${info.theme}-container shadow-sm`;
+                
+                if (unit.currentLevel === activeWorksheetIndex) {
+                    unit.currentLevel += 1;
+                    saveProgressLocal(unit.id, unit.currentLevel);
+                }
+            } else {
+                emojiEl.innerText = '💦';
+                badgeEl.innerText = '조금 더 노력이 필요해요.';
+                badgeEl.className = 'inline-block px-5 py-2 rounded-full text-sm font-extrabold mb-8 bg-error-container text-on-error-container shadow-sm';
+            }
+
+            if (correctCount === total) {
+                modalBtn.innerText = '성장 지도로 돌아가기';
+                modalBtn.onclick = () => {
+                    document.getElementById('result-modal').classList.add('hidden');
+                    navTo('stages');
+                };
+            } else {
+                modalBtn.innerText = '틀린 문제 다시 풀기';
+                modalBtn.onclick = () => {
+                    document.getElementById('result-modal').classList.add('hidden');
+                    for (let i = 0; i < total; i++) {
+                        const inputEl = document.getElementById(`answer-input-${i}`);
+                        if (inputEl && !inputEl.readOnly) {
+                            inputEl.focus();
+                            break;
+                        }
+                    }
+                };
+            }
+
+            document.getElementById('result-modal').classList.remove('hidden');
+            
+            emojiEl.classList.remove('plant-pop');
+            void emojiEl.offsetWidth; 
+            emojiEl.classList.add('plant-pop');
+        }
+
+        window.onload = () => {
+            loadState();
+            navTo('units');
+        };
+    </script>
+</body>
+</html>
