@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>태풍 경로 따라그리기</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f0f4f8; }
+h1 { text-align: center; font-size: 20px; padding: 14px 0 10px; color: #1a1a2e; font-weight: 700; }
+.tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; padding: 0 12px; }
+.tab-btn {
+  flex: 1; max-width: 160px; padding: 10px 6px;
+  border: 2px solid #cbd5e1; background: white;
+  border-radius: 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: #64748b; line-height: 1.4; text-align: center;
+  transition: all 0.15s;
+}
+.tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+.tab-content { display: none; padding: 0 12px 12px; }
+.tab-content.active { display: block; }
+.act-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; color: #1e293b; }
+.act-desc { font-size: 11px; color: #64748b; margin-bottom: 6px; line-height: 1.5; }
+.step-msg { font-size: 11px; color: #94a3b8; margin-bottom: 4px; min-height: 15px; }
+.map-wrap {
+  position: relative; width: 100%;
+  border-radius: 12px; overflow: hidden;
+  border: 2px solid #e2e8f0; background: #e8f4fd;
+}
+.map-wrap img {
+  display: block; width: 100%; height: auto;
+  pointer-events: none; user-select: none;
+}
+
+/* 가로화면: 지도 높이를 화면 안에 꽉 맞게 */
+@media (orientation: landscape) {
+  body { overflow: hidden; }
+  h1 { font-size: 15px; padding: 6px 0 6px; }
+  .tabs { margin-bottom: 6px; }
+  .tab-btn { padding: 6px 4px; font-size: 11px; }
+  .tab-content { padding: 0 10px 6px; }
+  .act-title { font-size: 12px; margin-bottom: 1px; }
+  .act-desc { display: none; }
+  .step-msg { font-size: 10px; margin-bottom: 2px; min-height: 13px; }
+  .map-wrap {
+    max-height: calc(100vh - 130px);
+  }
+  .map-wrap img {
+    max-height: calc(100vh - 130px);
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  .legend { margin-top: 4px; font-size: 10px; gap: 8px; }
+  .actions { margin-top: 6px; gap: 6px; }
+  .btn { padding: 5px 12px; font-size: 11px; }
+  .result-box { margin-top: 6px; padding: 8px 12px; font-size: 11px; }
+}
+.map-wrap canvas {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  cursor: crosshair; touch-action: none;
+}
+.legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: #64748b; }
+.ld { display: flex; align-items: center; gap: 5px; }
+.lline { width: 24px; height: 3px; border-radius: 2px; }
+.actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn {
+  padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 2px solid #e2e8f0;
+  background: white; color: #64748b;
+}
+.btn:active { opacity: 0.8; }
+.btn-blue { background: #2563eb; color: white; border-color: #2563eb; }
+.btn-green { background: #16a34a; color: white; border-color: #16a34a; }
+.result-box {
+  margin-top: 10px; padding: 12px 16px;
+  border-radius: 10px; background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  font-size: 12px; line-height: 1.8; color: #334155; display: none;
+}
+.result-box strong { color: #2563eb; }
+</style>
+</head>
+<body>
+
+<h1>🌀 태풍 경로 따라그리기</h1>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="sw(0)">따라 그리기 ①<br>2019 링링</button>
+  <button class="tab-btn" onclick="sw(1)">따라 그리기 ②<br>2023 카눈</button>
+  <button class="tab-btn" onclick="sw(2)">예측 그리기<br>내가 그려볼게!</button>
+</div>
+
+<div class="tab-content active" id="t0">
+  <div class="act-title">2019년 태풍 링링 — 따라 그리기</div>
+  <div class="act-desc">링링은 필리핀 동쪽 바다에서 발생해 서해를 통과하며 한반도를 강타했어요. 점선 힌트를 따라 그려보세요!</div>
+  <div class="map-wrap" id="mw0">
+    <img src="960px-East_Asia_map_blank.png" draggable="false">
+    <canvas id="c0"></canvas>
+  </div>
+  <div class="legend">
+    <div class="ld"><div style="width:24px;border-top:3px dashed #999;height:0;"></div>힌트 경로</div>
+    <div class="ld"><div class="lline" style="background:#ef4444;"></div>내가 그린 경로</div>
+    <div class="ld"><div class="lline" style="background:#2563eb;"></div>실제 경로</div>
+  </div>
+  <div class="actions">
+    <button class="btn" onclick="clr(0)">지우기</button>
+    <button class="btn-blue btn" onclick="revealAns(0)">실제 경로 확인</button>
+  </div>
+  <div class="result-box" id="r0">
+    <strong>링링(2019)</strong>은 필리핀 동쪽 해상에서 발생해 서해를 통과, 한반도 서쪽을 강타하고 북쪽으로 빠져나가며 소멸했어요. 최대 순간 풍속 <strong>초속 50m 이상</strong>의 강력한 태풍이었답니다. 2019년에는 태풍이 <strong>7개</strong>나 우리나라에 영향을 줬어요!
+  </div>
+</div>
+
+<div class="tab-content" id="t1">
+  <div class="act-title">2023년 태풍 카눈 — 따라 그리기</div>
+  <div class="act-desc">카눈은 일본 남쪽에서 방향을 크게 틀어 우리나라를 남에서 북으로 관통했어요. 관측 이래 최초의 경로였답니다!</div>
+  <div class="map-wrap" id="mw1">
+    <img src="960px-East_Asia_map_blank.png" draggable="false">
+    <canvas id="c1"></canvas>
+  </div>
+  <div class="legend">
+    <div class="ld"><div style="width:24px;border-top:3px dashed #999;height:0;"></div>힌트 경로</div>
+    <div class="ld"><div class="lline" style="background:#ef4444;"></div>내가 그린 경로</div>
+    <div class="ld"><div class="lline" style="background:#2563eb;"></div>실제 경로</div>
+  </div>
+  <div class="actions">
+    <button class="btn" onclick="clr(1)">지우기</button>
+    <button class="btn-blue btn" onclick="revealAns(1)">실제 경로 확인</button>
+  </div>
+  <div class="result-box" id="r1">
+    <strong>카눈(2023)</strong>은 일본 남쪽에서 크게 방향을 꺾어 우리나라를 <strong>남쪽에서 북쪽으로 완전히 관통</strong>했어요. 기상 관측 이래 처음 있는 경로로, 전국에 큰 피해를 남겼습니다.
+  </div>
+</div>
+
+<div class="tab-content" id="t2">
+  <div class="act-title">나라면 어디로 갈까? — 예측 그리기</div>
+  <div class="act-desc">빨간 ★ 위치에서 태풍이 발생했어요. 어디로 갈 것 같은지 자유롭게 그려보고 실제 경로와 비교해보세요!</div>
+  <div class="step-msg" id="s2">① 빨간 별에서 출발해 자유롭게 그려보세요</div>
+  <div class="map-wrap" id="mw2">
+    <img src="960px-East_Asia_map_blank.png" draggable="false">
+    <canvas id="c2"></canvas>
+  </div>
+  <div class="legend">
+    <div class="ld"><div class="lline" style="background:#ef4444;"></div>내 예측</div>
+    <div class="ld"><div class="lline" style="background:#16a34a;"></div>실제 경로</div>
+  </div>
+  <div class="actions">
+    <button class="btn" onclick="clr(2)">지우기</button>
+    <button class="btn-green btn" onclick="revealAns(2)">실제 경로 확인!</button>
+  </div>
+  <div class="result-box" id="r2">
+    예측과 많이 달랐나요? 이 태풍(<strong>2020 하이선</strong>)은 필리핀 동쪽에서 발생해 일본 남쪽을 지나 <strong>동해로 빠져나가며 한반도 동쪽을 강타</strong>했어요.<br>
+    태풍은 기압대와 제트기류 영향으로 경로가 수시로 바뀌어 <strong>예측이 매우 어렵답니다!</strong>
+  </div>
+</div>
+
+<script>
+// 이 지도(960x640)의 위경도 범위
+// 좌상단 약 동경 95°, 북위 55° / 우하단 약 동경 165°, 북위 5°
+const LON0=95, LON1=165, LAT0=55, LAT1=5;
+
+function toRatio(lon, lat) {
+  return [(lon-LON0)/(LON1-LON0), (lat-LAT0)/(LAT1-LAT0)];
+}
+
+// 태풍 경로 [lon, lat]
+const PATHS=[
+  // 링링 2019
+  [[140,14],[138,16],[135,18],[132,20],[129,22],[126,24],
+   [123,26],[121,28],[121,30],[122,32],[123,34],[124,36],
+   [124.5,38],[124,40],[123,42]],
+  // 카눈 2023
+  [[148,16],[144,17],[140,18],[136,19],[132,19.5],[129,20],
+   [127,21],[127,23],[128,25],[129,27],[130,29],[129.5,31],
+   [129,33],[128.5,35],[128,37],[127.5,39],[127.5,41],[127,43]],
+  // 하이선 2020
+  [[152,14],[150,16],[147,18],[144,20],[141,22],[138,24],
+   [134,26],[131,28],[130,30],[130,32],[130.5,34],[131,36],
+   [131,38],[130.5,40],[130,42]]
+];
+const S2=[152,14]; // 예측 시작점
+
+const upaths=[[],[],[]];
+const revealed=[false,false,false];
+const drw=[false,false,false];
+
+function setupCanvas(i){
+  const c=document.getElementById('c'+i);
+  const img=document.querySelector('#mw'+i+' img');
+  const r=img.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  c.width=Math.round(r.width*dpr);
+  c.height=Math.round(r.height*dpr);
+  c.style.width=r.width+'px';
+  c.style.height=r.height+'px';
+  redraw(i);
+}
+
+function lw(i){return parseFloat(document.getElementById('c'+i).style.width)||document.getElementById('c'+i).width;}
+function lh(i){return parseFloat(document.getElementById('c'+i).style.height)||document.getElementById('c'+i).height;}
+
+function toXY(lon,lat,i){
+  const[rx,ry]=toRatio(lon,lat);
+  return[rx*lw(i),ry*lh(i)];
+}
+
+function getPos(e,c){
+  const r=c.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  return[t.clientX-r.left,t.clientY-r.top];
+}
+
+function arrow(ctx,x1,y1,x2,y2,col,sz=11){
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.save();ctx.translate(x2,y2);ctx.rotate(a);
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-sz,-sz*0.42);ctx.lineTo(-sz,sz*0.42);
+  ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.restore();
+}
+
+function badge(ctx,x,y,txt,bg,r=11){
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=bg;ctx.fill();
+  ctx.font=`bold ${Math.round(r*0.82)}px sans-serif`;
+  ctx.fillStyle='white';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(txt,x,y);
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';
+}
+
+function star(ctx,cx,cy,r,col){
+  ctx.save();ctx.beginPath();
+  for(let k=0;k<10;k++){
+    const a=(k*36-90)*Math.PI/180,rr=k%2===0?r:r*0.42;
+    k?ctx.lineTo(cx+rr*Math.cos(a),cy+rr*Math.sin(a)):ctx.moveTo(cx+rr*Math.cos(a),cy+rr*Math.sin(a));
+  }
+  ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.restore();
+}
+
+function redraw(i){
+  const c=document.getElementById('c'+i);
+  const ctx=c.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  const W=lw(i),H=lh(i);
+  ctx.save();
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  // 힌트 점선 (탭0,1)
+  if(i<2){
+    const pts=PATHS[i].map(([lo,la])=>toXY(lo,la,i));
+    ctx.beginPath();
+    pts.forEach(([x,y],k)=>k?ctx.lineTo(x,y):ctx.moveTo(x,y));
+    ctx.strokeStyle='rgba(60,60,60,0.4)';ctx.lineWidth=3.5;
+    ctx.setLineDash([9,7]);ctx.lineCap='round';ctx.stroke();ctx.setLineDash([]);
+    badge(ctx,pts[0][0],pts[0][1],'발생','#3b82f6');
+    badge(ctx,pts[pts.length-1][0],pts[pts.length-1][1],'소멸','#6b7280');
+  }
+
+  // 예측 별 (탭2)
+  if(i===2){
+    const[sx,sy]=toXY(S2[0],S2[1],i);
+    star(ctx,sx,sy,15,'#ef4444');
+    ctx.font='bold 11px sans-serif';ctx.fillStyle='#ef4444';
+    ctx.textAlign='center';ctx.fillText('태풍 발생!',sx,sy+25);ctx.textAlign='left';
+  }
+
+  // 사용자 경로
+  const up=upaths[i];
+  if(up.length>1){
+    ctx.beginPath();
+    up.forEach(([x,y],k)=>k?ctx.lineTo(x,y):ctx.moveTo(x,y));
+    ctx.strokeStyle='#ef4444';ctx.lineWidth=3.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.setLineDash([]);ctx.stroke();
+    ctx.beginPath();ctx.arc(up[0][0],up[0][1],6,0,Math.PI*2);ctx.fillStyle='#ef4444';ctx.fill();
+    if(up.length>4)arrow(ctx,up[up.length-5][0],up[up.length-5][1],up[up.length-1][0],up[up.length-1][1],'#ef4444');
+    ctx.beginPath();ctx.arc(up[up.length-1][0],up[up.length-1][1],6,0,Math.PI*2);ctx.fillStyle='#b91c1c';ctx.fill();
+    if(i===2){ctx.font='500 10px sans-serif';ctx.fillStyle='#b91c1c';ctx.fillText('내 예측 끝',up[up.length-1][0]+8,up[up.length-1][1]-5);}
+  }
+
+  // 실제 경로
+  if(revealed[i]){
+    const col=i===2?'#16a34a':'#1d4ed8';
+    const pts=PATHS[i].map(([lo,la])=>toXY(lo,la,i));
+    ctx.beginPath();
+    pts.forEach(([x,y],k)=>k?ctx.lineTo(x,y):ctx.moveTo(x,y));
+    ctx.strokeStyle=col;ctx.lineWidth=4.5;ctx.lineCap='round';ctx.setLineDash([]);ctx.stroke();
+    pts.forEach(([x,y],k)=>{if(k%2===0){ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();}});
+    if(pts.length>3)arrow(ctx,pts[pts.length-4][0],pts[pts.length-4][1],pts[pts.length-1][0],pts[pts.length-1][1],col,13);
+    badge(ctx,pts[0][0],pts[0][1],'발생',col);
+    badge(ctx,pts[pts.length-1][0],pts[pts.length-1][1],'소멸','#374151');
+    const mid=pts[Math.floor(pts.length/2)];
+    ctx.font='600 12px sans-serif';ctx.fillStyle=col;
+    ctx.fillText(['링링 실제 경로','카눈 실제 경로','하이선 실제 경로'][i],mid[0]+8,mid[1]-7);
+  }
+
+  ctx.restore();
+}
+
+function initEvents(i){
+  const c=document.getElementById('c'+i);
+  c.addEventListener('mousedown',e=>{drw[i]=true;upaths[i]=[getPos(e,c)];});
+  c.addEventListener('mousemove',e=>{
+    if(!drw[i])return;
+    upaths[i].push(getPos(e,c));redraw(i);
+    if(i===2&&upaths[i].length>5)document.getElementById('s2').textContent='② 다 그렸으면 실제 경로 확인 버튼을 눌러보세요!';
+  });
+  c.addEventListener('mouseup',()=>drw[i]=false);
+  c.addEventListener('mouseleave',()=>drw[i]=false);
+  c.addEventListener('touchstart',e=>{e.preventDefault();drw[i]=true;upaths[i]=[getPos(e,c)];},{passive:false});
+  c.addEventListener('touchmove',e=>{
+    e.preventDefault();if(!drw[i])return;
+    upaths[i].push(getPos(e,c));redraw(i);
+    if(i===2&&upaths[i].length>5)document.getElementById('s2').textContent='② 다 그렸으면 실제 경로 확인 버튼을 눌러보세요!';
+  },{passive:false});
+  c.addEventListener('touchend',()=>drw[i]=false);
+}
+
+function clr(i){
+  upaths[i]=[];revealed[i]=false;
+  document.getElementById('r'+i).style.display='none';
+  if(i===2)document.getElementById('s2').textContent='① 빨간 별에서 출발해 자유롭게 그려보세요';
+  setupCanvas(i);
+}
+
+function revealAns(i){revealed[i]=true;redraw(i);document.getElementById('r'+i).style.display='block';}
+
+function sw(i){
+  [0,1,2].forEach(j=>{
+    document.getElementById('t'+j).classList.toggle('active',j===i);
+    document.querySelectorAll('.tab-btn')[j].classList.toggle('active',j===i);
+  });
+  setTimeout(()=>setupCanvas(i),30);
+}
+
+window.addEventListener('load',()=>{
+  [0,1,2].forEach(i=>{
+    initEvents(i);
+    const img=document.querySelector('#mw'+i+' img');
+    if(img.complete)setupCanvas(i);
+    else img.addEventListener('load',()=>setupCanvas(i));
+  });
+});
+window.addEventListener('resize',()=>[0,1,2].forEach(i=>{
+  if(document.getElementById('t'+i).classList.contains('active'))setupCanvas(i);
+}));
+</script>
+</body>
+</html>
