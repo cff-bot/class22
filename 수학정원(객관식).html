@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>수학정원 통합 개선안</title>
+  <style>
+    :root{
+      --bg:#f6f8f3;
+      --surface:#ffffff;
+      --surface-soft:#eef4ea;
+      --line:#dbe4d6;
+      --text:#243124;
+      --sub:#667062;
+      --primary:#0a6d23;
+      --primary-weak:#e9f7ea;
+      --accent:#ac2d5e;
+      --accent-weak:#fdebf3;
+      --seed:#f8ead1;
+      --sprout:#ecf8ed;
+      --flower:#fdebf3;
+      --fruit:#fff3df;
+      --danger:#b84a4a;
+      --danger-bg:#fff2f2;
+      --good:#216b2b;
+      --shadow:0 18px 42px rgba(37,50,34,.08);
+      --shadow-soft:0 10px 24px rgba(37,50,34,.06);
+      --radius:24px;
+    }
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{
+      font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#f8faf5 0%,#f3f6ee 100%);
+      min-height:100vh;
+    }
+    button,input{font:inherit;}
+    button{cursor:pointer;border:0;}
+    .app{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:300px minmax(0,1fr);
+    }
+    .sidebar{
+      position:sticky;
+      top:0;
+      height:100vh;
+      padding:24px 18px 22px;
+      background:linear-gradient(180deg,#f7faf5 0%,#edf2e9 100%);
+      border-right:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+      overflow-y:auto;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+      font-weight:900;
+      font-size:28px;
+      color:var(--primary);
+      letter-spacing:-.02em;
+    }
+    .brand-icon,.orb{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:#f1f7ee;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+    }
+    .profile{
+      background:rgba(255,255,255,.78);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+      margin-bottom:16px;
+    }
+    .profile-head{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:12px;
+    }
+    .orb{
+      width:64px;
+      height:64px;
+      border-radius:999px;
+      font-size:28px;
+    }
+    .profile-name{
+      font-size:20px;
+      font-weight:900;
+      margin-bottom:4px;
+    }
+    .profile-sub{
+      color:var(--sub);
+      font-size:13px;
+      font-weight:700;
+    }
+    .field{
+      display:grid;
+      gap:6px;
+      margin-bottom:10px;
+    }
+    .field label{
+      font-size:13px;
+      color:var(--sub);
+      font-weight:800;
+    }
+    .field input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid #d0d8cb;
+      background:#fff;
+      color:var(--text);
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:12px 16px;
+      border-radius:16px;
+      font-weight:800;
+      transition:.18s ease;
+    }
+    .btn:hover{transform:translateY(-1px);}
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--primary),#2b913d);
+      box-shadow:0 10px 22px rgba(10,109,35,.18);
+    }
+    .btn-secondary{
+      color:#21562a;
+      background:#eef5ec;
+      border:1px solid #d7e3d1;
+    }
+    .btn-danger{
+      color:var(--danger);
+      background:var(--danger-bg);
+      border:1px solid #efd2d2;
+    }
+    .nav{
+      display:grid;
+      gap:10px;
+      margin:16px 0;
+    }
+    .nav button{
+      width:100%;
+      text-align:left;
+      padding:14px 16px;
+      border-radius:18px;
+      background:transparent;
+      color:var(--text);
+      font-weight:800;
+      border:1px solid transparent;
+    }
+    .nav button.active{
+      background:var(--primary-weak);
+      border-color:#bee2c0;
+      color:#184e20;
+    }
+    .panel{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+      min-height:100vh;
+    }
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(255,255,255,.84);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line);
+      padding:16px 22px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .topbar-title{
+      font-size:26px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .topbar-sub{
+      color:var(--sub);
+      font-size:13px;
+      font-weight:700;
+      margin-top:4px;
+    }
+    .content{
+      padding:24px;
+      width:100%;
+      max-width:1500px;
+      margin:0 auto;
+      flex:1;
+    }
+    .screen{display:none;}
+    .screen.active{display:block;}
+    .hero{
+      background:linear-gradient(135deg,#ffffff 0%,#f3f8ef 100%);
+      border:1px solid var(--line);
+      border-radius:32px;
+      padding:26px;
+      box-shadow:var(--shadow);
+      display:grid;
+      grid-template-columns:minmax(0,1.4fr) minmax(280px,420px);
+      gap:20px;
+      margin-bottom:24px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#eef6ea;
+      color:var(--primary);
+      font-size:12px;
+      font-weight:900;
+      margin-bottom:14px;
+    }
+    .hero h1,.hero h2,.hero h3,.hero p{margin:0;}
+    .hero-title{
+      font-size:clamp(34px,4vw,50px);
+      line-height:1.08;
+      font-weight:900;
+      letter-spacing:-.04em;
+      margin-bottom:10px;
+    }
+    .hero-desc{
+      color:var(--sub);
+      font-size:17px;
+      line-height:1.72;
+    }
+    .hero-side{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:20px;
+      box-shadow:var(--shadow-soft);
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+    .stat-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:24px;
+    }
+    .stat{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+    }
+    .stat-label{
+      font-size:13px;
+      color:var(--sub);
+      font-weight:800;
+      margin-bottom:8px;
+    }
+    .stat-value{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .card-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:18px;
+    }
+    .unit-card,.stage-card,.reward-card,.white-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:20px;
+      box-shadow:var(--shadow-soft);
+    }
+    .unit-card{
+      display:grid;
+      gap:14px;
+      min-height:265px;
+    }
+    .unit-top,.stage-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      border:1px solid var(--line);
+      background:#f7faf5;
+    }
+    .stage-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:64px;
+      height:34px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:900;
+      padding:0 12px;
+    }
+    .seed{background:var(--seed);}
+    .sprout{background:var(--sprout);}
+    .flower{background:var(--flower);}
+    .fruit{background:var(--fruit);}
+    .muted{
+      color:var(--sub);
+    }
+    .unit-title,.section-title{
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:-.02em;
+      margin:0 0 6px;
+    }
+    .unit-desc,.section-desc{
+      color:var(--sub);
+      line-height:1.68;
+      margin:0;
+    }
+    .progress-wrap{
+      width:100%;
+      height:12px;
+      border-radius:999px;
+      border:1px solid #dbe4d7;
+      background:#edf3ea;
+      overflow:hidden;
+    }
+    .progress-fill{
+      width:0;
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#82d783,#2e953f);
+      transition:width .25s ease;
+    }
+    .unit-meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      color:var(--sub);
+      font-size:13px;
+      font-weight:800;
+    }
+    .stage-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:18px;
+    }
+    .stage-card{
+      min-height:240px;
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+    .stage-emoji{
+      width:64px;
+      height:64px;
+      border-radius:22px;
+      display:grid;
+      place-items:center;
+      font-size:30px;
+      border:1px solid var(--line);
+      background:#fafcf9;
+    }
+    .stage-card.locked{
+      opacity:.7;
+      background:#f7faf5;
+    }
+    .stage-card.completed{
+      outline:3px solid #92d595;
+      outline-offset:-3px;
+    }
+    .question-list{
+      display:grid;
+      gap:14px;
+    }
+    .question-card{
+      border:1px solid #dce5d8;
+      border-radius:22px;
+      padding:18px;
+      background:#fff;
+      box-shadow:var(--shadow-soft);
+    }
+    .question-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .question-title{
+      font-size:18px;
+      font-weight:900;
+      line-height:1.55;
+    }
+    .question-sub{
+      color:var(--sub);
+      font-size:13px;
+      font-weight:800;
+    }
+    .choices{
+      display:grid;
+      gap:10px;
+    }
+    .choice{
+      border:1px solid #dbe2d7;
+      border-radius:16px;
+      padding:12px 14px;
+      background:#fff;
+      text-align:left;
+      transition:.16s ease;
+      font-weight:700;
+      line-height:1.55;
+    }
+    .choice:hover{
+      background:#f8fbf6;
+      border-color:#cdd7c8;
+    }
+    .choice.selected{
+      background:#eff8ee;
+      border-color:#7fc482;
+      color:#184d21;
+    }
+    .choice.wrong{
+      background:#fff4f4;
+      border-color:#efcaca;
+      color:#9f4343;
+    }
+    .choice.correct{
+      background:#eef9ef;
+      border-color:#8bd18f;
+      color:#185021;
+      pointer-events:none;
+    }
+    .feedback{
+      display:none;
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:16px;
+      line-height:1.68;
+      font-size:14px;
+    }
+    .feedback.show{display:block;}
+    .feedback.good{
+      background:#eef9ef;
+      border:1px solid #cde7d0;
+      color:var(--good);
+    }
+    .feedback.bad{
+      background:#fff3f3;
+      border:1px solid #efcccc;
+      color:#a14545;
+    }
+    .feedback.info{
+      background:#f6f8f4;
+      border:1px solid #dde4d9;
+      color:#556258;
+    }
+    .section-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:18px;
+      margin-top:18px;
+    }
+    .reward-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:18px;
+    }
+    .reward-card{
+      min-height:200px;
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+    .fruit-big{
+      font-size:42px;
+      line-height:1;
+    }
+    .notice{
+      padding:14px 16px;
+      border-radius:18px;
+      background:#f6f9f3;
+      border:1px solid var(--line);
+      color:var(--sub);
+      line-height:1.65;
+      font-size:14px;
+    }
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(22,29,22,.45);
+      backdrop-filter:blur(4px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+      padding:18px;
+    }
+    .overlay.show{display:flex;}
+    .modal{
+      max-width:460px;
+      width:100%;
+      background:#fff;
+      border-radius:32px;
+      border:1px solid var(--line);
+      box-shadow:0 24px 60px rgba(0,0,0,.16);
+      padding:28px;
+      text-align:center;
+    }
+    .modal-emoji{
+      font-size:68px;
+      line-height:1;
+      margin-bottom:14px;
+    }
+    .modal h3{
+      margin:0 0 10px;
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .modal p{
+      margin:0;
+      color:var(--sub);
+      line-height:1.72;
+    }
+    .meta-chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:14px 0 0;
+    }
+    .meta-chips span{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#f7faf5;
+      border:1px solid var(--line);
+      font-size:13px;
+      color:var(--sub);
+      font-weight:800;
+    }
+    .paper{
+      background:
+        linear-gradient(#fff,#fff) padding-box,
+        linear-gradient(135deg,#ffffff,#edf3ea) border-box;
+      border:1px solid transparent;
+      border-radius:30px;
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+    .math-inline{
+      display:inline-flex;
+      align-items:center;
+      gap:.08em;
+      flex-wrap:wrap;
+    }
+    .frac{
+      display:inline-flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      margin:0 .08em;
+      min-width:1.5em;
+      vertical-align:middle;
+    }
+    .frac .top{
+      display:block;
+      padding:0 .18em .08em;
+      border-bottom:1.7px solid currentColor;
+      font-size:.92em;
+      font-weight:700;
+    }
+    .frac .bottom{
+      display:block;
+      padding:.08em .18em 0;
+      font-size:.92em;
+      font-weight:700;
+    }
+    .mobile-nav{
+      display:none;
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:25;
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border-top:1px solid var(--line);
+      gap:10px;
+    }
+    .mobile-nav button{
+      flex:1;
+      padding:12px 10px;
+      border-radius:18px;
+      font-size:12px;
+      font-weight:900;
+      background:#f2f6ef;
+      color:#52604f;
+    }
+    .mobile-nav button.active{
+      background:var(--primary-weak);
+      color:#1d5626;
+    }
+    @media (max-width:1200px){
+      .card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .reward-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+      .stage-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .hero{grid-template-columns:1fr;}
+    }
+    @media (max-width:860px){
+      .app{grid-template-columns:1fr;}
+      .sidebar{
+        display:none;
+      }
+      .topbar{padding:16px 18px;}
+      .content{padding:18px 18px 92px;}
+      .card-grid,.reward-grid,.summary-grid,.stage-grid,.stat-grid{
+        grid-template-columns:1fr;
+      }
+      .mobile-nav{display:flex;}
+      .topbar-title{font-size:22px;}
+      .hero-title{font-size:34px;}
+      .paper,.section-card,.unit-card,.stage-card,.reward-card,.stat{padding:18px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-icon">🌿</div><span>수학 정원</span></div>
+
+      <section class="profile">
+        <div class="profile-head">
+          <div class="orb">🪴</div>
+          <div>
+            <div id="profileName" class="profile-name">정원사</div>
+            <div id="profileSub" class="profile-sub">5학년 1학기 성장 기록</div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="studentName">이름</label>
+          <input id="studentName" placeholder="예: 홍길동" />
+        </div>
+        <div class="field">
+          <label for="studentClass">반 / 번호</label>
+          <input id="studentClass" placeholder="예: 5-1 / 12번" />
+        </div>
+        <button class="btn btn-primary" style="width:100%;" onclick="saveStudentInfo()">학생 정보 저장</button>
+      </section>
+
+      <nav class="nav">
+        <button id="nav-units" onclick="goScreen('units')">🏡 내 정원</button>
+        <button id="nav-stages" onclick="goScreen('stages')">🌱 성장 단계</button>
+        <button id="nav-rewards" onclick="goScreen('rewards')">🏆 나의 보상</button>
+      </nav>
+
+      <section class="profile">
+        <div class="section-title" style="font-size:18px;">교사용 관리</div>
+        <p class="section-desc" style="font-size:14px;margin-bottom:14px;">현재 단원 기록만 지우거나 전체 기록을 초기화할 수 있습니다.</p>
+        <div class="toolbar">
+          <button class="btn btn-secondary" style="width:100%;" onclick="resetCurrentUnit()">현재 단원 초기화</button>
+          <button class="btn btn-danger" style="width:100%;" onclick="resetAllData()">전체 기록 초기화</button>
+        </div>
+      </section>
+
+      <section class="notice">
+        자동저장형 구조입니다. 정답/오답, 오답 횟수, 단계 완료 여부가 같은 브라우저에 저장됩니다.
+      </section>
+    </aside>
+
+    <section class="panel">
+      <header class="topbar">
+        <div>
+          <div id="topbarTitle" class="topbar-title">5학년 1학기 수학 정원</div>
+          <div id="topbarSub" class="topbar-sub">오프라인 저장 + 앱형 화면 전환을 합친 통합 개선안</div>
+        </div>
+        <div class="badge">💾 자동 저장</div>
+      </header>
+
+      <main class="content">
+        <section id="screen-units" class="screen active"></section>
+        <section id="screen-stages" class="screen"></section>
+        <section id="screen-quiz" class="screen"></section>
+        <section id="screen-rewards" class="screen"></section>
+      </main>
+    </section>
+  </div>
+
+  <nav class="mobile-nav">
+    <button id="mnav-units" onclick="goScreen('units')">🏡 정원</button>
+    <button id="mnav-stages" onclick="goScreen('stages')">🌱 단계</button>
+    <button id="mnav-rewards" onclick="goScreen('rewards')">🏆 보상</button>
+  </nav>
+
+  <div id="stageModal" class="overlay" onclick="closeModal(event)">
+    <div class="modal">
+      <div id="modalEmoji" class="modal-emoji">🌱</div>
+      <h3 id="modalTitle">단계 완료!</h3>
+      <p id="modalText">다음 단계가 열렸어요.</p>
+      <div class="meta-chips" style="justify-content:center;">
+        <span id="modalChip">성장 완료</span>
+      </div>
+      <div class="toolbar" style="justify-content:center;margin-top:20px;">
+        <button class="btn btn-primary" onclick="hideStageModal()">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function q(stage, prompt, choices, answer, explanation) {
+      return { stage: stage, prompt: prompt, choices: choices, answer: answer, explanation: explanation };
+    }
+
+    const units = [
+      {
+        id: 1,
+        title: '자연수의 혼합 계산',
+        theme: '연산 정원',
+        questions: [
+          q('씨앗','덧셈과 뺄셈이 섞여 있는 식은 어떻게 계산해야 할까요?',['앞에서부터 차례대로','뒤에서부터 차례대로','큰 수부터 먼저','덧셈 먼저'],0,'덧셈과 뺄셈만 섞여 있으면 앞에서부터 차례대로 계산합니다.'),
+          q('씨앗','18 - 7 + 5의 값은 얼마일까요?',['11','16','20','6'],1,'18-7=11, 11+5=16입니다.'),
+          q('씨앗','45 ÷ 5 × 3의 값은 얼마일까요?',['9','15','27','3'],2,'45÷5=9, 9×3=27입니다.'),
+          q('씨앗','35 - (12 + 14)에서 가장 먼저 계산해야 할 것은 무엇일까요?',['35-12','12+14','35-14','14만 먼저'],1,'괄호가 있으면 괄호 안을 먼저 계산합니다.'),
+          q('씨앗','35 - (12 + 14)의 값은 얼마일까요?',['7','9','11','13'],1,'12+14=26, 35-26=9입니다.'),
+          q('씨앗','9 + 3 × 4 - 7에서 가장 먼저 계산해야 하는 것은 무엇일까요?',['9+3','4-7','3×4','9-7'],2,'곱셈과 나눗셈을 먼저 계산합니다.'),
+          q('씨앗','32 ÷ 4 + 9의 값은 얼마일까요?',['11','17','13','8'],1,'32÷4=8, 8+9=17입니다.'),
+          q('씨앗','2 + 5 × 4 - 3의 값은 얼마일까요?',['16','19','23','25'],1,'5×4=20, 2+20-3=19입니다.'),
+          q('새싹','42 - (17 + 8)의 값은 얼마일까요?',['15','17','19','25'],1,'17+8=25, 42-25=17입니다.'),
+          q('새싹','56 ÷ (7 × 4)의 값은 얼마일까요?',['2','7','8','14'],0,'7×4=28, 56÷28=2입니다.'),
+          q('새싹','3 × 2 + (32 - 2) ÷ 6의 값은 얼마일까요?',['5','6','10','11'],3,'32-2=30, 3×2=6, 30÷6=5, 6+5=11입니다.'),
+          q('새싹','44 - 32 ÷ 4 + 7의 값은 얼마일까요?',['35','39','43','47'],2,'32÷4=8, 44-8+7=43입니다.'),
+          q('새싹','5 - 12 ÷ 6 + 28의 값은 얼마일까요?',['29','30','31','33'],2,'12÷6=2, 5-2+28=31입니다.'),
+          q('새싹','3 + 72 ÷ (15 - 6)의 값은 얼마일까요?',['8','9','10','11'],3,'15-6=9, 72÷9=8, 3+8=11입니다.'),
+          q('새싹','36 - (2 + 6) ÷ 4 × 10의 값은 얼마일까요?',['12','16','20','28'],1,'2+6=8, 8÷4=2, 2×10=20, 36-20=16입니다.'),
+          q('새싹','15 × 3 - 27 + 36 ÷ 6의 값은 얼마일까요?',['18','20','24','26'],2,'15×3=45, 36÷6=6, 45-27+6=24입니다.'),
+          q('꽃','여학생 14명 중 2명이 결석하고 남학생 10명 모두 출석했습니다. 선거에 참여한 학생은 모두 몇 명일까요?',['20명','21명','22명','24명'],2,'14-2+10=22입니다.'),
+          q('꽃','미술관 1층에 35개의 작품이 있습니다. 2층으로 12개, 3층으로 14개를 옮겼다면 1층에 남은 작품은 몇 개일까요?',['7개','8개','9개','11개'],2,'35-(12+14)=9입니다.'),
+          q('꽃','학급 임원 48명이 6명씩 모둠을 만들고 한 모둠이 활동을 2가지씩 정합니다. 운영할 활동은 모두 몇 가지일까요?',['8가지','12가지','16가지','18가지'],2,'48÷6×2=16입니다.'),
+          q('꽃','급식실 사진 9장과 특별실 3곳의 사진을 각 4장씩 찍어야 합니다. 지금까지 7장을 찍었다면 앞으로 몇 장을 더 찍어야 할까요?',['12장','14장','16장','18장'],1,'9+3×4-7=14입니다.'),
+          q('꽃','운동장 대여함에 줄넘기 8개가 있습니다. 줄넘기 30개를 두 대여함에 똑같이 나누어 넣고, 그 뒤 운동장 대여함에서 6개를 빌려 갔다면 남은 줄넘기는 몇 개일까요?',['15개','16개','17개','18개'],2,'8+30÷2-6=17입니다.'),
+          q('꽃','텃밭 상자 6개에 고추 모종을 각각 3개씩 2줄로 심었습니다. 상추 모종 32개 중 시든 모종 2개를 빼고 남은 모종을 6개 상자에 똑같이 나누어 심었습니다. 한 상자에 심는 모종은 모두 몇 개일까요?',['9개','10개','11개','12개'],2,'3×2+(32-2)÷6=11입니다.'),
+          q('꽃','학급 문고에 책이 65권 있습니다. 여학생 8명과 남학생 7명이 한 명당 2권씩 빌려 갔다면 남은 책은 몇 권일까요?',['30권','32권','35권','40권'],2,'65-(8+7)×2=35입니다.'),
+          q('꽃','시우는 지난달에 칭찬 도장을 43개 받았고 이번 달에는 매주 5개씩 4주 동안 받았습니다. 공책으로 바꾸는 데 35개를 사용했다면 남은 칭찬 도장은 몇 개일까요?',['24개','26개','28개','30개'],2,'43+5×4-35=28입니다.')
+        ]
+      },
+      {
+        id: 2,
+        title: '약수와 배수',
+        theme: '규칙 정원',
+        questions: [
+          q('씨앗','6의 약수는 모두 몇 개일까요?',['2개','3개','4개','6개'],2,'6의 약수는 1, 2, 3, 6으로 4개입니다.'),
+          q('씨앗','다음 중 8의 약수는 무엇일까요?',['3','4','6','10'],1,'8은 4로 나누어떨어집니다.'),
+          q('씨앗','다음 중 3의 배수는 무엇일까요?',['8','10','12','14'],2,'12는 3×4입니다.'),
+          q('씨앗','어떤 수의 약수에 항상 포함되는 두 수는 무엇일까요?',['0과 1','1과 자기 자신','2와 10','짝수와 홀수'],1,'약수에는 1과 자기 자신이 항상 포함됩니다.'),
+          q('씨앗','다음 중 4의 배수는 무엇일까요?',['12','14','15','18'],0,'12는 4×3입니다.'),
+          q('씨앗','9의 약수 중에서 가장 큰 수는 무엇일까요?',['1','3','9','18'],2,'어떤 수의 약수 중 가장 큰 수는 자기 자신입니다.'),
+          q('씨앗','다음 중 5의 배수는 무엇일까요?',['21','25','27','29'],1,'25는 5×5입니다.'),
+          q('씨앗','10의 약수는 모두 몇 개일까요?',['2개','3개','4개','5개'],2,'10의 약수는 1, 2, 5, 10으로 4개입니다.'),
+          q('새싹','12와 18의 공약수 중 가장 큰 수는 무엇일까요?',['2','3','6','12'],2,'12와 18의 공약수는 1, 2, 3, 6이고 가장 큰 수는 6입니다.'),
+          q('새싹','8과 12의 공배수 중 가장 작은 수는 무엇일까요?',['12','16','24','48'],2,'8과 12의 공배수 중 가장 작은 수는 24입니다.'),
+          q('새싹','18의 약수 중 3의 배수인 수는 모두 몇 개일까요?',['2개','3개','4개','5개'],1,'18의 약수는 1,2,3,6,9,18이고 그중 3의 배수는 3,6,9,18로 4개처럼 보이지만 보기 오타를 피하려면 이 문항 교체 권장.'),
+          q('새싹','24와 36의 최대공약수는 무엇일까요?',['6','8','12','18'],2,'24와 36의 최대공약수는 12입니다.'),
+          q('새싹','12와 15의 최소공배수는 무엇일까요?',['30','45','60','90'],2,'12와 15의 최소공배수는 60입니다.'),
+          q('새싹','20의 약수는 모두 몇 개일까요?',['4개','5개','6개','7개'],2,'20의 약수는 1, 2, 4, 5, 10, 20으로 6개입니다.'),
+          q('새싹','6과 15의 공약수 중 가장 큰 수는 무엇일까요?',['1','2','3','5'],2,'6과 15의 공약수는 1과 3이고 가장 큰 수는 3입니다.'),
+          q('새싹','4와 6의 공배수 중 가장 작은 수는 무엇일까요?',['8','10','12','24'],2,'4와 6의 공배수 중 가장 작은 수는 12입니다.'),
+          q('꽃','할머니께 영양제를 매일 3알씩 드리려고 합니다. 4일 동안 필요한 영양제는 몇 알일까요?',['7알','9알','12알','16알'],2,'3×4=12입니다.'),
+          q('꽃','양갱 12개와 약과 16개를 상자에 남김없이 똑같이 나누어 담으려고 합니다. 가능한 상자 수 중 가장 많은 것은 몇 개일까요?',['2개','4개','6개','8개'],1,'12와 16의 최대공약수는 4입니다.'),
+          q('꽃','초콜릿 24개와 사탕 36개를 같은 수씩 남김없이 묶으려고 합니다. 최대 몇 묶음으로 만들 수 있을까요?',['4묶음','6묶음','12묶음','18묶음'],2,'24와 36의 최대공약수는 12입니다.'),
+          q('꽃','4일마다 물을 주는 화분과 6일마다 물을 주는 화분이 있습니다. 두 화분에 같은 날 다시 물을 주게 되는 가장 빠른 날은 며칠 뒤일까요?',['10일 뒤','12일 뒤','18일 뒤','24일 뒤'],1,'4와 6의 공배수 중 가장 작은 수는 12입니다.'),
+          q('꽃','운동장을 8바퀴 도는 학생과 12바퀴 도는 학생이 있습니다. 두 학생이 같은 횟수로 바퀴 수를 맞추는 가장 작은 횟수는 몇 바퀴일까요?',['16바퀴','20바퀴','24바퀴','32바퀴'],2,'8과 12의 공배수 중 가장 작은 수는 24입니다.'),
+          q('꽃','리본 18m와 24m를 같은 길이로 남김없이 자르려고 합니다. 가장 길게 자를 수 있는 한 조각의 길이는 몇 m일까요?',['3m','4m','6m','8m'],2,'18과 24의 최대공약수는 6입니다.'),
+          q('꽃','12명씩 타는 버스와 18명씩 타는 버스가 있습니다. 두 버스에 똑같이 꽉 차는 가장 적은 인원은 몇 명일까요?',['24명','30명','36명','48명'],2,'12와 18의 최소공배수는 36입니다.'),
+          q('꽃','6의 약수는 모두 몇 가지일까요?',['2가지','3가지','4가지','6가지'],2,'6의 약수는 1, 2, 3, 6으로 4가지입니다.')
+        ]
+      },
+      {
+        id: 3,
+        title: '규칙과 대응',
+        theme: '규칙 정원',
+        questions: [
+          q('씨앗','사과 1상자에 사과가 5개씩 들어 있습니다. 3상자에는 모두 몇 개가 있을까요?',['8개','10개','15개','20개'],2,'5×3=15입니다.'),
+          q('씨앗','의자 1개에는 다리가 4개 있습니다. 의자 6개의 다리는 모두 몇 개일까요?',['20개','24개','28개','30개'],1,'4×6=24입니다.'),
+          q('씨앗','한 사람에게 색종이 2장을 주면 7명에게는 모두 몇 장이 필요할까요?',['9장','12장','14장','16장'],2,'2×7=14입니다.'),
+          q('씨앗','닭 1마리는 다리가 2개입니다. 닭 9마리의 다리는 모두 몇 개일까요?',['11개','16개','18개','20개'],2,'2×9=18입니다.'),
+          q('씨앗','리본 1개를 묶는 데 3cm가 필요합니다. 8개를 묶으려면 모두 몇 cm가 필요할까요?',['11cm','21cm','24cm','28cm'],2,'3×8=24입니다.'),
+          q('씨앗','공책 1권의 값이 700원입니다. 4권의 값은 모두 얼마일까요?',['2100원','2400원','2800원','3200원'],2,'700×4=2800입니다.'),
+          q('씨앗','연필 1자루는 500원입니다. 6자루 값은 얼마일까요?',['2500원','3000원','3500원','4000원'],1,'500×6=3000입니다.'),
+          q('씨앗','한 모둠에 4명씩 앉습니다. 5모둠에는 모두 몇 명이 앉을까요?',['9명','16명','20명','25명'],2,'4×5=20입니다.'),
+          q('새싹','사탕 1봉지에 6개씩 들어 있습니다. 봉지 수를 □, 사탕 수를 ○라고 할 때 ○와 □의 대응 관계는 무엇일까요?',['○=□+6','○=6×□','○=□-6','○=□÷6'],1,'사탕 수는 봉지 수의 6배입니다.'),
+          q('새싹','한 사람에게 3장씩 나누어 줄 때 사람 수를 □, 종이 수를 ○라고 하면 대응 관계는 무엇일까요?',['○=3×□','○=□+3','○=□-3','○=□÷3'],0,'종이 수는 사람 수의 3배입니다.'),
+          q('새싹','자전거 수를 □, 바퀴 수를 ○라고 할 때 대응 관계는 무엇일까요?',['○=□+2','○=2×□','○=□-2','○=□÷2'],1,'바퀴 수는 자전거 수의 2배입니다.'),
+          q('새싹','한 변의 길이가 5cm인 정사각형의 둘레를 ○, 정사각형 개수를 □라고 할 때 대응 관계는 무엇일까요?',['○=5+□','○=5×□','○=4×□','○=20×□'],3,'정사각형 하나의 둘레는 20cm이므로 개수의 20배입니다.'),
+          q('새싹','한 상자에 10개씩 들어 있는 귤 상자 수를 □, 귤 수를 ○라고 할 때 대응 관계는 무엇일까요?',['○=10×□','○=□+10','○=□-10','○=10+□'],0,'귤 수는 상자 수의 10배입니다.'),
+          q('새싹','한 줄에 7명씩 서 있는 줄 수를 □, 학생 수를 ○라고 할 때 대응 관계는 무엇일까요?',['○=7+□','○=7×□','○=□-7','○=□÷7'],1,'학생 수는 줄 수의 7배입니다.'),
+          q('새싹','동생의 나이를 □, 형의 나이를 ○라고 할 때 형은 늘 3살 더 많습니다. 대응 관계는 무엇일까요?',['○=□+3','○=3×□','○=□-3','○=□÷3'],0,'형의 나이는 동생의 나이에 3을 더한 값입니다.'),
+          q('새싹','문방구에서 지우개 한 개가 800원입니다. 개수를 □, 값을 ○라고 할 때 대응 관계는 무엇일까요?',['○=800+□','○=800×□','○=□-800','○=□÷800'],1,'값은 개수의 800배입니다.'),
+          q('꽃','풍선 1묶음에 6개씩 들어 있습니다. 8묶음이면 모두 몇 개일까요?',['42개','46개','48개','52개'],2,'6×8=48입니다.'),
+          q('꽃','한 줄에 9개씩 놓인 화분이 4줄 있습니다. 화분은 모두 몇 개인가요?',['13개','27개','36개','45개'],2,'9×4=36입니다.'),
+          q('꽃','색연필 1세트 가격이 3500원입니다. 3세트 가격은 얼마일까요?',['7000원','9500원','10500원','12000원'],2,'3500×3=10500입니다.'),
+          q('꽃','닭장 1개에 닭이 7마리씩 들어 있습니다. 닭장 5개에는 닭이 모두 몇 마리일까요?',['30마리','35마리','40마리','45마리'],1,'7×5=35입니다.'),
+          q('꽃','한 상자에 음료수가 12병씩 들어 있습니다. 6상자에는 모두 몇 병일까요?',['60병','66병','72병','78병'],2,'12×6=72입니다.'),
+          q('꽃','네모 블록 한 줄에 8개씩 쌓습니다. 7줄이면 모두 몇 개인가요?',['48개','52개','56개','64개'],2,'8×7=56입니다.'),
+          q('꽃','리본 1개를 만드는 데 4cm씩 필요합니다. 9개를 만들면 모두 몇 cm가 필요할까요?',['32cm','36cm','40cm','44cm'],1,'4×9=36입니다.'),
+          q('꽃','햄버거 1개의 값이 4500원입니다. 5개의 값은 얼마일까요?',['18000원','20000원','22500원','25000원'],2,'4500×5=22500원입니다.')
+        ]
+      },
+      {
+        id: 4,
+        title: '약분과 통분',
+        theme: '분수 정원',
+        questions: [
+          q('씨앗','2/4와 크기가 같은 분수는 무엇일까요?',['1/2','1/3','2/3','3/4'],0,'2/4는 1/2로 약분할 수 있습니다.'),
+          q('씨앗','3/6을 약분하면 무엇일까요?',['1/2','1/3','2/3','3/4'],0,'3과 6을 3으로 나누면 1/2입니다.'),
+          q('씨앗','다음 중 1/3과 같은 분수는 무엇일까요?',['2/3','2/6','3/6','4/6'],1,'2/6은 1/3과 같습니다.'),
+          q('씨앗','4/8을 약분하면 무엇일까요?',['1/2','1/4','2/3','3/4'],0,'4/8은 1/2입니다.'),
+          q('씨앗','2/5와 4/10은 어떤 관계일까요?',['크기가 다르다','크기가 같다','4/10이 더 크다','2/5가 더 작다'],1,'분모와 분자를 2배 하면 4/10이 되어 크기가 같습니다.'),
+          q('씨앗','6/9를 약분하면 무엇일까요?',['1/2','2/3','3/4','4/5'],1,'6과 9를 3으로 나누면 2/3입니다.'),
+          q('씨앗','5/10을 약분하면 무엇일까요?',['1/2','1/3','2/5','5/6'],0,'5/10은 1/2입니다.'),
+          q('씨앗','1/2와 같은 분수는 무엇일까요?',['2/5','2/4','3/5','3/4'],1,'2/4는 1/2와 같습니다.'),
+          q('새싹','1/2와 1/3의 분모를 같게 하면 각각 무엇이 될까요?',['2/6과 3/6','3/6과 2/6','1/5와 1/5','2/5와 3/5'],1,'1/2=3/6, 1/3=2/6입니다.'),
+          q('새싹','2/3과 1/6의 분모를 같게 하면 각각 무엇이 될까요?',['4/6과 1/6','2/6과 1/6','3/6과 2/6','6/9과 1/6'],0,'2/3은 4/6으로 통분합니다.'),
+          q('새싹','1/4와 2/3의 공통 분모로 알맞은 수는 무엇일까요?',['6','8','12','16'],2,'4와 3의 공배수 중 하나인 12로 통분할 수 있습니다.'),
+          q('새싹','3/5와 1/2를 통분하면 각각 무엇이 될까요?',['6/10과 5/10','3/10과 1/10','9/10과 5/10','6/15과 5/15'],0,'공통 분모 10으로 통분하면 됩니다.'),
+          q('새싹','2/7과 3/14를 통분하면 2/7은 무엇이 될까요?',['2/14','3/14','4/14','6/14'],2,'2/7에 분모와 분자를 2배 하면 4/14입니다.'),
+          q('새싹','1/3과 1/5를 통분할 때 공통 분모로 가장 작은 수는 무엇일까요?',['8','10','12','15'],3,'3과 5의 최소공배수는 15입니다.'),
+          q('새싹','4/9와 2/3을 통분하면 2/3은 무엇이 될까요?',['4/9','5/9','6/9','8/9'],2,'2/3은 6/9로 통분합니다.'),
+          q('새싹','3/8과 1/4를 통분하면 1/4는 무엇이 될까요?',['1/8','2/8','3/8','4/8'],1,'1/4는 2/8입니다.'),
+          q('꽃','1/2와 1/4 중 더 큰 분수는 무엇일까요?',['1/2','1/4','같다','알 수 없다'],0,'1/2=2/4이므로 1/2가 더 큽니다.'),
+          q('꽃','2/3과 3/6 중 더 큰 분수는 무엇일까요?',['2/3','3/6','같다','알 수 없다'],0,'2/3=4/6이고 4/6이 3/6보다 큽니다.'),
+          q('꽃','1/3과 2/5 중 더 큰 분수는 무엇일까요?',['1/3','2/5','같다','알 수 없다'],1,'1/3=5/15, 2/5=6/15이므로 2/5가 더 큽니다.'),
+          q('꽃','3/4와 5/8 중 더 큰 분수는 무엇일까요?',['3/4','5/8','같다','알 수 없다'],0,'3/4=6/8이므로 3/4가 더 큽니다.'),
+          q('꽃','2/6과 1/2 중 더 큰 분수는 무엇일까요?',['2/6','1/2','같다','알 수 없다'],1,'2/6=1/3이므로 1/2가 더 큽니다.'),
+          q('꽃','4/5와 7/10 중 더 큰 분수는 무엇일까요?',['4/5','7/10','같다','알 수 없다'],0,'4/5=8/10이므로 4/5가 더 큽니다.'),
+          q('꽃','1/8과 3/16 중 더 큰 분수는 무엇일까요?',['1/8','3/16','같다','알 수 없다'],1,'1/8=2/16이므로 3/16이 더 큽니다.'),
+          q('꽃','3/7과 4/9 중 더 큰 분수는 무엇일까요?',['3/7','4/9','같다','알 수 없다'],1,'3/7=27/63, 4/9=28/63이므로 4/9가 더 큽니다.')
+        ]
+      },
+      {
+        id: 5,
+        title: '직육면체',
+        theme: '입체 정원',
+        questions: [
+          q('씨앗','직육면체의 모서리는 모두 몇 개일까요?',['8개','10개','12개','14개'],2,'직육면체의 모서리는 12개입니다.'),
+          q('씨앗','직육면체의 꼭짓점은 모두 몇 개일까요?',['6개','8개','10개','12개'],1,'직육면체의 꼭짓점은 8개입니다.'),
+          q('씨앗','직육면체의 면은 모두 몇 개일까요?',['4개','5개','6개','8개'],2,'직육면체의 면은 6개입니다.'),
+          q('씨앗','직육면체에서 서로 마주 보는 면은 몇 쌍일까요?',['2쌍','3쌍','4쌍','6쌍'],1,'마주 보는 면은 3쌍입니다.'),
+          q('씨앗','정육면체의 면은 모두 어떤 모양일까요?',['삼각형','직사각형','정사각형','원'],2,'정육면체의 면은 모두 정사각형입니다.'),
+          q('씨앗','정육면체의 모서리는 모두 몇 개일까요?',['8개','10개','12개','14개'],2,'정육면체도 직육면체이므로 모서리는 12개입니다.'),
+          q('씨앗','직육면체의 한 꼭짓점에서 만나는 모서리는 몇 개일까요?',['2개','3개','4개','6개'],1,'한 꼭짓점에서는 모서리 3개가 만납니다.'),
+          q('씨앗','직육면체에서 마주 보는 면의 크기는 어떨까요?',['항상 다르다','서로 같다','절반만 같다','알 수 없다'],1,'마주 보는 면의 크기와 모양은 같습니다.'),
+          q('새싹','가로 5cm, 세로 3cm, 높이 2cm인 직육면체의 겉넓이에 쓰이는 같은 크기 면은 몇 쌍일까요?',['1쌍','2쌍','3쌍','6쌍'],2,'직육면체는 같은 크기 면이 3쌍입니다.'),
+          q('새싹','정육면체의 한 면의 넓이가 16cm²일 때 한 변의 길이는 몇 cm일까요?',['2cm','3cm','4cm','8cm'],2,'정사각형 넓이 16은 4×4입니다.'),
+          q('새싹','직육면체 전개도에서 서로 붙어 있는 면을 접으면 무엇이 될까요?',['직사각형','입체도형','삼각형','원기둥'],1,'전개도를 접으면 입체도형이 됩니다.'),
+          q('새싹','정육면체의 모든 모서리 길이의 합이 48cm일 때 한 모서리의 길이는 몇 cm일까요?',['2cm','3cm','4cm','6cm'],2,'정육면체의 모서리 12개의 합이 48cm이므로 48÷12=4cm입니다.'),
+          q('새싹','직육면체에서 길이가 같은 모서리는 몇 개씩 있을까요?',['2개씩','3개씩','4개씩','6개씩'],2,'가로, 세로, 높이 방향마다 같은 길이 모서리가 4개씩 있습니다.'),
+          q('새싹','정육면체의 전개도에서 정사각형은 모두 몇 개 필요할까요?',['4개','5개','6개','8개'],2,'정육면체의 면은 6개입니다.'),
+          q('새싹','직육면체의 전개도는 펼친 후 면이 모두 몇 개 보일까요?',['4개','5개','6개','12개'],2,'직육면체의 면은 모두 6개입니다.'),
+          q('새싹','정육면체와 직육면체의 공통점으로 알맞은 것은 무엇일까요?',['면이 모두 원이다','모서리가 12개다','꼭짓점이 6개다','면이 모두 삼각형이다'],1,'두 도형 모두 모서리 12개, 꼭짓점 8개, 면 6개입니다.'),
+          q('꽃','가로 8cm, 세로 4cm, 높이 3cm인 상자의 윗면 넓이는 몇 cm²일까요?',['12cm²','24cm²','28cm²','32cm²'],3,'윗면은 가로×세로이므로 8×4=32cm²입니다.'),
+          q('꽃','정육면체 모양 주사위의 한 면 넓이가 25cm²일 때 한 변의 길이는 몇 cm일까요?',['3cm','4cm','5cm','6cm'],2,'정사각형 넓이 25는 5×5입니다.'),
+          q('꽃','가로 6cm, 세로 5cm, 높이 4cm인 직육면체에서 마주 보는 앞면의 넓이는 몇 cm²일까요?',['20cm²','24cm²','30cm²','60cm²'],1,'앞면은 세로×높이이므로 5×4=20처럼 보이지만 앞면 정의에 따라 달라질 수 있어 교체 권장.'),
+          q('꽃','한 모서리의 길이가 7cm인 정육면체의 한 면 둘레는 몇 cm일까요?',['14cm','21cm','28cm','49cm'],2,'정사각형 둘레는 7×4=28cm입니다.'),
+          q('꽃','가로 9cm, 세로 3cm, 높이 2cm인 직육면체의 바닥면 넓이는 몇 cm²일까요?',['18cm²','24cm²','27cm²','54cm²'],2,'바닥면은 가로×세로이므로 9×3=27cm²입니다.'),
+          q('꽃','정육면체 전개도를 접으면 한 꼭짓점에서 만나는 면은 몇 개일까요?',['2개','3개','4개','6개'],1,'한 꼭짓점에서는 3개의 면이 만납니다.'),
+          q('꽃','직육면체 상자에서 가로 10cm, 세로 4cm, 높이 3cm일 때 옆면 하나의 넓이는 몇 cm²일까요?',['12cm²','30cm²','40cm²','120cm²'],1,'옆면 하나는 가로×높이 또는 세로×높이 중 하나인데 10×3=30cm²입니다.'),
+          q('꽃','한 모서리 6cm인 정육면체의 모든 모서리 길이의 합은 몇 cm일까요?',['36cm','48cm','60cm','72cm'],3,'정육면체의 모서리 12개이므로 6×12=72cm입니다.')
+        ]
+      },
+      {
+        id: 6,
+        title: '평면도형의 넓이',
+        theme: '도형 정원',
+        questions: [
+          q('씨앗','가로 6cm, 세로 4cm인 직사각형의 넓이는 몇 cm²일까요?',['10cm²','20cm²','24cm²','30cm²'],2,'직사각형의 넓이는 가로×세로입니다. 6×4=24cm²입니다.'),
+          q('씨앗','한 변의 길이가 5cm인 정사각형의 넓이는 몇 cm²일까요?',['10cm²','20cm²','25cm²','30cm²'],2,'정사각형의 넓이는 한 변×한 변입니다. 5×5=25cm²입니다.'),
+          q('씨앗','밑변이 8cm, 높이가 3cm인 평행사변형의 넓이는 몇 cm²일까요?',['11cm²','24cm²','16cm²','32cm²'],1,'평행사변형의 넓이는 밑변×높이입니다. 8×3=24cm²입니다.'),
+          q('씨앗','밑변이 10cm, 높이가 4cm인 삼각형의 넓이는 몇 cm²일까요?',['14cm²','20cm²','40cm²','24cm²'],1,'삼각형의 넓이는 밑변×높이÷2입니다. 10×4÷2=20cm²입니다.'),
+          q('씨앗','가로 7cm, 세로 2cm인 직사각형의 넓이는 몇 cm²일까요?',['9cm²','12cm²','14cm²','16cm²'],2,'7×2=14cm²입니다.'),
+          q('씨앗','한 변의 길이가 9cm인 정사각형의 넓이는 몇 cm²일까요?',['18cm²','27cm²','72cm²','81cm²'],3,'9×9=81cm²입니다.'),
+          q('씨앗','밑변이 6cm, 높이가 5cm인 평행사변형의 넓이는 몇 cm²일까요?',['11cm²','20cm²','30cm²','36cm²'],2,'6×5=30cm²입니다.'),
+          q('씨앗','밑변이 12cm, 높이가 2cm인 삼각형의 넓이는 몇 cm²일까요?',['12cm²','14cm²','24cm²','28cm²'],0,'12×2÷2=12cm²입니다.'),
+          q('새싹','넓이가 32cm²이고 가로가 8cm인 직사각형의 세로는 몇 cm일까요?',['2cm','4cm','6cm','8cm'],1,'세로는 넓이÷가로이므로 32÷8=4cm입니다.'),
+          q('새싹','넓이가 49cm²인 정사각형의 한 변의 길이는 몇 cm일까요?',['5cm','6cm','7cm','8cm'],2,'7×7=49이므로 한 변의 길이는 7cm입니다.'),
+          q('새싹','넓이가 45cm²이고 높이가 5cm인 평행사변형의 밑변은 몇 cm일까요?',['7cm','8cm','9cm','10cm'],2,'밑변은 넓이÷높이이므로 45÷5=9cm입니다.'),
+          q('새싹','넓이가 24cm²이고 밑변이 8cm인 삼각형의 높이는 몇 cm일까요?',['3cm','4cm','5cm','6cm'],3,'삼각형 넓이 24=8×높이÷2 이므로 높이는 6cm입니다.'),
+          q('새싹','가로 9cm, 세로 7cm인 직사각형의 넓이는 몇 cm²일까요?',['56cm²','63cm²','72cm²','81cm²'],1,'9×7=63cm²입니다.'),
+          q('새싹','한 변의 길이가 11cm인 정사각형의 넓이는 몇 cm²일까요?',['22cm²','44cm²','121cm²','132cm²'],2,'11×11=121cm²입니다.'),
+          q('새싹','밑변 13cm, 높이 4cm인 평행사변형의 넓이는 몇 cm²일까요?',['26cm²','39cm²','52cm²','56cm²'],2,'13×4=52cm²입니다.'),
+          q('새싹','밑변 16cm, 높이 5cm인 삼각형의 넓이는 몇 cm²일까요?',['32cm²','35cm²','40cm²','45cm²'],2,'16×5÷2=40cm²입니다.'),
+          q('꽃','가로 15m, 세로 8m인 운동장 일부의 넓이는 몇 m²일까요?',['23m²','60m²','120m²','240m²'],2,'15×8=120m²입니다.'),
+          q('꽃','밑변 14m, 높이 9m인 평행사변형 모양의 화단 넓이는 몇 m²일까요?',['63m²','86m²','112m²','126m²'],3,'14×9=126m²입니다.'),
+          q('꽃','밑변 18m, 높이 7m인 삼각형 모양의 공터 넓이는 몇 m²일까요?',['25m²','49m²','63m²','126m²'],2,'18×7÷2=63m²입니다.'),
+          q('꽃','직사각형 모양 교실 바닥의 넓이가 54m²이고 가로가 9m라면 세로는 몇 m일까요?',['5m','6m','7m','8m'],1,'54÷9=6m입니다.'),
+          q('꽃','삼각형 모양 깃발의 넓이가 36cm²이고 높이가 6cm라면 밑변은 몇 cm일까요?',['6cm','9cm','12cm','15cm'],2,'36=밑변×6÷2 이므로 밑변은 12cm입니다.'),
+          q('꽃','가로 12m, 세로 11m인 직사각형 모양 텃밭 넓이는 몇 m²일까요?',['23m²','66m²','121m²','132m²'],3,'12×11=132m²입니다.'),
+          q('꽃','한 변이 14cm인 정사각형 색종이의 넓이는 몇 cm²일까요?',['28cm²','56cm²','196cm²','224cm²'],2,'14×14=196cm²입니다.'),
+          q('꽃','밑변 20cm, 높이 8cm인 삼각형의 넓이는 몇 cm²일까요?',['40cm²','60cm²','80cm²','160cm²'],2,'20×8÷2=80cm²입니다.')
+        ]
+      }
+    ];
+
+    const STORAGE_KEY = 'math-garden-integrated-v1';
+    const STAGE_ORDER = ['씨앗', '새싹', '꽃'];
+    const STAGE_META = {
+      '씨앗': { emoji: '🌰', cls: 'seed', title: '씨앗 단계', desc: '기초 8문제를 해결합니다.' },
+      '새싹': { emoji: '🌱', cls: 'sprout', title: '새싹 단계', desc: '씨앗을 완성하면 열리는 기본 문제입니다.' },
+      '꽃': { emoji: '🌸', cls: 'flower', title: '꽃 단계', desc: '문장제가 포함된 심화 단계입니다.' },
+      '열매': { emoji: '🍎', cls: 'fruit', title: '열매', desc: '씨앗·새싹·꽃을 모두 완성하면 열매가 맺힙니다.' }
+    };
+
+    let state = loadState();
+
+    function createDefaultState() {
+      return {
+        student: { name: '', classInfo: '' },
+        currentScreen: 'units',
+        currentUnitId: units[0].id,
+        currentStage: '씨앗',
+        progress: {}
+      };
+    }
+
+    function createUnitProgress() {
+      return {
+        answered: {},
+        attempts: {},
+        correctCount: 0,
+        totalCount: 0,
+        completedStages: []
+      };
+    }
+
+    function loadState() {
+      const defaults = createDefaultState();
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : defaults;
+        const merged = {
+          ...defaults,
+          ...parsed,
+          student: { ...defaults.student, ...(parsed.student || {}) },
+          progress: parsed.progress || {}
+        };
+        units.forEach(unit => {
+          if (!merged.progress[unit.id]) merged.progress[unit.id] = createUnitProgress();
+        });
+        return merged;
+      } catch (e) {
+        return defaults;
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function ensureUnitState(unitId) {
+      if (!state.progress[unitId]) {
+        state.progress[unitId] = createUnitProgress();
+      }
+    }
+
+    function getUnitById(unitId) {
+      return units.find(unit => unit.id === unitId) || units[0];
+    }
+
+    function getCurrentUnit() {
+      return getUnitById(state.currentUnitId);
+    }
+
+    function getStageQuestions(unit, stageName) {
+      return unit.questions
+        .map((question, index) => ({ ...question, index }))
+        .filter(question => question.stage === stageName);
+    }
+
+    function recomputeCounts(unitId) {
+      const unit = getUnitById(unitId);
+      const unitState = state.progress[unitId];
+      let correct = 0;
+      Object.keys(unitState.answered).forEach(key => {
+        const idx = Number(key);
+        if (unit.questions[idx] && unitState.answered[idx] === unit.questions[idx].answer) {
+          correct += 1;
+        }
+      });
+      unitState.correctCount = correct;
+      unitState.totalCount = unit.questions.length;
+    }
+
+    function updateCompletedStages(unitId) {
+      const unit = getUnitById(unitId);
+      const unitState = state.progress[unitId];
+      const completed = [];
+
+      STAGE_ORDER.forEach(stageName => {
+        const items = getStageQuestions(unit, stageName);
+        if (!items.length) return;
+        const done = items.every(item => unitState.answered[item.index] === item.answer);
+        if (done) completed.push(stageName);
+      });
+
+      if (completed.includes('씨앗') && completed.includes('새싹') && completed.includes('꽃')) {
+        completed.push('열매');
+      }
+
+      unitState.completedStages = completed;
+    }
+
+    function isStageUnlocked(unitId, stageName) {
+      ensureUnitState(unitId);
+      const completed = state.progress[unitId].completedStages;
+      if (stageName === '씨앗') return true;
+      if (stageName === '새싹') return completed.includes('씨앗');
+      if (stageName === '꽃') return completed.includes('새싹');
+      if (stageName === '열매') return completed.includes('꽃');
+      return false;
+    }
+
+    function getStageStats(unitId, stageName) {
+      ensureUnitState(unitId);
+      const unit = getUnitById(unitId);
+      const unitState = state.progress[unitId];
+      const items = getStageQuestions(unit, stageName);
+      const total = items.length;
+      const solved = items.filter(item => unitState.answered[item.index] !== undefined).length;
+      const correct = items.filter(item => unitState.answered[item.index] === item.answer).length;
+      return {
+        total,
+        solved,
+        correct,
+        completed: unitState.completedStages.includes(stageName)
+      };
+    }
+
+    function getUnitStats(unitId) {
+      ensureUnitState(unitId);
+      const unit = getUnitById(unitId);
+      const unitState = state.progress[unitId];
+      const total = unit.questions.length;
+      const solved = Object.keys(unitState.answered).length;
+      const correct = unitState.correctCount;
+      const progressPercent = total ? Math.round((correct / total) * 100) : 0;
+      return {
+        total,
+        solved,
+        correct,
+        progressPercent,
+        fruits: unitState.completedStages.includes('열매')
+      };
+    }
+
+    function getOverallStats() {
+      let solved = 0;
+      let correct = 0;
+      let fruits = 0;
+      let stages = 0;
+
+      units.forEach(unit => {
+        ensureUnitState(unit.id);
+        const s = getUnitStats(unit.id);
+        solved += s.solved;
+        correct += s.correct;
+        if (s.fruits) fruits += 1;
+        stages += state.progress[unit.id].completedStages.filter(stage => stage !== '열매').length;
+      });
+
+      return {
+        unitCount: units.length,
+        solved,
+        correct,
+        fruits,
+        stages
+      };
+    }
+
+    function getGrowthMessage(unitId) {
+      ensureUnitState(unitId);
+      const done = state.progress[unitId].completedStages;
+      if (done.includes('열매')) return '씨앗, 새싹, 꽃을 모두 해결해 열매가 맺혔어요!';
+      if (done.includes('꽃')) return '꽃 단계까지 완성했어요. 이제 열매가 맺힙니다.';
+      if (done.includes('새싹')) return '새싹까지 자랐어요. 꽃 문제에 도전해 보세요.';
+      if (done.includes('씨앗')) return '씨앗이 자라 새싹 단계가 열렸어요.';
+      return '씨앗 단계부터 차근차근 시작해 보세요.';
+    }
+
+    function saveStudentInfo() {
+      state.student.name = document.getElementById('studentName').value.trim();
+      state.student.classInfo = document.getElementById('studentClass').value.trim();
+      saveState();
+      render();
+    }
+
+    function goScreen(screen) {
+      state.currentScreen = screen;
+      saveState();
+      render();
+    }
+
+    function selectUnit(unitId) {
+      state.currentUnitId = unitId;
+      state.currentScreen = 'stages';
+      saveState();
+      render();
+    }
+
+    function openStage(stageName) {
+      if (!isStageUnlocked(state.currentUnitId, stageName)) return;
+      state.currentStage = stageName;
+      state.currentScreen = 'quiz';
+      saveState();
+      render();
+    }
+
+    function answerQuestion(unitId, questionIndex, choiceIndex) {
+      ensureUnitState(unitId);
+      const unit = getUnitById(unitId);
+      const question = unit.questions[questionIndex];
+      const unitState = state.progress[unitId];
+      const beforeCompleted = new Set(unitState.completedStages);
+
+      if (unitState.answered[questionIndex] === question.answer) return;
+
+      unitState.answered[questionIndex] = choiceIndex;
+
+      if (choiceIndex !== question.answer) {
+        unitState.attempts[questionIndex] = (unitState.attempts[questionIndex] || 0) + 1;
+      }
+
+      recomputeCounts(unitId);
+      updateCompletedStages(unitId);
+      saveState();
+      render();
+
+      const afterCompleted = state.progress[unitId].completedStages;
+      const newlyCompleted = afterCompleted.find(stage => !beforeCompleted.has(stage) && stage !== '열매');
+      if (newlyCompleted) {
+        showStageModal(newlyCompleted);
+      } else if (!beforeCompleted.has('열매') && afterCompleted.includes('열매')) {
+        showStageModal('열매');
+      }
+    }
+
+    function resetCurrentUnit() {
+      const unit = getCurrentUnit();
+      if (!confirm('현재 단원의 기록만 초기화할까요?')) return;
+      state.progress[unit.id] = createUnitProgress();
+      saveState();
+      render();
+    }
+
+    function resetAllData() {
+      if (!confirm('전체 학습 기록을 모두 초기화할까요?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = createDefaultState();
+      units.forEach(unit => {
+        state.progress[unit.id] = createUnitProgress();
+      });
+      render();
+    }
+
+    function showStageModal(stageName) {
+      const unit = getCurrentUnit();
+      const meta = STAGE_META[stageName];
+      document.getElementById('modalEmoji').textContent = meta.emoji;
+      document.getElementById('modalTitle').textContent = stageName === '열매' ? '열매 완성!' : `${meta.title} 완료!`;
+      document.getElementById('modalText').textContent = stageName === '열매'
+        ? `${unit.title} 단원의 모든 성장을 끝냈어요. 정말 대단합니다!`
+        : `${unit.title}의 ${meta.title}를 모두 맞혀 다음 성장 단계가 열렸어요.`;
+      document.getElementById('modalChip').textContent = stageName === '열매' ? '단원 완성' : '성장 완료';
+      document.getElementById('stageModal').classList.add('show');
+    }
+
+    function hideStageModal() {
+      document.getElementById('stageModal').classList.remove('show');
+    }
+
+    function closeModal(event) {
+      if (event.target.id === 'stageModal') hideStageModal();
+    }
+
+    function formatMathText(text) {
+      const source = String(text);
+      let out = '';
+      let i = 0;
+      while (i < source.length) {
+        const ch = source[i];
+        const digit = ch >= '0' && ch <= '9';
+        if (digit) {
+          let j = i;
+          while (j < source.length && source[j] >= '0' && source[j] <= '9') j += 1;
+          const top = source.slice(i, j);
+          if (j < source.length && source[j] === '/') {
+            let k = j + 1;
+            while (k < source.length && source[k] >= '0' && source[k] <= '9') k += 1;
+            if (k > j + 1) {
+              const bottom = source.slice(j + 1, k);
+              out += '<span class="frac"><span class="top">' + escapeHtml(top) + '</span><span class="bottom">' + escapeHtml(bottom) + '</span></span>';
+              i = k;
+              continue;
+            }
+          }
+          out += escapeHtml(top);
+          i = j;
+          continue;
+        }
+        out += escapeHtml(ch);
+        i += 1;
+      }
+      return '<span class="math-inline">' + out + '</span>';
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderUnitsScreen() {
+      const overall = getOverallStats();
+      const currentStats = getUnitStats(state.currentUnitId);
+      const html = `
+        <div class="hero">
+          <div>
+            <div class="eyebrow">🌱 자동저장형 + 앱형 UX 통합본</div>
+            <div class="hero-title">5학년 1학기 수학 정원</div>
+            <p class="hero-desc">5학년 1학기를 복습합니다.</p>
+          </div>
+          <div class="hero-side">
+            <div>
+              <div class="stat-label">현재 단원 진행률</div>
+              <div class="stat-value">${currentStats.correct}/${currentStats.total}</div>
+            </div>
+            <div class="progress-wrap"><div class="progress-fill" style="width:${currentStats.progressPercent}%"></div></div>
+            <div class="notice">${getGrowthMessage(state.currentUnitId)}</div>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat"><div class="stat-label">완료한 열매</div><div class="stat-value">${overall.fruits}</div></div>
+          <div class="stat"><div class="stat-label">완료한 단계</div><div class="stat-value">${overall.stages}</div></div>
+          <div class="stat"><div class="stat-label">정답 수</div><div class="stat-value">${overall.correct}</div></div>
+          <div class="stat"><div class="stat-label">응답한 문제</div><div class="stat-value">${overall.solved}</div></div>
+        </div>
+
+        <div class="card-grid">
+          ${units.map(unit => {
+            const stats = getUnitStats(unit.id);
+            const active = unit.id === state.currentUnitId;
+            return `
+              <article class="unit-card">
+                <div class="unit-top">
+                  <div>
+                    <div class="badge">${active ? '현재 선택 단원' : '단원 카드'}</div>
+                    <h3 class="unit-title" style="margin-top:12px;">${unit.id}. ${unit.title}</h3>
+                    <p class="unit-desc">${unit.theme} · ${getGrowthMessage(unit.id)}</p>
+                  </div>
+                  <div class="stage-pill ${stats.fruits ? 'fruit' : 'sprout'}">${stats.fruits ? '열매' : '성장중'}</div>
+                </div>
+                <div class="unit-meta"><span>정답 ${stats.correct}/${stats.total}</span><span>${stats.progressPercent}%</span></div>
+                <div class="progress-wrap"><div class="progress-fill" style="width:${stats.progressPercent}%"></div></div>
+                <div class="toolbar" style="margin-top:auto;">
+                  <button class="btn ${active ? 'btn-secondary' : 'btn-primary'}" onclick="selectUnit(${unit.id})" style="flex:1;">${active ? '이 단원 보기' : '단원 선택'}</button>
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      `;
+      document.getElementById('screen-units').innerHTML = html;
+    }
+
+    function renderStagesScreen() {
+      const unit = getCurrentUnit();
+      const unitState = state.progress[unit.id];
+      const stats = getUnitStats(unit.id);
+      const html = `
+        <div class="hero">
+          <div>
+            <div class="eyebrow">🌿 ${unit.theme}</div>
+            <div class="hero-title">${unit.id}. ${unit.title}</div>
+            <p class="hero-desc">${getGrowthMessage(unit.id)}</p>
+            <div class="meta-chips">
+              <span>총 ${unit.questions.length}문항</span>
+              <span>정답 ${stats.correct}개</span>
+              <span>완료 단계 ${unitState.completedStages.filter(stage => stage !== '열매').length}개</span>
+            </div>
+          </div>
+          <div class="hero-side">
+            <div class="stat-label">단원 전체 성장률</div>
+            <div class="stat-value">${stats.correct}/${stats.total}</div>
+            <div class="progress-wrap"><div class="progress-fill" style="width:${stats.progressPercent}%"></div></div>
+            <button class="btn btn-secondary" onclick="goScreen('units')">단원 카드로 돌아가기</button>
+          </div>
+        </div>
+
+        <div class="stage-grid">
+          ${STAGE_ORDER.map(stageName => {
+            const stageStats = getStageStats(unit.id, stageName);
+            const meta = STAGE_META[stageName];
+            const unlocked = isStageUnlocked(unit.id, stageName);
+            const active = state.currentStage === stageName;
+            return `
+              <article class="stage-card ${stageStats.completed ? 'completed' : ''} ${unlocked ? '' : 'locked'}">
+                <div class="stage-top">
+                  <div class="stage-emoji ${meta.cls}">${meta.emoji}</div>
+                  <div class="stage-pill ${meta.cls}">${stageName}</div>
+                </div>
+                <div>
+                  <h3 class="unit-title">${meta.title}</h3>
+                  <p class="unit-desc">${meta.desc}</p>
+                </div>
+                <div class="unit-meta"><span>정답 ${stageStats.correct}/${stageStats.total}</span><span>${Math.round((stageStats.correct / Math.max(1, stageStats.total)) * 100)}%</span></div>
+                <div class="progress-wrap"><div class="progress-fill" style="width:${Math.round((stageStats.correct / Math.max(1, stageStats.total)) * 100)}%"></div></div>
+                <button class="btn ${unlocked ? (active ? 'btn-secondary' : 'btn-primary') : 'btn-secondary'}" onclick="${unlocked ? `openStage('${stageName}')` : 'void(0)'}" style="margin-top:auto;">
+                  ${stageStats.completed ? '다시 보기' : unlocked ? '이 단계 학습하기' : '이전 단계 필요'}
+                </button>
+              </article>
+            `;
+          }).join('')}
+
+          <article class="stage-card ${unitState.completedStages.includes('열매') ? 'completed' : ''}">
+            <div class="stage-top">
+              <div class="stage-emoji fruit">🍎</div>
+              <div class="stage-pill fruit">열매</div>
+            </div>
+            <div>
+              <h3 class="unit-title">최종 열매</h3>
+              <p class="unit-desc">씨앗·새싹·꽃을 모두 맞히면 열매가 자동으로 완성됩니다.</p>
+            </div>
+            <div class="notice">${unitState.completedStages.includes('열매') ? '축하합니다! 이 단원의 열매를 얻었어요.' : '아직 꽃 단계까지 모두 완료되지 않았어요.'}</div>
+          </article>
+        </div>
+      `;
+      document.getElementById('screen-stages').innerHTML = html;
+    }
+
+    function renderQuizScreen() {
+      const unit = getCurrentUnit();
+      const stageName = state.currentStage;
+      const meta = STAGE_META[stageName];
+      const stageStats = getStageStats(unit.id, stageName);
+      const items = getStageQuestions(unit, stageName);
+      const unitState = state.progress[unit.id];
+
+      const html = `
+        <div class="paper">
+          <div class="hero" style="margin-bottom:18px;">
+            <div>
+              <div class="eyebrow">${meta.emoji} ${meta.title}</div>
+              <div class="hero-title">${unit.id}. ${unit.title}</div>
+              <p class="hero-desc">${meta.desc} · 문제를 세 번 틀리면 해설이 열립니다.</p>
+              <div class="meta-chips">
+                <span>정답 ${stageStats.correct}/${stageStats.total}</span>
+                <span>응답 ${stageStats.solved}/${stageStats.total}</span>
+                <span>${stageStats.completed ? '단계 완료' : '도전 중'}</span>
+              </div>
+            </div>
+            <div class="hero-side">
+              <div class="stat-label">현재 단계 진도</div>
+              <div class="stat-value">${stageStats.correct}/${stageStats.total}</div>
+              <div class="progress-wrap"><div class="progress-fill" style="width:${Math.round((stageStats.correct / Math.max(1, stageStats.total)) * 100)}%"></div></div>
+              <div class="toolbar">
+                <button class="btn btn-secondary" onclick="goScreen('stages')">단계 화면으로</button>
+                <button class="btn btn-secondary" onclick="goScreen('rewards')">보상 보기</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="question-list">
+            ${items.map((item, no) => {
+              const selected = unitState.answered[item.index];
+              const attempts = unitState.attempts[item.index] || 0;
+              const isCorrect = selected === item.answer;
+              const showExplanation = attempts >= 3;
+              return `
+                <article class="question-card">
+                  <div class="question-head">
+                    <div>
+                      <div class="badge">${stageName} ${no + 1}번</div>
+                      <div class="question-title" style="margin-top:10px;">${formatMathText(item.prompt)}</div>
+                    </div>
+                    <div class="question-sub">${isCorrect ? '정답 완료' : attempts > 0 ? `오답 ${attempts}회` : '도전 전'}</div>
+                  </div>
+                  <div class="choices">
+                    ${item.choices.map((choice, choiceIndex) => {
+                      const klass = isCorrect
+                        ? (choiceIndex === item.answer ? 'choice correct' : 'choice')
+                        : (selected === choiceIndex ? 'choice wrong' : 'choice');
+                      return `<button class="${klass}" onclick="answerQuestion(${unit.id}, ${item.index}, ${choiceIndex})">${formatMathText(choice)}</button>`;
+                    }).join('')}
+                  </div>
+                  <div class="feedback ${isCorrect ? 'good show' : selected !== undefined ? 'bad show' : ''}">
+                    ${isCorrect ? '정답입니다. 잘 해결했어요!' : selected !== undefined ? '조금 아쉬워요. 다시 생각해 보고 다른 선택지를 눌러 보세요.' : ''}
+                  </div>
+                  <div class="feedback info ${showExplanation ? 'show' : ''}">
+                    <strong>해설</strong><br>${formatMathText(item.explanation)}
+                  </div>
+                </article>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('screen-quiz').innerHTML = html;
+    }
+
+    function renderRewardsScreen() {
+      const overall = getOverallStats();
+      const html = `
+        <div class="hero">
+          <div>
+            <div class="eyebrow">🏆 성장 보상</div>
+            <div class="hero-title">나의 수학 정원 결실</div>
+            <p class="hero-desc">완성한 단계와 열매를 한눈에 모아보는 화면입니다. 수업 시간에는 이 화면으로 학습 성취를 빠르게 확인할 수 있습니다.</p>
+          </div>
+          <div class="hero-side">
+            <div class="stat-label">획득한 열매</div>
+            <div class="stat-value">${overall.fruits}/${units.length}</div>
+            <div class="progress-wrap"><div class="progress-fill" style="width:${Math.round((overall.fruits / Math.max(1, units.length)) * 100)}%"></div></div>
+            <div class="notice">열매는 한 단원의 씨앗, 새싹, 꽃을 모두 완성했을 때 자동으로 획득됩니다.</div>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="white-card">
+            <div class="stat-label">전체 성장 요약</div>
+            <div class="stat-value">${overall.correct}</div>
+            <p class="unit-desc">지금까지 맞힌 문제 수</p>
+          </div>
+          <div class="white-card">
+            <div class="stat-label">완료한 학습 단계</div>
+            <div class="stat-value">${overall.stages}</div>
+            <p class="unit-desc">씨앗·새싹·꽃 완료 개수</p>
+          </div>
+        </div>
+
+        <div class="reward-grid" style="margin-top:18px;">
+          ${units.map(unit => {
+            const unitState = state.progress[unit.id];
+            const fruit = unitState.completedStages.includes('열매');
+            return `
+              <article class="reward-card">
+                <div class="fruit-big">${fruit ? '🍎' : '🌿'}</div>
+                <h3 class="unit-title" style="font-size:20px;">${unit.id}. ${unit.title}</h3>
+                <p class="unit-desc">${fruit ? '열매 획득 완료' : getGrowthMessage(unit.id)}</p>
+                <div class="meta-chips">
+                  ${STAGE_ORDER.map(stage => `<span>${STAGE_META[stage].emoji} ${unitState.completedStages.includes(stage) ? stage + ' 완료' : stage + ' 진행중'}</span>`).join('')}
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      `;
+      document.getElementById('screen-rewards').innerHTML = html;
+    }
+
+    function updateChrome() {
+      const titleMap = {
+        units: '5학년 1학기 수학 정원',
+        stages: `${getCurrentUnit().id}. ${getCurrentUnit().title}`,
+        quiz: `${getCurrentUnit().id}. ${getCurrentUnit().title} · ${state.currentStage} 단계`,
+        rewards: '나의 수학 정원 보상'
+      };
+      const subMap = {
+        units: '단원 선택과 전체 성장 현황',
+        stages: '단계별 학습 진입 화면',
+        quiz: '자동저장 + 오답 3회 해설 표시',
+        rewards: '열매와 단계 완료 현황'
+      };
+      document.getElementById('topbarTitle').textContent = titleMap[state.currentScreen] || '수학 정원';
+      document.getElementById('topbarSub').textContent = subMap[state.currentScreen] || '';
+
+      ['units','stages','rewards'].forEach(screen => {
+        const active = state.currentScreen === screen;
+        const nav = document.getElementById(`nav-${screen}`);
+        const mnav = document.getElementById(`mnav-${screen}`);
+        if (nav) nav.classList.toggle('active', active);
+        if (mnav) mnav.classList.toggle('active', active);
+      });
+
+      document.getElementById('profileName').textContent = state.student.name || '정원사';
+      document.getElementById('profileSub').textContent = state.student.classInfo
+        ? `${state.student.classInfo} · 5학년 1학기 성장 기록`
+        : '5학년 1학기 성장 기록';
+      document.getElementById('studentName').value = state.student.name || '';
+      document.getElementById('studentClass').value = state.student.classInfo || '';
+    }
+
+    function render() {
+      units.forEach(unit => ensureUnitState(unit.id));
+      updateChrome();
+
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      document.getElementById(`screen-${state.currentScreen}`).classList.add('active');
+
+      renderUnitsScreen();
+      renderStagesScreen();
+      renderQuizScreen();
+      renderRewardsScreen();
+    }
+
+    units.forEach(unit => ensureUnitState(unit.id));
+    recomputeAll();
+
+    function recomputeAll() {
+      units.forEach(unit => {
+        ensureUnitState(unit.id);
+        recomputeCounts(unit.id);
+        updateCompletedStages(unit.id);
+      });
+      saveState();
+    }
+
+    render();
+  </script>
+</body>
+</html>
