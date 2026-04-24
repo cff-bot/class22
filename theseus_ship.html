@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>테세우스의 배</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #fdf8f0;
+    --surface: #fff;
+    --text: #2c2416;
+    --text-dim: #7a6e5f;
+    --accent: #c97d2e;
+    --accent-light: #f5e8d0;
+    --accent2: #4a7c6f;
+    --accent2-light: #dff0eb;
+    --border: rgba(180,150,90,0.2);
+    --ink: #3a2e1e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 17px;
+    line-height: 1.95;
+  }
+
+  /* 상단 물결 장식 */
+  .ocean-header {
+    background: linear-gradient(180deg, #1a4a6e 0%, #2a6f9e 50%, #4a9fc0 100%);
+    padding: 60px 24px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ocean-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0; right: 0;
+    height: 60px;
+    background: var(--bg);
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .wave-deco {
+    position: absolute;
+    bottom: 20px;
+    left: 0; right: 0;
+    opacity: 0.15;
+    font-size: 80px;
+    letter-spacing: -10px;
+    color: white;
+  }
+
+  .header-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .header-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(30px, 7vw, 52px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+
+  .header-sub {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  /* 본문 */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 50px 24px 100px;
+  }
+
+  /* 스토리 단락 */
+  .story p {
+    margin-bottom: 22px;
+    color: var(--ink);
+    font-size: 17px;
+  }
+
+  .story p.lead {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+
+  /* 대화 스타일 */
+  .dialogue {
+    margin: 28px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .speech {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .speech.right {
+    flex-direction: row-reverse;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 900;
+  }
+
+  .avatar.old { background: #e8d5b0; color: #7a5c2e; }
+  .avatar.young { background: #c8e8df; color: #2a6f5e; }
+
+  .bubble {
+    max-width: 80%;
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .bubble.old-bubble {
+    background: #f5e8d0;
+    border-radius: 4px 18px 18px 18px;
+  }
+
+  .bubble.young-bubble {
+    background: #dff0eb;
+    border-radius: 18px 4px 18px 18px;
+  }
+
+  .speaker-name {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  /* 섹션 구분 */
+  .section-break {
+    text-align: center;
+    margin: 40px 0;
+    color: var(--accent);
+    font-size: 18px;
+    letter-spacing: 10px;
+    opacity: 0.5;
+  }
+
+  /* 철학 박스 */
+  .philosophy-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 16px 16px 0;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+
+  .philosophy-box .box-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .philosophy-box p {
+    color: var(--ink);
+    font-style: italic;
+    font-size: 16px;
+  }
+
+  .philosophy-box.teal {
+    border-left-color: var(--accent2);
+  }
+  .philosophy-box.teal .box-title { color: var(--accent2); }
+
+  /* 질문 카드들 */
+  .question-section {
+    margin-top: 50px;
+  }
+
+  .question-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .q-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .q-card:hover {
+    border-color: rgba(180,150,90,0.5);
+  }
+
+  .q-card.open {
+    border-color: var(--accent);
+  }
+
+  .q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .q-num {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .q-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    flex: 1;
+    line-height: 1.6;
+  }
+
+  .q-toggle {
+    font-size: 18px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    margin-top: 2px;
+  }
+
+  .q-card.open .q-toggle {
+    transform: rotate(45deg);
+  }
+
+  .q-hint {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .q-card.open .q-hint {
+    display: block;
+  }
+
+  /* 생각해보기 */
+  .think-section {
+    background: linear-gradient(135deg, #1a4a6e 0%, #2a6f9e 100%);
+    border-radius: 20px;
+    padding: 36px 32px;
+    margin-top: 50px;
+    color: white;
+  }
+
+  .think-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .think-text {
+    font-size: 15px;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 20px;
+  }
+
+  .think-final {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffd9a0;
+    font-style: italic;
+  }
+
+  .footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="ocean-header">
+  <div class="header-tag">✦ 철학 동화</div>
+  <h1 class="header-title">테세우스의 배</h1>
+  <p class="header-sub">— 같은 배일까, 다른 배일까?</p>
+  <div class="wave-deco">〰〰〰〰〰〰〰</div>
+</div>
+
+<div class="container">
+
+  <div class="story">
+    <p class="lead">오래전, 그리스의 영웅 테세우스가 탄 배 한 척이 항구에 정박해 있었습니다. 사람들은 그 배를 무척 소중히 여겼어요. 영웅의 배이니까요.</p>
+
+    <p>세월이 흘렀습니다. 배의 나무 판자 하나가 썩어서 새것으로 교체되었어요. 그다음 해에는 또 다른 판자가 낡아서 바꾸었고, 그다음 해에는 돛대를, 그다음 해에는 노를 갈았습니다.</p>
+
+    <p>이런 식으로 100년이 지났습니다. 처음에 있던 나무 조각은 단 하나도 남지 않았어요. 배를 이루는 모든 부품이 새것으로 바뀐 것이지요.</p>
+
+    <div class="philosophy-box">
+      <div class="box-title">여기서 질문!</div>
+      <p>이 배는 여전히 테세우스의 배일까요? 아니면 완전히 다른 배가 된 걸까요?</p>
+    </div>
+
+    <p>어느 날, 항구 근처 카페에서 두 친구가 이 배를 바라보며 이야기를 나누고 있었습니다.</p>
+  </div>
+
+  <div class="section-break">⚓</div>
+
+  <!-- 대화 -->
+  <div class="dialogue">
+
+    <div class="speech">
+      <div>
+        <div class="avatar old">할</div>
+      </div>
+      <div>
+        <div class="speaker-name">할아버지</div>
+        <div class="bubble old-bubble">저 배 보이니? 저게 바로 그 유명한 테세우스의 배란다. 수백 년이 지났어도 여전히 그 배야.</div>
+      </div>
+    </div>
+
+    <div class="speech right">
+      <div>
+        <div class="avatar young">지</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="speaker-name" style="text-align: right;">지아</div>
+        <div class="bubble young-bubble">정말요? 그런데 할아버지, 저 배는 원래 있던 나무가 하나도 없다고 들었어요. 그러면 진짜 같은 배 맞나요?</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div>
+        <div class="avatar old">할</div>
+      </div>
+      <div>
+        <div class="speaker-name">할아버지</div>
+        <div class="bubble old-bubble">흠, 그건 나도 생각해봤단다. 나무는 바뀌었지만, 모양은 그대로잖니. 테세우스의 배가 가진 형태, 그 정체성은 남아있지 않겠니?</div>
+      </div>
+    </div>
+
+    <div class="speech right">
+      <div>
+        <div class="avatar young">지</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="speaker-name" style="text-align: right;">지아</div>
+        <div class="bubble young-bubble">그런데요, 할아버지. 만약 누군가가 바꾼 낡은 나무 조각들을 하나도 버리지 않고 모아뒀다가 다시 조립하면 어떻게 되나요? 그럼 두 척이 다 테세우스의 배가 되는 건가요?</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div>
+        <div class="avatar old">할</div>
+      </div>
+      <div>
+        <div class="speaker-name">할아버지</div>
+        <div class="bubble old-bubble">…하하. 그건 정말 골치 아픈 질문이구나. 그 두 배가 동시에 테세우스의 배일 수는 없을 텐데 말이야.</div>
+      </div>
+    </div>
+
+    <div class="speech right">
+      <div>
+        <div class="avatar young">지</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="speaker-name" style="text-align: right;">지아</div>
+        <div class="bubble young-bubble">그렇죠? 그럼 둘 다 아닌 건가요? 아니면 둘 다인 건가요? 배에게 '진짜'라는 게 있긴 한 걸까요?</div>
+      </div>
+    </div>
+
+    <div class="speech">
+      <div>
+        <div class="avatar old">할</div>
+      </div>
+      <div>
+        <div class="speaker-name">할아버지</div>
+        <div class="bubble old-bubble">지아야, 그 질문이 바로 2,500년 전부터 철학자들이 씨름해온 질문이란다. 아직도 정답이 없어. 대신, 우리가 그 질문을 계속 생각한다는 것이 중요한 거지.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-break">〰</div>
+
+  <div class="story">
+    <p>지아는 집에 돌아오는 길 내내 생각했습니다.</p>
+
+    <p>그런데 문득, 이상한 생각이 들었어요.</p>
+
+    <p class="lead">'잠깐만, 나도 마찬가지 아닐까?'</p>
+
+    <p>지아가 갓난아기였을 때의 세포는 이제 하나도 남아 있지 않습니다. 몸을 이루는 세포는 끊임없이 죽고 새로 태어나거든요. 뼈도, 피부도, 심지어 뇌의 일부도 바뀐다고 해요. 어릴 때 좋아하던 것들도 달라졌고, 생각하는 방식도 변했습니다.</p>
+
+    <p>그렇다면 지금의 지아는 5살 때의 지아와 같은 사람일까요?</p>
+
+    <div class="philosophy-box teal">
+      <div class="box-title">잠깐 생각해봐요</div>
+      <p>우리 몸의 세포는 약 7년마다 대부분 새로운 세포로 바뀐다고 합니다. 그렇다면 7년 전의 나와 지금의 나는 같은 사람일까요?</p>
+    </div>
+
+    <p>지아는 오래된 사진첩을 꺼냈습니다. 아장아장 걷던 아기 때 사진, 유치원 때 사진, 1학년 때 사진…</p>
+
+    <p>사진 속 아이들은 모두 지아였습니다. 다른 사람이라고 느껴지지 않았어요. 하지만 무엇이 같은 걸까요? 몸? 생각? 기억?</p>
+
+    <p>만약 기억을 잃어버린다면 나는 여전히 '나'일까요?</p>
+
+    <p>만약 생각하는 방식이 완전히 달라진다면, 나는 여전히 '나'일까요?</p>
+  </div>
+
+  <div class="section-break">⚓</div>
+
+  <!-- 생각 넓히기 -->
+  <div class="question-section">
+    <div class="question-title">📖 함께 생각해봐요</div>
+    <div class="q-cards">
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-header">
+          <div class="q-num">Q 1</div>
+          <div class="q-text">모든 부품이 바뀐 배는 여전히 테세우스의 배라고 할 수 있을까요? 여러분의 생각을 이야기해보세요.</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          정답은 없어요! "이름과 역사가 이어지면 같은 배다"라고 말할 수도 있고, "재료가 하나도 같지 않으면 다른 배다"라고 말할 수도 있어요. 중요한 건 왜 그렇게 생각하는지 이유를 말해보는 거예요.
+        </div>
+      </div>
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-header">
+          <div class="q-num">Q 2</div>
+          <div class="q-text">테세우스의 배 이야기를 '사람'에 적용하면 어떨까요? 10년 전의 나와 지금의 나는 같은 사람인가요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          몸의 세포는 계속 바뀌지만, 우리는 보통 "나는 나"라고 느껴요. 무엇이 우리를 '나'로 만드는 걸까요? 기억? 마음? 이름? 아니면 다른 무언가일까요?
+        </div>
+      </div>
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-header">
+          <div class="q-num">Q 3</div>
+          <div class="q-text">낡은 나무로 다시 조립한 배와, 새 나무로 만들어진 배. 둘 중 어느 쪽이 진짜 테세우스의 배에 더 가깝다고 생각하나요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          '원래의 재료'를 중요하게 보는 입장과 '이어져온 역사'를 중요하게 보는 입장이 충돌하는 질문이에요. 박물관에 있는 유물을 수리할 때도 비슷한 고민을 한답니다.
+        </div>
+      </div>
+
+      <div class="q-card" onclick="toggleQ(this)">
+        <div class="q-header">
+          <div class="q-num">Q 4</div>
+          <div class="q-text">우리 주변에서 테세우스의 배와 비슷한 상황을 찾아볼 수 있나요?</div>
+          <div class="q-toggle">+</div>
+        </div>
+        <div class="q-hint">
+          오래된 학교 건물을 리모델링했을 때, 모든 멤버가 바뀐 밴드, 오랜 시간이 지나 성격이 완전히 달라진 친구… 주변에서 비슷한 예를 많이 찾을 수 있어요.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 마무리 -->
+  <div class="think-section">
+    <div class="think-title">💭 이 이야기가 하고 싶은 말</div>
+    <p class="think-text">테세우스의 배 이야기는 단순히 배에 관한 이야기가 아니에요. '어떤 것이 같다', '어떤 것이 다르다'는 게 무엇을 의미하는지를 묻는 질문입니다.</p>
+    <p class="think-text">이 질문은 우리 스스로에게도 적용됩니다. 나는 매일 조금씩 변하고 있어요. 몸도, 생각도, 감정도. 그럼에도 우리는 어제의 나와 오늘의 나를 같은 사람이라고 여깁니다.</p>
+    <p class="think-text">철학은 이런 당연해 보이는 것들에 "정말 그럴까?"라고 물어보는 학문이에요.</p>
+    <p class="think-final">"철학은 답을 주는 것이 아니라, 더 좋은 질문을 하게 해준다."</p>
+  </div>
+
+  <div class="footer">
+    <p>⚓ 정답이 없는 질문일수록, 더 오래 생각해볼 가치가 있습니다.</p>
+  </div>
+
+</div>
+
+<script>
+  function toggleQ(card) {
+    card.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
