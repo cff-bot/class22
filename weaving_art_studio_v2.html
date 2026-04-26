@@ -1,0 +1,289 @@
+
+<style>
+*{box-sizing:border-box}
+.panel{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.row:last-child{margin-bottom:0}
+.lbl{font-size:11px;color:var(--color-text-secondary);min-width:70px;line-height:1.3}
+.val{font-size:11px;font-weight:500;color:var(--color-text-primary);min-width:26px;text-align:right}
+.sec{font-size:10px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.color-grid{display:flex;flex-wrap:wrap;gap:4px}
+.cswatch{width:22px;height:22px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .12s}
+.cswatch.active{border-color:var(--color-text-primary);transform:scale(1.18)}
+.btn-row{display:flex;gap:6px}
+button{font-size:11px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);cursor:pointer;transition:all .1s}
+button:hover{background:var(--color-background-secondary)}
+button.pri{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+button.pri:hover{opacity:.82}
+#cw{border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);background:#fff;line-height:0}
+.gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.thumb{border-radius:5px;overflow:hidden;border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:transform .12s}
+.thumb:hover{transform:scale(1.06)}
+.thumb img{display:block;width:68px;height:68px;object-fit:cover}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.tab{font-size:10px;padding:3px 9px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer}
+.tab.on{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+input[type=range]{flex:1}
+</style>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">곡선과 불규칙 모양을 포함한 직조 패턴 미술 생성기</h2>
+
+<div style="display:grid;grid-template-columns:210px 1fr;gap:12px;padding:1rem 0">
+<div>
+
+<div class="panel">
+  <div class="sec">패턴</div>
+  <div class="tabs" id="tabs1">
+    <button class="tab on" data-m="plain">평직</button>
+    <button class="tab" data-m="twill">능직</button>
+    <button class="tab" data-m="diamond">다이아몬드</button>
+  </div>
+  <div class="tabs" id="tabs2">
+    <button class="tab" data-m="sine">사인파</button>
+    <button class="tab" data-m="spiral">나선</button>
+    <button class="tab" data-m="ripple">파문</button>
+  </div>
+  <div class="tabs" id="tabs3">
+    <button class="tab" data-m="noise">노이즈</button>
+    <button class="tab" data-m="organic">유기체</button>
+    <button class="tab" data-m="fractal">프랙탈</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="sec">구조</div>
+  <div class="row"><span class="lbl">격자</span><input type="range" id="s_grid" min="6" max="60" step="1" value="24"><span class="val" id="v_grid">24</span></div>
+  <div class="row"><span class="lbl">실 두께</span><input type="range" id="s_thick" min="1" max="12" step="1" value="5"><span class="val" id="v_thick">5</span></div>
+  <div class="row"><span class="lbl">간격</span><input type="range" id="s_gap" min="0" max="6" step="1" value="1"><span class="val" id="v_gap">1</span></div>
+</div>
+
+<div class="panel">
+  <div class="sec">곡선 변형</div>
+  <div class="row"><span class="lbl">진폭</span><input type="range" id="s_amp" min="0" max="20" step="1" value="6"><span class="val" id="v_amp">6</span></div>
+  <div class="row"><span class="lbl">주파수</span><input type="range" id="s_freq" min="1" max="20" step="1" value="6"><span class="val" id="v_freq">6</span></div>
+  <div class="row"><span class="lbl">불규칙도</span><input type="range" id="s_chaos" min="0" max="100" step="1" value="0"><span class="val" id="v_chaos">0</span></div>
+  <div class="row"><span class="lbl">꼬임</span><input type="range" id="s_twist" min="0" max="20" step="1" value="0"><span class="val" id="v_twist">0</span></div>
+</div>
+
+<div class="panel">
+  <div class="sec">날실 색상</div>
+  <div class="color-grid" id="warp-pal"></div>
+</div>
+<div class="panel">
+  <div class="sec">씨실 색상</div>
+  <div class="color-grid" id="weft-pal"></div>
+</div>
+<div class="panel">
+  <div class="sec">색상 배열</div>
+  <div class="row"><span class="lbl">날실 주기</span><input type="range" id="s_wpc" min="1" max="10" step="1" value="3"><span class="val" id="v_wpc">3</span></div>
+  <div class="row"><span class="lbl">씨실 주기</span><input type="range" id="s_epc" min="1" max="10" step="1" value="3"><span class="val" id="v_epc">3</span></div>
+  <div class="row"><span class="lbl">색상 수</span><input type="range" id="s_nc" min="2" max="6" step="1" value="3"><span class="val" id="v_nc">3</span></div>
+</div>
+
+<div class="panel">
+  <div class="btn-row">
+    <button onclick="randomize()" style="flex:1">랜덤</button>
+    <button class="pri" onclick="saveImg()" style="flex:1">저장</button>
+  </div>
+</div>
+
+</div>
+
+<div>
+  <div id="cw"><canvas id="c" width="448" height="448"></canvas></div>
+  <div style="margin-top:12px">
+    <div style="font-size:10px;color:var(--color-text-tertiary);margin-bottom:6px">저장된 작품</div>
+    <div class="gallery" id="gal"></div>
+  </div>
+</div>
+</div>
+
+<script>
+const PALS = [
+  ['#F5E6DC','#E8C4B8','#D4856A','#A84E2F','#6B2D1A'],
+  ['#DCF0F5','#B8D4E8','#6AA8D4','#2F7AB8','#1A4A6B'],
+  ['#DCF5E6','#B8E8C8','#6AD485','#2FB84E','#1A6B2D'],
+  ['#F5F0DC','#E8E4B8','#D4C86A','#B8942F','#6B581A'],
+  ['#F0DCF5','#D8B8E8','#B06AD4','#7E2FB8','#471A6B'],
+  ['#F5DCE6','#E8B8C8','#D46A8C','#B82F54','#6B1A30'],
+  ['#DCF5F3','#B8E8E4','#6AD4CC','#2FB8B0','#1A6B67'],
+  ['#FFF8E8','#F5D98C','#E8B830','#B88A10','#7A5C00'],
+];
+
+let st = {
+  mode:'plain',grid:24,thick:5,gap:1,
+  amp:6,freq:6,chaos:0,twist:0,
+  wpi:0,epi:2,wpc:3,epc:3,nc:3,
+  seed:Math.random()*9999|0
+};
+
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+
+function noise2d(x,y,seed){
+  const n=(x*127+y*311+seed*73)&0xfffffff;
+  return((n*n*n*n^n>>4)*0.000000001)%1;
+}
+
+function smoothNoise(x,y,seed){
+  const ix=Math.floor(x),iy=Math.floor(y);
+  const fx=x-ix,fy=y-iy;
+  const a=noise2d(ix,iy,seed),b=noise2d(ix+1,iy,seed);
+  const c=noise2d(ix,iy+1,seed),d=noise2d(ix+1,iy+1,seed);
+  const ux=fx*fx*(3-2*fx),uy=fy*fy*(3-2*fy);
+  return a*(1-ux)*(1-uy)+b*ux*(1-uy)+c*(1-ux)*uy+d*ux*uy;
+}
+
+function weave(r,c,cols,rows,s){
+  const {mode,amp,freq,chaos,twist,seed,grid} = s;
+  const nr=r/rows, nc2=c/cols;
+  const n = chaos>0 ? smoothNoise(c*freq/cols*3,r*freq/rows*3,seed)*chaos/100 : 0;
+  const twistOff = twist>0 ? Math.sin(nr*Math.PI*2)*twist : 0;
+
+  switch(mode){
+    case 'plain': return (r+c)%2===0;
+    case 'twill': return ((r+c)%4)<2;
+    case 'diamond':{
+      const p=8; const rr=r%p,cc=c%p;
+      const dr=rr<p/2?rr:p-rr, dc=cc<p/2?cc:p-cc;
+      return (dr+dc)%2===0;
+    }
+    case 'sine':{
+      const wave = Math.sin((c+twistOff)*freq*Math.PI*2/cols)*amp + n*amp;
+      return ((r+wave)%2+2)%2<1;
+    }
+    case 'spiral':{
+      const cx2=cols/2,cy2=rows/2;
+      const angle=Math.atan2(r-cy2,c-cx2);
+      const dist=Math.sqrt((r-cx2)**2+(c-cy2)**2);
+      const spiral=angle/(Math.PI*2)*freq+dist/10+n;
+      return spiral%1<0.5;
+    }
+    case 'ripple':{
+      const cx2=cols/2,cy2=rows/2;
+      const dist=Math.sqrt((r-cy2)**2+(c-cx2)**2);
+      return Math.sin(dist*freq/cols*Math.PI*4+n*Math.PI)>0;
+    }
+    case 'noise':{
+      const v=smoothNoise(c*freq/cols*4+n,r*freq/rows*4+n,seed);
+      return v>0.5;
+    }
+    case 'organic':{
+      const v1=smoothNoise(c*0.03+n,r*0.03,seed);
+      const v2=smoothNoise(c*0.07,r*0.07+n,seed+99);
+      return (v1+v2*0.5)%1>0.5;
+    }
+    case 'fractal':{
+      let x=nc2*3.5-2.5, y=nr*2-1;
+      x+=n*0.3; y+=n*0.3;
+      let zx=0,zy=0,i=0;
+      for(;i<8;i++){const t=zx*zx-zy*zy+x;zy=2*zx*zy+y;zx=t;if(zx*zx+zy*zy>4)break;}
+      return i%2===0;
+    }
+    default: return (r+c)%2===0;
+  }
+}
+
+function draw(){
+  const {grid,thick,gap,wpi,epi,wpc,epc,nc} = st;
+  const wp=PALS[wpi], ep=PALS[epi];
+  const cell=thick+gap;
+  const cols=Math.floor(448/cell);
+  const rows=Math.floor(448/cell);
+  cx.fillStyle='#ffffff';
+  cx.fillRect(0,0,448,448);
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const isW=weave(r,c,cols,rows,st);
+      const pal=isW?wp:ep;
+      const cyc=isW?wpc:epc;
+      const idx=Math.min(Math.floor((isW?c:r)/cyc)%nc, pal.length-1);
+      cx.fillStyle=pal[idx];
+      cx.fillRect(c*cell, r*cell, thick, thick);
+    }
+  }
+}
+
+function buildPal(id,key){
+  const el=document.getElementById(id);
+  el.innerHTML='';
+  PALS.forEach((p,i)=>{
+    const d=document.createElement('div');
+    d.className='cswatch'+(st[key]===i?' active':'');
+    d.style.background=p[2];
+    d.onclick=()=>{st[key]=i;buildPal(id,key);draw();};
+    el.appendChild(d);
+  });
+}
+
+function bind(id,key,vid){
+  document.getElementById(id).addEventListener('input',e=>{
+    st[key]=parseInt(e.target.value);
+    document.getElementById(vid).textContent=e.target.value;
+    draw();
+  });
+}
+
+[['s_grid','grid','v_grid'],['s_thick','thick','v_thick'],['s_gap','gap','v_gap'],
+ ['s_amp','amp','v_amp'],['s_freq','freq','v_freq'],['s_chaos','chaos','v_chaos'],
+ ['s_twist','twist','v_twist'],['s_wpc','wpc','v_wpc'],['s_epc','epc','v_epc'],
+ ['s_nc','nc','v_nc']].forEach(a=>bind(...a));
+
+document.querySelectorAll('.tab').forEach(b=>{
+  b.addEventListener('click',()=>{
+    st.mode=b.dataset.m;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    draw();
+  });
+});
+
+function randomize(){
+  const modes=['plain','twill','diamond','sine','spiral','ripple','noise','organic','fractal'];
+  st.mode=modes[Math.random()*modes.length|0];
+  st.grid=Math.random()*40+8|0;
+  st.thick=Math.random()*9+2|0;
+  st.gap=Math.random()*5|0;
+  st.amp=Math.random()*18+1|0;
+  st.freq=Math.random()*16+2|0;
+  st.chaos=Math.random()*80|0;
+  st.twist=Math.random()*15|0;
+  st.wpi=Math.random()*PALS.length|0;
+  st.epi=Math.random()*PALS.length|0;
+  st.wpc=Math.random()*8+1|0;
+  st.epc=Math.random()*8+1|0;
+  st.nc=Math.random()*4+2|0;
+  st.seed=Math.random()*9999|0;
+  syncUI();draw();
+}
+
+function syncUI(){
+  [['s_grid','grid','v_grid'],['s_thick','thick','v_thick'],['s_gap','gap','v_gap'],
+   ['s_amp','amp','v_amp'],['s_freq','freq','v_freq'],['s_chaos','chaos','v_chaos'],
+   ['s_twist','twist','v_twist'],['s_wpc','wpc','v_wpc'],['s_epc','epc','v_epc'],
+   ['s_nc','nc','v_nc']].forEach(([sid,key,vid])=>{
+    document.getElementById(sid).value=st[key];
+    document.getElementById(vid).textContent=st[key];
+  });
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.m===st.mode));
+  buildPal('warp-pal','wpi');buildPal('weft-pal','epi');
+}
+
+function saveImg(){
+  const url=cv.toDataURL('image/png');
+  const t=document.createElement('div');
+  t.className='thumb';
+  const img=document.createElement('img');
+  img.src=url;
+  img.title=`작품 ${document.getElementById('gal').children.length+1}`;
+  const a=document.createElement('a');
+  a.href=url;a.download=`weaving_${Date.now()}.png`;
+  img.onclick=()=>a.click();
+  t.appendChild(img);
+  document.getElementById('gal').insertBefore(t,document.getElementById('gal').firstChild);
+}
+
+buildPal('warp-pal','wpi');
+buildPal('weft-pal','epi');
+draw();
+</script>
