@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>기후 행동 실천 체크</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1a5c3a;
+    --green-mid: #2e8b57;
+    --green-light: #4caf7d;
+    --green-pale: #e8f5ee;
+    --sky: #87ceeb;
+    --sky-pale: #eaf6fb;
+    --yellow: #f9c846;
+    --orange: #f4845f;
+    --text: #1a2e22;
+    --text-muted: #5a7a68;
+    --white: #ffffff;
+    --card-bg: #f4faf7;
+    --border: #c8e6d4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(160deg, #e8f5ee 0%, #eaf6fb 60%, #f0faf5 100%);
+    min-height: 100vh;
+    color: var(--text);
+    padding: 16px;
+  }
+
+  header {
+    text-align: center;
+    padding: 24px 16px 20px;
+    position: relative;
+  }
+
+  .leaf-deco {
+    font-size: 2rem;
+    display: inline-block;
+    animation: sway 3s ease-in-out infinite;
+  }
+  @keyframes sway {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--green-dark);
+    margin: 6px 0 4px;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  /* 이름 입력 */
+  .name-box {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .name-box label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    white-space: nowrap;
+  }
+  .name-box input {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid var(--green-light);
+    padding: 4px 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text);
+    background: transparent;
+    outline: none;
+  }
+
+  /* 기후행동 입력 섹션 */
+  .section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .actions-setup {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .action-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .action-input-row:last-child { margin-bottom: 0; }
+
+  .action-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--green-mid);
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .action-input-row input[type="text"] {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    touch-action: manipulation;
+  }
+  .action-input-row input[type="text"]:focus {
+    border-color: var(--green-mid);
+  }
+
+  .hint-btn {
+    background: var(--green-pale);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 7px 11px;
+    font-size: 0.78rem;
+    color: var(--green-dark);
+    cursor: pointer;
+    white-space: nowrap;
+    touch-action: manipulation;
+    font-family: inherit;
+  }
+  .hint-btn:active { background: var(--border); }
+
+  /* 힌트 팝업 */
+  .hint-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .hint-overlay.open { display: flex; }
+  .hint-panel {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 20px 16px 30px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .hint-panel h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--green-dark);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .hint-category {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--green-mid);
+    margin: 10px 0 6px;
+  }
+  .hint-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .hint-item {
+    background: var(--green-pale);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.15s;
+  }
+  .hint-item:active { background: var(--green-light); color: white; }
+  .hint-close {
+    display: block;
+    margin: 18px auto 0;
+    background: var(--green-dark);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 32px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  /* 시작 버튼 */
+  .start-btn {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 16px rgba(46,139,87,0.3);
+  }
+  .start-btn:active { opacity: 0.85; }
+
+  /* 체크 테이블 */
+  .tracker {
+    display: none;
+  }
+  .tracker.show { display: block; }
+
+  /* 요일 탭 */
+  .day-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 14px;
+    scrollbar-width: none;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+
+  .day-tab {
+    flex-shrink: 0;
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: var(--text-muted);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .day-tab .day-emoji { font-size: 0.9rem; display: block; }
+  .day-tab.active {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+    color: white;
+  }
+  .day-tab.done {
+    border-color: var(--green-light);
+    color: var(--green-mid);
+  }
+  .day-tab.done.active {
+    background: var(--green-dark);
+    color: white;
+  }
+
+  /* 오늘 체크카드 */
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  .day-header {
+    background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+    border-radius: 16px 16px 0 0;
+    padding: 14px 18px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .day-header .day-name { font-size: 1rem; font-weight: 800; }
+  .day-header .day-score { font-size: 0.85rem; opacity: 0.9; }
+
+  .check-cards {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 0 0 16px 16px;
+    border-top: none;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .check-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.2s;
+    background: var(--card-bg);
+    border: 1.5px solid transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .check-card:last-child { margin-bottom: 0; }
+  .check-card.checked {
+    background: var(--green-pale);
+    border-color: var(--green-light);
+  }
+
+  .check-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    background: white;
+  }
+  .check-card.checked .check-circle {
+    background: var(--green-mid);
+    border-color: var(--green-mid);
+  }
+
+  .check-label {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .check-card.checked .check-label {
+    color: var(--green-dark);
+  }
+
+  .result-badge {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+  .result-o { background: #d4edda; color: #1a5c3a; }
+  .result-b { background: #fff3cd; color: #856404; }
+  .result-x { background: #fde8e8; color: #c0392b; }
+
+  /* 결과 선택 */
+  .result-picker {
+    display: none;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .check-card.checked .result-picker { display: flex; }
+  .rp-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .rp-o { background: #d4edda; color: #1a5c3a; }
+  .rp-o.sel { background: #1a5c3a; color: white; }
+  .rp-b { background: #fff3cd; color: #856404; }
+  .rp-b.sel { background: #856404; color: white; }
+  .rp-x { background: #fde8e8; color: #c0392b; }
+  .rp-x.sel { background: #c0392b; color: white; }
+
+  /* 주간 요약 */
+  .summary {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .summary h3 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--green-dark);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .summary-card {
+    background: var(--green-pale);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+  .summary-card .s-num {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--green-dark);
+    line-height: 1;
+  }
+  .summary-card .s-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .action-summary {
+    margin-top: 10px;
+  }
+  .action-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .action-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    flex: 1;
+    color: var(--text);
+  }
+  .action-bar-wrap {
+    width: 80px;
+    height: 10px;
+    background: var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .action-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-light), var(--green-dark));
+    border-radius: 5px;
+    transition: width 0.4s ease;
+  }
+  .action-count {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    width: 28px;
+    text-align: right;
+  }
+
+  /* 소감 */
+  .comment-area {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .comment-area textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text);
+    resize: none;
+    outline: none;
+    height: 80px;
+    margin-top: 8px;
+  }
+  .comment-area textarea:focus {
+    border-color: var(--green-mid);
+  }
+
+  /* 인쇄 버튼 */
+  .print-btn {
+    display: block;
+    width: 100%;
+    background: var(--sky-pale);
+    border: 2px solid var(--sky);
+    border-radius: 14px;
+    padding: 13px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: #1a5a8a;
+    cursor: pointer;
+    touch-action: manipulation;
+    margin-bottom: 30px;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .hint-btn, .start-btn, .print-btn, .hint-overlay, .day-tabs { display: none !important; }
+    .tracker { display: block !important; }
+    .day-panel { display: block !important; page-break-inside: avoid; }
+    .actions-setup, .name-box { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="leaf-deco">🌿</div>
+  <h1>매일매일 기후 행동 실천 기록</h1>
+  <p>일주일 동안 나의 기후 행동을 기록해요</p>
+</header>
+
+<!-- 이름 입력 -->
+<div class="name-box">
+  <label>이름</label>
+  <input type="text" id="studentName" placeholder="이름을 써 주세요" />
+  <label style="margin-left:8px">반</label>
+  <input type="text" id="studentClass" placeholder="예) 5-2" style="max-width:70px" />
+</div>
+<div class="name-box" style="margin-top:-8px">
+  <label>시작 날짜</label>
+  <input type="date" id="startDate" style="flex:1; border:none; border-bottom:2px solid var(--green-light); padding:4px 6px; font-size:0.95rem; font-family:inherit; color:var(--text); background:transparent; outline:none;" />
+</div>
+
+<!-- 기후행동 입력 -->
+<div class="actions-setup">
+  <div class="section-title">✏️ 내가 실천할 기후 행동 5가지를 써 보세요</div>
+  <div id="actionInputs">
+    <div class="action-input-row">
+      <div class="action-num">1</div>
+      <input type="text" class="action-text" placeholder="예) 일회용품 사용하지 않기" />
+    </div>
+    <div class="action-input-row">
+      <div class="action-num">2</div>
+      <input type="text" class="action-text" placeholder="기후 행동을 입력하세요" />
+    </div>
+    <div class="action-input-row">
+      <div class="action-num">3</div>
+      <input type="text" class="action-text" placeholder="기후 행동을 입력하세요" />
+    </div>
+    <div class="action-input-row">
+      <div class="action-num">4</div>
+      <input type="text" class="action-text" placeholder="기후 행동을 입력하세요" />
+    </div>
+    <div class="action-input-row">
+      <div class="action-num">5</div>
+      <input type="text" class="action-text" placeholder="기후 행동을 입력하세요" />
+    </div>
+  </div>
+  <div style="text-align:right; margin-top:12px">
+    <button class="hint-btn" onclick="openHint()">💡 기후 행동 예시 보기</button>
+  </div>
+</div>
+
+<button class="start-btn" onclick="startTracker()">🌱 기록 시작하기</button>
+
+<!-- 힌트 패널 -->
+<div class="hint-overlay" id="hintOverlay" onclick="closeHintOutside(event)">
+  <div class="hint-panel">
+    <h3>💡 기후 행동 예시</h3>
+    <div class="hint-category">🏠 집에서</div>
+    <div class="hint-items">
+      <div class="hint-item" onclick="fillHint(this)">일회용품 사용하지 않기</div>
+      <div class="hint-item" onclick="fillHint(this)">사용 안 하는 콘센트 뽑기</div>
+      <div class="hint-item" onclick="fillHint(this)">짧게 샤워하기</div>
+      <div class="hint-item" onclick="fillHint(this)">음식 남기지 않기</div>
+      <div class="hint-item" onclick="fillHint(this)">분리배출 잘 하기</div>
+      <div class="hint-item" onclick="fillHint(this)">장바구니 사용하기</div>
+      <div class="hint-item" onclick="fillHint(this)">텀블러 사용하기</div>
+      <div class="hint-item" onclick="fillHint(this)">냉난방 온도 조절하기</div>
+    </div>
+    <div class="hint-category">🏫 학교에서</div>
+    <div class="hint-items">
+      <div class="hint-item" onclick="fillHint(this)">급식 남기지 않기</div>
+      <div class="hint-item" onclick="fillHint(this)">빈 교실 전등 끄기</div>
+      <div class="hint-item" onclick="fillHint(this)">이면지 사용하기</div>
+      <div class="hint-item" onclick="fillHint(this)">학용품 아껴 쓰기</div>
+    </div>
+    <div class="hint-category">🚌 이동할 때</div>
+    <div class="hint-items">
+      <div class="hint-item" onclick="fillHint(this)">걷거나 자전거 타기</div>
+      <div class="hint-item" onclick="fillHint(this)">대중교통 이용하기</div>
+      <div class="hint-item" onclick="fillHint(this)">계단 이용하기</div>
+    </div>
+    <div class="hint-category">🛒 소비할 때</div>
+    <div class="hint-items">
+      <div class="hint-item" onclick="fillHint(this)">필요한 것만 사기</div>
+      <div class="hint-item" onclick="fillHint(this)">오래 쓸 물건 고르기</div>
+      <div class="hint-item" onclick="fillHint(this)">친환경 제품 선택하기</div>
+    </div>
+    <button class="hint-close" onclick="closeHint()">닫기</button>
+  </div>
+</div>
+
+<!-- 트래커 -->
+<div class="tracker" id="tracker">
+
+  <div class="day-tabs" id="dayTabs"></div>
+
+  <div id="dayPanels"></div>
+
+  <!-- 주간 요약 -->
+  <div class="summary">
+    <h3>📊 나의 일주일 기후 행동 요약</h3>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="s-num" id="totalChecked">0</div>
+        <div class="s-label">총 실천 횟수</div>
+      </div>
+      <div class="summary-card">
+        <div class="s-num" id="totalO">0</div>
+        <div class="s-label">참 O 횟수</div>
+      </div>
+    </div>
+    <div class="section-title" style="margin-bottom:10px">행동별 실천 횟수</div>
+    <div class="action-summary" id="actionSummary"></div>
+  </div>
+
+  <!-- 소감 -->
+  <div class="comment-area">
+    <div class="section-title">💬 일주일 동안 느낀 점</div>
+    <textarea id="comment" placeholder="기후 행동을 실천하면서 어떤 점이 좋았나요? 어렵거나 힘든 점은 무엇이었나요?"></textarea>
+  </div>
+
+  <button class="print-btn" onclick="window.print()">🖨️ 인쇄하기</button>
+</div>
+
+<script>
+const DAY_EMOJI = ['🌤️','☀️','⛅','🌈','🎉','🌿','😊'];
+const WEEK_DAYS = ['일','월','화','수','목','금','토'];
+let actions = [];
+let checks = {}; // checks[day][actionIdx] = { checked, result }
+let dayDates = []; // 각 날의 Date 객체
+
+function openHint() {
+  document.getElementById('hintOverlay').classList.add('open');
+}
+function closeHint() {
+  document.getElementById('hintOverlay').classList.remove('open');
+}
+function closeHintOutside(e) {
+  if (e.target === document.getElementById('hintOverlay')) closeHint();
+}
+
+function fillHint(el) {
+  const inputs = document.querySelectorAll('.action-text');
+  for (let inp of inputs) {
+    if (!inp.value.trim()) {
+      inp.value = el.textContent;
+      break;
+    }
+  }
+}
+
+// 오늘 날짜를 기본값으로 설정
+window.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const dd = String(today.getDate()).padStart(2,'0');
+  document.getElementById('startDate').value = `${yyyy}-${mm}-${dd}`;
+});
+
+function startTracker() {
+  const inputs = document.querySelectorAll('.action-text');
+  actions = [];
+  inputs.forEach(inp => {
+    const v = inp.value.trim();
+    actions.push(v || '기후 행동');
+  });
+
+  // 시작 날짜 파싱
+  const dateVal = document.getElementById('startDate').value;
+  const base = dateVal ? new Date(dateVal + 'T00:00:00') : new Date();
+  dayDates = [];
+  for (let d = 0; d < 7; d++) {
+    const dt = new Date(base);
+    dt.setDate(base.getDate() + d);
+    dayDates.push(dt);
+  }
+
+  // 초기화
+  checks = {};
+  for (let d = 0; d < 7; d++) {
+    checks[d] = {};
+    for (let a = 0; a < 5; a++) {
+      checks[d][a] = { checked: false, result: null };
+    }
+  }
+
+  buildTracker();
+  document.getElementById('tracker').classList.add('show');
+  document.getElementById('tracker').scrollIntoView({ behavior: 'smooth' });
+}
+
+function formatTabLabel(dt) {
+  const m = dt.getMonth() + 1;
+  const d = dt.getDate();
+  const wd = WEEK_DAYS[dt.getDay()];
+  return `${m}/${d}<br><span style="font-size:0.72rem;font-weight:500">(${wd})</span>`;
+}
+
+function formatHeaderLabel(dt) {
+  const m = dt.getMonth() + 1;
+  const d = dt.getDate();
+  const wd = WEEK_DAYS[dt.getDay()];
+  return `${m}월 ${d}일 (${wd}요일)`;
+}
+
+function buildTracker() {
+  const tabsEl = document.getElementById('dayTabs');
+  const panelsEl = document.getElementById('dayPanels');
+  tabsEl.innerHTML = '';
+  panelsEl.innerHTML = '';
+
+  dayDates.forEach((dt, d) => {
+    // 탭
+    const tab = document.createElement('button');
+    tab.className = 'day-tab' + (d === 0 ? ' active' : '');
+    tab.innerHTML = `<span class="day-emoji">${DAY_EMOJI[d]}</span>${formatTabLabel(dt)}`;
+    tab.onclick = () => switchDay(d);
+    tab.id = `tab-${d}`;
+    tabsEl.appendChild(tab);
+
+    // 패널
+    const panel = document.createElement('div');
+    panel.className = 'day-panel' + (d === 0 ? ' active' : '');
+    panel.id = `panel-${d}`;
+
+    const checkedCount = Object.values(checks[d]).filter(c => c.checked).length;
+
+    panel.innerHTML = `
+      <div class="day-header">
+        <div class="day-name">${DAY_EMOJI[d]} ${formatHeaderLabel(dt)}</div>
+        <div class="day-score" id="score-${d}">${checkedCount}/5 실천</div>
+      </div>
+      <div class="check-cards" id="cards-${d}"></div>
+    `;
+    panelsEl.appendChild(panel);
+
+    // 카드 생성
+    const cardsEl = panel.querySelector(`#cards-${d}`);
+    actions.forEach((action, a) => {
+      const card = document.createElement('div');
+      const c = checks[d][a];
+      card.className = 'check-card' + (c.checked ? ' checked' : '');
+      card.id = `card-${d}-${a}`;
+      card.onclick = () => toggleCheck(d, a);
+      card.innerHTML = `
+        <div class="check-circle">${c.checked ? '✓' : ''}</div>
+        <div class="check-label">${action}</div>
+        <div class="result-picker" onclick="event.stopPropagation()">
+          <button class="rp-btn rp-o${c.result==='O'?' sel':''}" onclick="setResult(${d},${a},'O')">참 O</button>
+          <button class="rp-btn rp-b${c.result==='B'?' sel':''}" onclick="setResult(${d},${a},'B')">보통 △</button>
+          <button class="rp-btn rp-x${c.result==='X'?' sel':''}" onclick="setResult(${d},${a},'X')">부족 ×</button>
+        </div>
+      `;
+      cardsEl.appendChild(card);
+    });
+  });
+
+  updateSummary();
+}
+
+function switchDay(d) {
+  document.querySelectorAll('.day-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === d);
+  });
+  document.querySelectorAll('.day-panel').forEach((p,i) => {
+    p.classList.toggle('active', i === d);
+  });
+}
+
+function toggleCheck(d, a) {
+  checks[d][a].checked = !checks[d][a].checked;
+  if (!checks[d][a].checked) checks[d][a].result = null;
+  refreshCard(d, a);
+  updateScore(d);
+  updateSummary();
+  updateTabDone(d);
+}
+
+function setResult(d, a, r) {
+  checks[d][a].result = r;
+  refreshCard(d, a);
+  updateSummary();
+}
+
+function refreshCard(d, a) {
+  const c = checks[d][a];
+  const card = document.getElementById(`card-${d}-${a}`);
+  if (!card) return;
+  card.className = 'check-card' + (c.checked ? ' checked' : '');
+  card.innerHTML = `
+    <div class="check-circle">${c.checked ? '✓' : ''}</div>
+    <div class="check-label">${actions[a]}</div>
+    <div class="result-picker" onclick="event.stopPropagation()">
+      <button class="rp-btn rp-o${c.result==='O'?' sel':''}" onclick="setResult(${d},${a},'O')">참 O</button>
+      <button class="rp-btn rp-b${c.result==='B'?' sel':''}" onclick="setResult(${d},${a},'B')">보통 △</button>
+      <button class="rp-btn rp-x${c.result==='X'?' sel':''}" onclick="setResult(${d},${a},'X')">부족 ×</button>
+    </div>
+  `;
+}
+
+function updateScore(d) {
+  const cnt = Object.values(checks[d]).filter(c => c.checked).length;
+  const el = document.getElementById(`score-${d}`);
+  if (el) el.textContent = `${cnt}/5 실천`;
+}
+
+function updateTabDone(d) {
+  const cnt = Object.values(checks[d]).filter(c => c.checked).length;
+  const tab = document.getElementById(`tab-${d}`);
+  if (cnt > 0) tab.classList.add('done');
+  else tab.classList.remove('done');
+}
+
+function updateSummary() {
+  let totalChecked = 0, totalO = 0;
+  const actionCounts = new Array(5).fill(0);
+
+  for (let d = 0; d < 7; d++) {
+    for (let a = 0; a < 5; a++) {
+      const c = checks[d][a];
+      if (c.checked) {
+        totalChecked++;
+        actionCounts[a]++;
+        if (c.result === 'O') totalO++;
+      }
+    }
+  }
+
+  document.getElementById('totalChecked').textContent = totalChecked;
+  document.getElementById('totalO').textContent = totalO;
+
+  const summaryEl = document.getElementById('actionSummary');
+  summaryEl.innerHTML = '';
+  actions.forEach((action, a) => {
+    const pct = Math.round((actionCounts[a] / 7) * 100);
+    const row = document.createElement('div');
+    row.className = 'action-row';
+    row.innerHTML = `
+      <div class="action-name">${action}</div>
+      <div class="action-bar-wrap"><div class="action-bar" style="width:${pct}%"></div></div>
+      <div class="action-count">${actionCounts[a]}/7</div>
+    `;
+    summaryEl.appendChild(row);
+  });
+}
+</script>
+</body>
+</html>
