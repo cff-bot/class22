@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎯 양궁 릴레이</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;600;700&display=swap');
+
+:root {
+  --bg: #0a0e1a;
+  --panel: #111827;
+  --border: rgba(255,255,255,0.08);
+  --gold: #f5c842;
+  --red: #e63946;
+  --blue: #4895ef;
+  --green: #4cc9a0;
+  --white: #f0f4ff;
+  --dim: #6b7a99;
+
+  --t1: #ef476f;
+  --t2: #ffd166;
+  --t3: #06d6a0;
+  --t4: #118ab2;
+  --t5: #a855f7;
+  --t6: #f97316;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; user-select:none; }
+
+body {
+  background: var(--bg);
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--white);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── SETUP SCREEN ── */
+#setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 20px;
+  gap: 20px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(72,149,239,0.15) 0%, transparent 70%);
+}
+
+.setup-title {
+  text-align: center;
+}
+.setup-title .big-emoji { font-size: 64px; line-height: 1; margin-bottom: 8px; }
+.setup-title h1 {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 32px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+.setup-title p { font-size: 14px; color: var(--dim); margin-top: 4px; }
+
+.setup-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+.setup-card h3 {
+  font-size: 13px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+.num-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.num-label { font-size: 15px; font-weight: 600; flex: 1; }
+.num-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.num-btn {
+  width: 44px; height: 44px;
+  border: none; background: none;
+  color: var(--white); font-size: 20px;
+  cursor: pointer; touch-action: manipulation;
+  display: flex; align-items: center; justify-content: center;
+}
+.num-btn:active { background: rgba(255,255,255,0.1); }
+.num-val {
+  width: 44px; text-align: center;
+  font-size: 20px; font-weight: 700;
+  color: var(--gold);
+}
+.num-row + .num-row { margin-top: 12px; }
+
+.difficulty-row {
+  margin-top: 16px;
+}
+.diff-label { font-size: 13px; color: var(--dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.diff-btns {
+  display: flex; gap: 8px;
+}
+.diff-btn {
+  flex: 1; padding: 10px 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: none;
+  color: var(--dim);
+  font-size: 13px; font-weight: 600;
+  font-family: inherit;
+  cursor: pointer; touch-action: manipulation;
+  transition: all 0.2s;
+}
+.diff-btn.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.start-btn {
+  width: 100%; max-width: 400px;
+  padding: 18px;
+  background: var(--gold);
+  color: #0a0e1a;
+  border: none; border-radius: 14px;
+  font-size: 18px; font-weight: 700;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 1px;
+  cursor: pointer; touch-action: manipulation;
+}
+.start-btn:active { opacity: 0.85; }
+
+/* ── GAME SCREEN ── */
+#game { display: none; flex-direction: column; height: 100vh; }
+
+/* Scoreboard top */
+.scoreboard {
+  display: flex;
+  gap: 6px;
+  padding: 10px 10px 6px;
+  background: rgba(0,0,0,0.4);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.score-chip {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  text-align: center;
+  min-width: 64px;
+  transition: all 0.3s;
+}
+.score-chip.active-team {
+  transform: scale(1.08);
+  box-shadow: 0 0 16px currentColor;
+}
+.score-chip .chip-name { font-size: 11px; font-weight: 700; opacity: 0.9; }
+.score-chip .chip-score {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 20px;
+  line-height: 1;
+}
+.score-chip .chip-turn { font-size: 10px; opacity: 0.7; margin-top: 1px; }
+
+/* Turn banner */
+.turn-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+.turn-info { display: flex; flex-direction: column; gap: 2px; }
+.turn-team {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 18px;
+}
+.turn-player { font-size: 12px; color: var(--dim); }
+.turn-shots {
+  display: flex; gap: 4px; align-items: center;
+}
+.shot-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  transition: all 0.2s;
+}
+.shot-dot.used { background: var(--gold); border-color: var(--gold); }
+
+/* Canvas area */
+.canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+}
+canvas#arc { width: 100%; height: 100%; touch-action: none; }
+
+/* Score popup */
+.score-popup {
+  position: absolute;
+  pointer-events: none;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 36px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  opacity: 0;
+  transition: none;
+}
+
+/* Bottom action */
+.action-bar {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+.next-btn {
+  padding: 12px 24px;
+  border: none; border-radius: 10px;
+  font-size: 15px; font-weight: 700;
+  font-family: inherit;
+  cursor: pointer; touch-action: manipulation;
+  color: #fff;
+}
+.timer-display {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 28px;
+  color: var(--gold);
+}
+.timer-display.urgent { color: var(--red); animation: pulse 0.5s ease infinite alternate; }
+@keyframes pulse { from { opacity:1; } to { opacity:0.4; } }
+
+/* ── RESULT SCREEN ── */
+#result {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 20px 16px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245,200,66,0.12) 0%, transparent 60%);
+  overflow-y: auto;
+}
+
+.result-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.result-title h2 {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 28px;
+  color: var(--gold);
+}
+
+.podium-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 440px;
+  margin-bottom: 20px;
+}
+
+.podium-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.podium-emoji { font-size: 32px; }
+.podium-name {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 15px;
+}
+.podium-score-val {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 22px;
+}
+.podium-block {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 28px;
+}
+
+.rank-list {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+}
+.rank-num {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 22px;
+  width: 32px;
+  text-align: center;
+}
+.rank-name { flex: 1; font-size: 16px; font-weight: 700; }
+.rank-pts {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 24px;
+}
+.rank-pts span { font-size: 13px; font-weight: 400; color: var(--dim); }
+
+.replay-btn {
+  width: 100%; max-width: 440px;
+  padding: 16px;
+  background: var(--gold);
+  color: #0a0e1a;
+  border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 700;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 1px;
+  cursor: pointer; touch-action: manipulation;
+  margin-top: 4px;
+}
+
+/* Transition overlay */
+.trans-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.92);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.trans-overlay.show { opacity: 1; pointer-events: all; }
+.trans-big { font-size: 64px; margin-bottom: 8px; }
+.trans-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 28px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.trans-sub { font-size: 15px; color: var(--dim); margin-bottom: 28px; }
+.trans-btn {
+  padding: 14px 36px;
+  border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 700;
+  font-family: inherit;
+  cursor: pointer; touch-action: manipulation;
+  color: #fff;
+}
+
+/* Ring flash animation on canvas */
+@keyframes ripple {
+  0%   { transform: scale(0.3); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.ripple-el {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ripple 0.6s ease-out forwards;
+}
+</style>
+</head>
+<body>
+
+<!-- ── SETUP ── -->
+<div id="setup">
+  <div class="setup-title">
+    <div class="big-emoji">🎯</div>
+    <h1>양궁 릴레이</h1>
+    <p>모둠원이 번갈아 나와 과녁을 탭! 팀 총점으로 승부!</p>
+  </div>
+
+  <div class="setup-card">
+    <h3>⚙️ 게임 설정</h3>
+    <div class="num-row">
+      <div class="num-label">🏹 모둠 수</div>
+      <div class="num-ctrl">
+        <button class="num-btn" onclick="adj('teams',-1)">−</button>
+        <div class="num-val" id="val-teams">4</div>
+        <button class="num-btn" onclick="adj('teams',1)">+</button>
+      </div>
+    </div>
+    <div class="num-row">
+      <div class="num-label">👤 모둠원 수</div>
+      <div class="num-ctrl">
+        <button class="num-btn" onclick="adj('members',-1)">−</button>
+        <div class="num-val" id="val-members">5</div>
+        <button class="num-btn" onclick="adj('members',1)">+</button>
+      </div>
+    </div>
+    <div class="num-row">
+      <div class="num-label">🏹 1인당 화살</div>
+      <div class="num-ctrl">
+        <button class="num-btn" onclick="adj('arrows',-1)">−</button>
+        <div class="num-val" id="val-arrows">3</div>
+        <button class="num-btn" onclick="adj('arrows',1)">+</button>
+      </div>
+    </div>
+    <div class="difficulty-row">
+      <div class="diff-label">🎮 난이도</div>
+      <div class="diff-btns">
+        <button class="diff-btn active" onclick="setDiff('easy',this)">쉬움</button>
+        <button class="diff-btn" onclick="setDiff('normal',this)">보통</button>
+        <button class="diff-btn" onclick="setDiff('hard',this)">어려움</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startGame()">🏹 게임 시작!</button>
+</div>
+
+<!-- ── GAME ── -->
+<div id="game">
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="turn-banner">
+    <div class="turn-info">
+      <div class="turn-team" id="turn-team">1모둠</div>
+      <div class="turn-player" id="turn-player">1번째 선수 차례</div>
+    </div>
+    <div class="turn-shots" id="turn-shots"></div>
+  </div>
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="arc"></canvas>
+  </div>
+  <div class="action-bar">
+    <div class="timer-display" id="timer-disp">10</div>
+    <button class="next-btn" id="next-btn" onclick="nextTurn()" style="background:var(--blue)">다음 선수 →</button>
+  </div>
+</div>
+
+<!-- ── RESULT ── -->
+<div id="result">
+  <div class="result-title">
+    <div style="font-size:52px">🏆</div>
+    <h2>최종 결과!</h2>
+  </div>
+  <div class="podium-wrap" id="podium"></div>
+  <div class="rank-list" id="rank-list"></div>
+  <button class="replay-btn" onclick="goSetup()">🔄 다시 하기</button>
+</div>
+
+<!-- Transition overlay -->
+<div class="trans-overlay" id="trans">
+  <div class="trans-big" id="trans-emoji">🏹</div>
+  <div class="trans-title" id="trans-title">준비!</div>
+  <div class="trans-sub" id="trans-sub">화살을 당겨라</div>
+  <button class="trans-btn" id="trans-btn" onclick="dismissTrans()" style="background:var(--blue)">탭해서 시작!</button>
+</div>
+
+<script>
+// ──────────────────────────────────────────
+// CONFIG
+// ──────────────────────────────────────────
+const TEAM_COLORS = ['--t1','--t2','--t3','--t4','--t5','--t6'];
+const TEAM_NAMES  = ['1모둠','2모둠','3모둠','4모둠','5모둠','6모둠'];
+const TEAM_EMOJIS = ['🔴','🟡','🟢','🔵','🟣','🟠'];
+
+const DIFF = {
+  easy:   { speed: 2.0, sizeMin: 75, sizeMax: 95,  timerSec: 15, ring:[10,8,6,4,2] },
+  normal: { speed: 4.0, sizeMin: 55, sizeMax: 75,  timerSec: 12, ring:[10,8,6,4,2] },
+  hard:   { speed: 7.5, sizeMin: 38, sizeMax: 55,  timerSec: 10, ring:[10,8,6,4,2] },
+};
+
+let cfg = { teams:4, members:5, arrows:3, diff:'easy' };
+
+function adj(key, d) {
+  const limits = { teams:[2,6], members:[2,10], arrows:[1,5] };
+  cfg[key] = Math.min(limits[key][1], Math.max(limits[key][0], cfg[key]+d));
+  document.getElementById('val-'+key).textContent = cfg[key];
+}
+function setDiff(d, btn) {
+  cfg.diff = d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ──────────────────────────────────────────
+// GAME STATE
+// ──────────────────────────────────────────
+let teamScores = [];
+let currentTeam = 0;
+let currentMember = 0;
+let arrowsLeft = 0;
+let gameTimer = null;
+let timeLeft = 0;
+let target = { x:0.5, y:0.45, vx:0, vy:0, size:70 };
+let animFrame = null;
+
+// Canvas
+const canvas = document.getElementById('arc');
+const ctx = canvas.getContext('2d');
+
+function startGame() {
+  teamScores = Array.from({length: cfg.teams}, (_,i) => ({ idx:i, score:0 }));
+  currentTeam = 0;
+  currentMember = 0;
+  arrowsLeft = cfg.arrows;
+
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+
+  renderScoreboard();
+  resizeCanvas();
+  resetTarget();
+  startAnimLoop();
+  showTurnTrans();
+}
+
+function resizeCanvas() {
+  const wrap = document.getElementById('canvas-wrap');
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+}
+
+// ──────────────────────────────────────────
+// TARGET MOVEMENT
+// ──────────────────────────────────────────
+function resetTarget() {
+  const d = DIFF[cfg.diff];
+  target.size = d.sizeMin + Math.random()*(d.sizeMax - d.sizeMin);
+  target.x = 0.2 + Math.random()*0.6;
+  target.y = 0.2 + Math.random()*0.5;
+  const angle = Math.random()*Math.PI*2;
+  // vx/vy in pixels per frame
+  target.vx = Math.cos(angle) * d.speed;
+  target.vy = Math.sin(angle) * d.speed;
+}
+
+function updateTarget() {
+  const W = canvas.width, H = canvas.height;
+  const r = target.size;
+  // convert ratio to pixels, move, convert back
+  let px = target.x * W;
+  let py = target.y * H;
+  px += target.vx;
+  py += target.vy;
+  if(px - r < 0 || px + r > W) { target.vx *= -1; px += target.vx*2; }
+  if(py - r < 0 || py + r > H) { target.vy *= -1; py += target.vy*2; }
+  px = Math.max(r, Math.min(W - r, px));
+  py = Math.max(r, Math.min(H - r, py));
+  target.x = px / W;
+  target.y = py / H;
+}
+
+// ──────────────────────────────────────────
+// DRAW
+// ──────────────────────────────────────────
+let arrows = []; // visual trail of shot arrows
+
+function drawScene() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // background gradient
+  const grad = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.7);
+  grad.addColorStop(0,'#131c2e');
+  grad.addColorStop(1,'#0a0e1a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+
+  // draw shot arrow marks
+  arrows.forEach(a => {
+    ctx.globalAlpha = a.alpha;
+    ctx.fillStyle = a.color;
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, 5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    a.alpha -= 0.008;
+  });
+  arrows = arrows.filter(a => a.alpha > 0);
+
+  // draw target
+  const tx = target.x * W;
+  const ty = target.y * H;
+  const r = target.size;
+
+  // outer glow
+  const glow = ctx.createRadialGradient(tx,ty,0,tx,ty,r*1.4);
+  glow.addColorStop(0,'rgba(255,255,100,0.12)');
+  glow.addColorStop(1,'rgba(255,255,100,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(tx,ty,r*1.4,0,Math.PI*2); ctx.fill();
+
+  // rings: white, black, blue, red, yellow (outermost to innermost scoring)
+  const rings = [
+    { r:1.0,   color:'#fff' },
+    { r:0.80,  color:'#1a1a2e' },
+    { r:0.62,  color:'#2255cc' },
+    { r:0.44,  color:'#cc2222' },
+    { r:0.26,  color:'#f5c842' },
+  ];
+  rings.forEach(ring => {
+    ctx.fillStyle = ring.color;
+    ctx.beginPath();
+    ctx.arc(tx, ty, r * ring.r, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // ring outlines
+  [1.0,0.80,0.62,0.44,0.26].forEach(pct => {
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.arc(tx,ty,r*pct,0,Math.PI*2); ctx.stroke();
+  });
+
+  // center dot
+  ctx.fillStyle = '#0a0e1a';
+  ctx.beginPath(); ctx.arc(tx, ty, r*0.07, 0, Math.PI*2); ctx.fill();
+
+  // crosshair lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(tx-r,ty); ctx.lineTo(tx+r,ty); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(tx,ty-r); ctx.lineTo(tx,ty+r); ctx.stroke();
+}
+
+function startAnimLoop() {
+  if(animFrame) cancelAnimationFrame(animFrame);
+  function loop() {
+    updateTarget();
+    drawScene();
+    animFrame = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ──────────────────────────────────────────
+// SHOOT
+// ──────────────────────────────────────────
+function getScore(dx, dy, r) {
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const pct = dist / r;
+  if(pct <= 0.26) return 10;
+  if(pct <= 0.44) return 8;
+  if(pct <= 0.62) return 6;
+  if(pct <= 0.80) return 4;
+  if(pct <= 1.00) return 2;
+  return 0;
+}
+
+function shoot(clientX, clientY) {
+  if(arrowsLeft <= 0) return;
+  const wrap = document.getElementById('canvas-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const px = (clientX - rect.left);
+  const py = (clientY - rect.top);
+  const W = canvas.width, H = canvas.height;
+  const tx = target.x * W;
+  const ty = target.y * H;
+  const dx = px - tx, dy = py - ty;
+  const pts = getScore(dx, dy, target.size);
+
+  teamScores[currentTeam].score += pts;
+  arrowsLeft--;
+
+  // visual
+  const teamColor = getComputedStyle(document.documentElement).getPropertyValue(TEAM_COLORS[currentTeam]).trim() || '#fff';
+  arrows.push({ x: px, y: py, color: teamColor || '#f5c842', alpha: 1 });
+
+  // ripple
+  addRipple(px + rect.left, py + rect.top, pts > 0 ? '#f5c842' : '#e63946');
+
+  // popup
+  showScorePopup(px, py, pts, wrap);
+
+  // update shot dots
+  renderShotDots();
+  renderScoreboard();
+
+  if(arrowsLeft <= 0) {
+    clearInterval(gameTimer);
+    setTimeout(() => {
+      if(isGameEnd()) {
+        endGame();
+      } else {
+        nextTurn();
+      }
+    }, 900);
+  }
+}
+
+canvas.addEventListener('click', e => { shoot(e.clientX, e.clientY); });
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  shoot(t.clientX, t.clientY);
+}, { passive: false });
+
+// ──────────────────────────────────────────
+// SCORE POPUP
+// ──────────────────────────────────────────
+function showScorePopup(x, y, pts, parent) {
+  const el = document.createElement('div');
+  el.className = 'score-popup';
+  el.textContent = pts > 0 ? '+'+pts : 'MISS';
+  el.style.color = pts >= 10 ? '#f5c842' : pts >= 6 ? '#4cc9a0' : pts > 0 ? '#4895ef' : '#e63946';
+  el.style.left = (x - 20) + 'px';
+  el.style.top  = (y - 20) + 'px';
+  el.style.fontSize = pts >= 8 ? '42px' : '32px';
+  parent.appendChild(el);
+  el.style.transition = 'opacity 0.8s, transform 0.8s';
+  el.style.opacity = '1';
+  requestAnimationFrame(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-60px) scale(1.2)';
+  });
+  setTimeout(() => el.remove(), 900);
+}
+
+function addRipple(cx, cy, color) {
+  const el = document.createElement('div');
+  el.className = 'ripple-el';
+  const size = 60;
+  el.style.cssText = `
+    width:${size}px;height:${size}px;
+    left:${cx - size/2}px;top:${cy - size/2}px;
+    border:3px solid ${color};
+    position:fixed;
+  `;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 700);
+}
+
+// ──────────────────────────────────────────
+// TURN MANAGEMENT
+// ──────────────────────────────────────────
+function showTurnTrans() {
+  const ov = document.getElementById('trans');
+  const t = currentTeam, m = currentMember;
+  document.getElementById('trans-emoji').textContent = TEAM_EMOJIS[t];
+  document.getElementById('trans-title').textContent = TEAM_NAMES[t] + ' ' + (m+1) + '번째 선수!';
+  document.getElementById('trans-sub').textContent = '태블릿 앞으로 나오세요 🏹';
+  const btn = document.getElementById('trans-btn');
+  btn.style.background = getCssColor(t);
+  btn.textContent = '탭해서 시작!';
+  ov.classList.add('show');
+}
+
+function dismissTrans() {
+  document.getElementById('trans').classList.remove('show');
+  arrowsLeft = cfg.arrows;
+  renderShotDots();
+  renderTurnBanner();
+  startTurnTimer();
+  resetTarget();
+}
+
+function startTurnTimer() {
+  clearInterval(gameTimer);
+  timeLeft = DIFF[cfg.diff].timerSec;
+  const disp = document.getElementById('timer-disp');
+  disp.textContent = timeLeft;
+  disp.className = 'timer-display';
+  gameTimer = setInterval(() => {
+    timeLeft--;
+    disp.textContent = timeLeft;
+    if(timeLeft <= 3) disp.className = 'timer-display urgent';
+    if(timeLeft <= 0) {
+      clearInterval(gameTimer);
+      setTimeout(() => {
+        if(isGameEnd()) endGame();
+        else nextTurn();
+      }, 400);
+    }
+  }, 1000);
+}
+
+function nextTurn() {
+  clearInterval(gameTimer);
+  // advance
+  currentTeam++;
+  if(currentTeam >= cfg.teams) {
+    currentTeam = 0;
+    currentMember++;
+  }
+  if(isGameEnd()) { endGame(); return; }
+  arrowsLeft = cfg.arrows;
+  showTurnTrans();
+}
+
+function isGameEnd() {
+  return currentMember >= cfg.members;
+}
+
+function renderTurnBanner() {
+  const t = currentTeam;
+  const el = document.getElementById('turn-team');
+  el.textContent = TEAM_NAMES[t];
+  el.style.color = getCssColor(t);
+  document.getElementById('turn-player').textContent = (currentMember+1) + '번째 선수 차례';
+}
+
+function renderShotDots() {
+  const wrap = document.getElementById('turn-shots');
+  wrap.innerHTML = '';
+  for(let i=0;i<cfg.arrows;i++) {
+    const d = document.createElement('div');
+    d.className = 'shot-dot' + (i >= arrowsLeft ? ' used' : '');
+    wrap.appendChild(d);
+  }
+}
+
+// ──────────────────────────────────────────
+// SCOREBOARD
+// ──────────────────────────────────────────
+function renderScoreboard() {
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = '';
+  teamScores.forEach((ts, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'score-chip' + (i === currentTeam ? ' active-team' : '');
+    const col = getCssColor(i);
+    chip.style.background = hexToRgba(col, 0.18);
+    chip.style.borderColor = i === currentTeam ? col : 'transparent';
+    chip.style.color = col;
+    chip.innerHTML = `
+      <div class="chip-name">${TEAM_EMOJIS[i]} ${TEAM_NAMES[i]}</div>
+      <div class="chip-score">${ts.score}</div>
+    `;
+    sb.appendChild(chip);
+  });
+}
+
+// ──────────────────────────────────────────
+// RESULT
+// ──────────────────────────────────────────
+function endGame() {
+  cancelAnimationFrame(animFrame);
+  clearInterval(gameTimer);
+
+  const sorted = [...teamScores].sort((a,b) => b.score - a.score);
+
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('result').style.display = 'flex';
+
+  // Podium (top 3)
+  const podium = document.getElementById('podium');
+  podium.innerHTML = '';
+  const podiumOrder = sorted.length >= 3 ? [sorted[1], sorted[0], sorted[2]] : sorted;
+  const heights = ['80px','120px','60px'];
+  const medals = ['🥇','🥇','🥉'];
+  const actualMedals = ['🥈','🥇','🥉'];
+  podiumOrder.forEach((ts, pi) => {
+    const isFirst = (pi === 1 && sorted.length >= 2);
+    const rank = sorted.indexOf(ts);
+    const col = getCssColor(ts.idx);
+    const item = document.createElement('div');
+    item.className = 'podium-item';
+    item.innerHTML = `
+      <div class="podium-emoji">${['🥈','🥇','🥉'][pi]}</div>
+      <div class="podium-name" style="color:${col}">${TEAM_NAMES[ts.idx]}</div>
+      <div class="podium-score-val" style="color:${col}">${ts.score}점</div>
+      <div class="podium-block" style="background:${hexToRgba(col,0.3)};border:2px solid ${col};height:${heights[pi]}">${TEAM_EMOJIS[ts.idx]}</div>
+    `;
+    podium.appendChild(item);
+  });
+
+  // Full rank list
+  const rl = document.getElementById('rank-list');
+  rl.innerHTML = '';
+  sorted.forEach((ts, rank) => {
+    const col = getCssColor(ts.idx);
+    const row = document.createElement('div');
+    row.className = 'rank-row';
+    row.style.borderColor = hexToRgba(col, 0.3);
+    const medal = ['🥇','🥈','🥉'][rank] || (rank+1)+'위';
+    row.innerHTML = `
+      <div class="rank-num">${medal}</div>
+      <div class="rank-name" style="color:${col}">${TEAM_EMOJIS[ts.idx]} ${TEAM_NAMES[ts.idx]}</div>
+      <div class="rank-pts">${ts.score}<span>점</span></div>
+    `;
+    rl.appendChild(row);
+  });
+}
+
+function goSetup() {
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('setup').style.display = 'flex';
+  document.getElementById('trans').classList.remove('show');
+}
+
+// ──────────────────────────────────────────
+// COLOR UTILS
+// ──────────────────────────────────────────
+const COLOR_MAP = {
+  '--t1':'#ef476f','--t2':'#ffd166','--t3':'#06d6a0',
+  '--t4':'#118ab2','--t5':'#a855f7','--t6':'#f97316'
+};
+function getCssColor(teamIdx) {
+  return COLOR_MAP[TEAM_COLORS[teamIdx]] || '#fff';
+}
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// resize
+window.addEventListener('resize', () => {
+  resizeCanvas();
+});
+</script>
+</body>
+</html>
