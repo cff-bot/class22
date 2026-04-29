@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>체육대회 안전수칙 짝찾기</title>
+<style>
+:root {
+  --bg: #0f1923;
+  --surface: #162030;
+  --card-back: #1e3a5f;
+  --card-front-activity: #1b4332;
+  --card-front-rule: #3d1a00;
+  --accent-blue: #4fc3f7;
+  --accent-green: #52b788;
+  --accent-orange: #f4a261;
+  --accent-gold: #ffd700;
+  --text: #e8f4f8;
+  --text-dim: #7a9bb5;
+  --matched: #1a3d2e;
+  --matched-border: #52b788;
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+}
+
+/* Header */
+.header {
+  width: 100%;
+  max-width: 720px;
+  text-align: center;
+  padding: 16px 0 12px;
+}
+.header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+.header p {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* Stats bar */
+.stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  width: 100%;
+  max-width: 720px;
+}
+.stat-box {
+  flex: 1;
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid rgba(79,195,247,0.12);
+}
+.stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  line-height: 1;
+}
+.stat-value.gold { color: var(--accent-gold); }
+.stat-value.green { color: var(--accent-green); }
+
+/* Progress */
+.progress-wrap {
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 14px;
+}
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-gold));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Card grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 720px;
+}
+
+@media (max-width: 400px) {
+  .grid { gap: 6px; }
+}
+
+/* Card */
+.card {
+  aspect-ratio: 1 / 1.2;
+  position: relative;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  border-radius: var(--radius);
+}
+
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+/* Card back */
+.card-back {
+  background: var(--card-back);
+  border: 2px solid rgba(79,195,247,0.25);
+  font-size: 26px;
+}
+.card-back::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  background: radial-gradient(circle at 30% 30%, rgba(79,195,247,0.08), transparent 60%);
+}
+
+/* Card front - activity */
+.card-front {
+  transform: rotateY(180deg);
+}
+.card-front.activity {
+  background: var(--card-front-activity);
+  border: 2px solid rgba(82,183,136,0.4);
+}
+.card-front.rule {
+  background: var(--card-front-rule);
+  border: 2px solid rgba(244,162,97,0.4);
+}
+
+.card-emoji {
+  font-size: 24px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+.card-text {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+}
+.card-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-top: 5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.activity .card-tag {
+  background: rgba(82,183,136,0.25);
+  color: var(--accent-green);
+}
+.rule .card-tag {
+  background: rgba(244,162,97,0.2);
+  color: var(--accent-orange);
+}
+
+/* Matched state */
+.card.matched .card-front.activity {
+  background: var(--matched);
+  border-color: var(--matched-border);
+}
+.card.matched .card-front.rule {
+  background: #2d1500;
+  border-color: var(--accent-orange);
+}
+.card.matched .card-text {
+  color: rgba(232,244,248,0.7);
+}
+.card.matched .card-emoji {
+  filter: grayscale(0.4);
+}
+
+/* Wrong shake */
+@keyframes shake {
+  0%,100%{transform:rotateY(180deg) translateX(0)}
+  20%{transform:rotateY(180deg) translateX(-6px)}
+  40%{transform:rotateY(180deg) translateX(6px)}
+  60%{transform:rotateY(180deg) translateX(-4px)}
+  80%{transform:rotateY(180deg) translateX(4px)}
+}
+.card.wrong .card-inner {
+  animation: shake 0.4s ease;
+}
+.card.wrong .card-front {
+  border-color: #e63946 !important;
+  background: #2a0a0a !important;
+}
+
+/* Match sparkle */
+@keyframes pulse-match {
+  0%{transform:rotateY(180deg) scale(1)}
+  50%{transform:rotateY(180deg) scale(1.06)}
+  100%{transform:rotateY(180deg) scale(1)}
+}
+.card.just-matched .card-inner {
+  animation: pulse-match 0.35s ease;
+}
+
+/* Overlay */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.overlay.show { display: flex; }
+
+.result-box {
+  background: var(--surface);
+  border: 2px solid var(--accent-gold);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+}
+.result-emoji { font-size: 56px; margin-bottom: 12px; }
+.result-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+}
+.result-sub {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+.result-score {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  margin: 12px 0;
+}
+.result-rating {
+  font-size: 15px;
+  color: var(--accent-green);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  margin-bottom: 8px;
+}
+.btn-primary {
+  background: var(--accent-blue);
+  color: #0f1923;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-size: 14px;
+  font-weight: 500;
+}
+.btn:active { opacity: 0.8; }
+
+/* Hint toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,60,90,0.95);
+  border: 1px solid var(--accent-blue);
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.show { opacity: 1; }
+
+/* Difficulty tabs */
+.mode-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  width: 100%;
+  max-width: 720px;
+}
+.mode-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border: 1px solid rgba(79,195,247,0.2);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all 0.2s;
+}
+.mode-btn.active {
+  background: var(--accent-blue);
+  color: #0f1923;
+  border-color: var(--accent-blue);
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏅 체육대회 안전수칙 짝찾기</h1>
+  <p>활동 카드와 안전수칙 카드를 짝지어 보세요!</p>
+</div>
+
+<div class="mode-bar">
+  <button class="mode-btn active" onclick="setMode(4)" id="mode4">4쌍 (쉬움)</button>
+  <button class="mode-btn" onclick="setMode(6)" id="mode6">6쌍 (보통)</button>
+  <button class="mode-btn" onclick="setMode(8)" id="mode8">8쌍 (어려움)</button>
+</div>
+
+<div class="stats">
+  <div class="stat-box">
+    <div class="stat-label">맞춘 짝</div>
+    <div class="stat-value green" id="stat-matched">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">시도 횟수</div>
+    <div class="stat-value" id="stat-tries">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">남은 시간</div>
+    <div class="stat-value gold" id="stat-time">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">점수</div>
+    <div class="stat-value gold" id="stat-score">0</div>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="overlay" id="overlay">
+  <div class="result-box">
+    <div class="result-emoji" id="res-emoji">🏆</div>
+    <div class="result-title" id="res-title">완성!</div>
+    <div class="result-sub" id="res-sub"></div>
+    <div class="result-score" id="res-score"></div>
+    <div class="result-rating" id="res-rating"></div>
+    <button class="btn btn-primary" onclick="restartGame()">🔄 다시 하기</button>
+    <button class="btn btn-secondary" onclick="closeOverlay()">결과 보기</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ALL_PAIRS = [
+  { id:1, activity:{ emoji:'🏃', text:'달리기' }, rule:{ emoji:'🚦', text:'출발 신호 전에는\n절대 뛰지 않기' }},
+  { id:2, activity:{ emoji:'🤝', text:'줄다리기' }, rule:{ emoji:'↔️', text:'줄이 끊어질 수 있어요\n충분한 간격 유지하기' }},
+  { id:3, activity:{ emoji:'🎯', text:'공 던지기' }, rule:{ emoji:'🚫', text:'사람 있는 방향으로\n절대 던지지 않기' }},
+  { id:4, activity:{ emoji:'🔄', text:'이어달리기' }, rule:{ emoji:'🏃‍♂️', text:'바톤 주고받을 때\n속도 줄이기' }},
+  { id:5, activity:{ emoji:'🦘', text:'넓이뛰기' }, rule:{ emoji:'👀', text:'착지 후 바로 일어나\n뒤 선수 확인하기' }},
+  { id:6, activity:{ emoji:'💫', text:'줄넘기' }, rule:{ emoji:'📐', text:'줄에 걸려 넘어지지 않게\n충분한 간격 유지하기' }},
+  { id:7, activity:{ emoji:'⚽', text:'공 굴리기' }, rule:{ emoji:'🛑', text:'공이 밖으로 나가도\n차도로 뛰어들지 않기' }},
+  { id:8, activity:{ emoji:'📣', text:'응원하기' }, rule:{ emoji:'💛', text:'응원 도구로 다른 사람\n치지 않기' }},
+];
+
+let currentMode = 4;
+let pairs = [];
+let cards = [];
+let flipped = [];
+let matched = 0;
+let tries = 0;
+let score = 0;
+let locked = false;
+let timer = null;
+let timeLeft = 0;
+let gameActive = false;
+
+function setMode(n) {
+  currentMode = n;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode'+n).classList.add('active');
+  startGame();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function startGame() {
+  clearInterval(timer);
+  matched = 0; tries = 0; score = 0; locked = false; flipped = [];
+  gameActive = true;
+
+  // Pick pairs
+  pairs = shuffle(ALL_PAIRS).slice(0, currentMode);
+
+  // Time based on mode
+  const times = {4: 90, 6: 120, 8: 180};
+  timeLeft = times[currentMode];
+
+  // Build card data
+  cards = [];
+  pairs.forEach(p => {
+    cards.push({ pairId: p.id, type:'activity', emoji: p.activity.emoji, text: p.activity.text, matched: false, id: 'a'+p.id });
+    cards.push({ pairId: p.id, type:'rule', emoji: p.rule.emoji, text: p.rule.text, matched: false, id: 'r'+p.id });
+  });
+  cards = shuffle(cards);
+
+  updateStats();
+  renderGrid();
+  startTimer();
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('progress').style.width = '0%';
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  // Adjust columns based on mode
+  if(currentMode === 4) grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+  else if(currentMode === 6) grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+  else grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+
+  grid.innerHTML = '';
+  cards.forEach((card, idx) => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.dataset.idx = idx;
+    el.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-back">🏅</div>
+        <div class="card-face card-front ${card.type}">
+          <div class="card-emoji">${card.emoji}</div>
+          <div class="card-text">${card.text.replace(/\n/g,'<br>')}</div>
+          <div class="card-tag">${card.type==='activity'?'활동':'안전수칙'}</div>
+        </div>
+      </div>`;
+    el.addEventListener('click', () => flipCard(idx));
+    el.addEventListener('touchend', (e) => { e.preventDefault(); flipCard(idx); });
+    grid.appendChild(el);
+  });
+}
+
+function flipCard(idx) {
+  if(!gameActive || locked) return;
+  const card = cards[idx];
+  if(card.matched) return;
+  const el = document.querySelectorAll('.card')[idx];
+  if(el.classList.contains('flipped')) return;
+  if(flipped.length === 2) return;
+
+  el.classList.add('flipped');
+  flipped.push(idx);
+
+  if(flipped.length === 2) {
+    tries++;
+    locked = true;
+    setTimeout(checkMatch, 700);
+  }
+}
+
+function checkMatch() {
+  const [i1, i2] = flipped;
+  const c1 = cards[i1], c2 = cards[i2];
+  const els = document.querySelectorAll('.card');
+
+  if(c1.pairId === c2.pairId && c1.type !== c2.type) {
+    // Match!
+    c1.matched = true; c2.matched = true;
+    matched++;
+    const bonus = Math.max(10, 30 - tries);
+    score += 100 + bonus;
+
+    els[i1].classList.add('matched','just-matched');
+    els[i2].classList.add('matched','just-matched');
+    setTimeout(()=>{
+      els[i1].classList.remove('just-matched');
+      els[i2].classList.remove('just-matched');
+    },400);
+
+    showToast('✅ 정답! +' + (100+bonus) + '점');
+    updateStats();
+    updateProgress();
+
+    if(matched === currentMode) {
+      setTimeout(showResult, 600);
+    }
+  } else {
+    // Wrong
+    els[i1].classList.add('wrong');
+    els[i2].classList.add('wrong');
+    score = Math.max(0, score - 10);
+    showToast('❌ 다시 해봐요!');
+    setTimeout(()=>{
+      els[i1].classList.remove('flipped','wrong');
+      els[i2].classList.remove('flipped','wrong');
+      updateStats();
+    },600);
+  }
+
+  flipped = [];
+  locked = false;
+}
+
+function updateProgress() {
+  const pct = (matched / currentMode) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function startTimer() {
+  document.getElementById('stat-time').style.color = 'var(--accent-gold)';
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById('stat-time').textContent = timeLeft;
+    if(timeLeft <= 10) {
+      document.getElementById('stat-time').style.color = '#e63946';
+    }
+    if(timeLeft <= 0) {
+      clearInterval(timer);
+      if(matched < currentMode) showTimeUp();
+    }
+  }, 1000);
+  document.getElementById('stat-time').textContent = timeLeft;
+}
+
+function updateStats() {
+  document.getElementById('stat-matched').textContent = matched + '/' + currentMode;
+  document.getElementById('stat-tries').textContent = tries;
+  document.getElementById('stat-score').textContent = score;
+}
+
+function getRating(accuracy, timeBonus) {
+  const total = score;
+  if(matched < currentMode) return { emoji:'😅', text:'아쉬워요! 다시 도전해봐요!', star:'⭐' };
+  if(tries <= currentMode + 2 && timeLeft > 30) return { emoji:'🏆', text:'완벽해요! 안전 마스터!', star:'⭐⭐⭐' };
+  if(tries <= currentMode * 1.5) return { emoji:'🥇', text:'훌륭해요! 안전왕!', star:'⭐⭐⭐' };
+  if(tries <= currentMode * 2) return { emoji:'🥈', text:'잘했어요! 안전지킴이!', star:'⭐⭐' };
+  return { emoji:'🥉', text:'좋아요! 조금만 더!', star:'⭐' };
+}
+
+function showResult() {
+  clearInterval(timer);
+  gameActive = false;
+  const timeBonus = timeLeft * 3;
+  score += timeBonus;
+  updateStats();
+
+  const r = getRating();
+  const accuracy = Math.round((currentMode / Math.max(tries, currentMode)) * 100);
+
+  document.getElementById('res-emoji').textContent = r.emoji;
+  document.getElementById('res-title').textContent = '모두 완성! 🎉';
+  document.getElementById('res-sub').innerHTML = `시도 ${tries}회 · 남은 시간 ${timeLeft}초<br>시간 보너스 +${timeBonus}점`;
+  document.getElementById('res-score').textContent = score + '점';
+  document.getElementById('res-rating').textContent = r.star + ' ' + r.text;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function showTimeUp() {
+  gameActive = false;
+  const r = { emoji:'⏰', text:'시간이 다 됐어요!', star:'' };
+  document.getElementById('res-emoji').textContent = '⏰';
+  document.getElementById('res-title').textContent = '시간 초과!';
+  document.getElementById('res-sub').innerHTML = `${matched}/${currentMode}쌍 완성<br>시도 횟수: ${tries}회`;
+  document.getElementById('res-score').textContent = score + '점';
+  document.getElementById('res-rating').textContent = '😅 다시 도전해봐요!';
+  document.getElementById('overlay').classList.add('show');
+}
+
+function restartGame() {
+  document.getElementById('overlay').classList.remove('show');
+  startGame();
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+// Init
+startGame();
+</script>
+</body>
+</html>
