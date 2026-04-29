@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>체육대회 안전 런!</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;}
+body{background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Noto Sans KR',sans-serif;}
+#gc{width:100%;background:#1a1a2e;border-radius:12px;overflow:hidden;position:relative;}
+canvas{display:block;width:100%;touch-action:none;}
+#ui{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+#hud{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,0,0,0.5);}
+.hud-left{display:flex;align-items:center;gap:8px;}
+.hud-right{display:flex;align-items:center;gap:8px;}
+#score-display{color:#FFD700;font-size:14px;font-weight:500;font-family:monospace;}
+#stage-display{color:#7EC8E3;font-size:12px;font-weight:500;}
+#lives-display{font-size:16px;letter-spacing:2px;}
+#shield-display{color:#00E676;font-size:12px;display:none;}
+#overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.82);pointer-events:all;padding:20px;text-align:center;}
+#overlay h2{color:#fff;font-size:20px;font-weight:500;margin-bottom:8px;font-family:'Noto Sans KR',sans-serif;}
+#overlay p{color:#aaa;font-size:13px;margin-bottom:20px;line-height:1.6;font-family:'Noto Sans KR',sans-serif;}
+#overlay .big{font-size:40px;margin-bottom:10px;}
+.ov-btn{background:#185FA5;color:#fff;border:none;border-radius:8px;padding:14px 32px;font-size:16px;cursor:pointer;pointer-events:all;width:100%;max-width:200px;font-family:'Noto Sans KR',sans-serif;touch-action:manipulation;}
+.ov-btn:active{opacity:.85;}
+.ov-btn.danger{background:#C62828;}
+#item-hint{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,200,100,0.9);color:#fff;font-size:12px;padding:5px 12px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;}
+#controls{position:absolute;bottom:0;left:0;width:100%;height:64px;display:flex;pointer-events:all;background:rgba(0,0,0,0.6);}
+.ctrl-btn{flex:1;display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(255,255,255,0.8);cursor:pointer;border:none;background:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;padding:10px;}
+.ctrl-btn:active{background:rgba(255,255,255,0.1);}
+.ctrl-sep{width:1px;background:rgba(255,255,255,0.1);}
+#stage-banner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:#FFD700;font-size:22px;font-weight:500;padding:12px 28px;border-radius:8px;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;}
+</style>
+</head>
+<body>
+<div id="gc">
+<canvas id="c"></canvas>
+<div id="ui">
+  <div id="hud">
+    <div class="hud-left">
+      <span id="lives-display">❤️❤️❤️</span>
+      <span id="shield-display">🛡️ 무적!</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <span id="stage-display">STAGE 1</span>
+      <span id="score-display">0</span>
+    </div>
+    <div class="hud-right">
+      <span id="hi-display" style="color:#888;font-size:12px;font-family:monospace;">HI:0</span>
+    </div>
+  </div>
+  <div id="overlay">
+    <div class="big">🏃</div>
+    <h2>체육대회 안전 런!</h2>
+    <p>장애물을 피해 달리세요!<br>
+    ❤️ 목숨 3개 · 4스테이지<br>
+    🛡️ 방패=무적 · ⭐ 별=점수 · ⚡ 번개=속도↓<br>
+    <span style="color:#FFD700;">← → 이동 &nbsp;↑ 점프</span></p>
+    <button class="ov-btn" onclick="startGame()">게임 시작!</button>
+  </div>
+  <div id="item-hint"></div>
+  <div id="stage-banner"></div>
+</div>
+<div id="controls">
+  <button class="ctrl-btn" id="btn-left" ontouchstart="keys.left=true" ontouchend="keys.left=false" onmousedown="keys.left=true" onmouseup="keys.left=false">◀</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-jump" ontouchstart="doJump()" onmousedown="doJump()">▲ 점프</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-right" ontouchstart="keys.right=true" ontouchend="keys.right=false" onmousedown="keys.right=true" onmouseup="keys.right=false">▶</button>
+</div>
+</div>
+
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const GC=document.getElementById('gc');
+
+const W=360,H=320;
+canvas.width=W; canvas.height=H+64;
+GC.style.maxWidth='420px';
+
+const GROUND=H-64;
+const keys={left:false,right:false,jump:false};
+
+const STAGES=[
+  {name:'STAGE 1',bg:'#1a3a5c',ground:'#2d6a4f',speed:2.5,enemyRate:0.018,itemRate:0.008,desc:'운동장을 달려라!',enemies:['cone']},
+  {name:'STAGE 2',bg:'#2d1b4e',ground:'#6b3fa0',speed:3.5,enemyRate:0.024,itemRate:0.009,desc:'속도가 빨라졌어!',enemies:['cone','runner']},
+  {name:'STAGE 3',bg:'#3a1a1a',ground:'#8b4513',speed:4.5,enemyRate:0.028,itemRate:0.010,desc:'장애물이 더 많아졌어!',enemies:['cone','runner','hurdle']},
+  {name:'STAGE 4',bg:'#1a2a1a',ground:'#2e4a1e',speed:5.5,enemyRate:0.032,itemRate:0.011,desc:'최종 스테이지! 살아남아라!',enemies:['cone','runner','hurdle','ball']},
+];
+
+let raf,state='idle',score=0,hiScore=0,lives=3,stage=0,stageTimer=0,shieldTimer=0;
+let player,enemies,items,particles,scrollX;
+let gameRunning=false;
+
+function mkPlayer(){
+  return {x:60,y:GROUND-36,w:24,h:36,vy:0,onGround:true,invincible:0,blinkT:0,color:'#4FC3F7',runFrame:0,runT:0};
+}
+
+function initGame(){
+  player=mkPlayer();
+  enemies=[];items=[];particles=[];scrollX=0;
+  score=0;stage=0;lives=3;stageTimer=0;shieldTimer=0;
+  gameRunning=true;
+  showStageBanner(STAGES[0]);
+  updateHUD();
+}
+
+function showStageBanner(st){
+  const b=document.getElementById('stage-banner');
+  b.textContent=st.name+' — '+st.desc;
+  b.style.opacity='1';
+  setTimeout(()=>b.style.opacity='0',2000);
+}
+
+function hideOverlay(){document.getElementById('overlay').style.display='none';}
+function showOverlay(html,btnHtml){
+  const ov=document.getElementById('overlay');
+  ov.style.display='flex';
+  ov.innerHTML=html+'<br>'+btnHtml;
+}
+
+function startGame(){
+  hideOverlay();
+  initGame();
+  if(raf) cancelAnimationFrame(raf);
+  loop();
+}
+
+function doJump(){
+  if(player&&player.onGround){player.vy=-10;player.onGround=false;}
+}
+
+window.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft')keys.left=true;
+  if(e.key==='ArrowRight')keys.right=true;
+  if((e.key==='ArrowUp'||e.key===' ')&&player&&player.onGround){player.vy=-10;player.onGround=false;}
+  e.preventDefault();
+},{passive:false});
+window.addEventListener('keyup',e=>{
+  if(e.key==='ArrowLeft')keys.left=false;
+  if(e.key==='ArrowRight')keys.right=false;
+});
+
+function spawnEnemy(){
+  const st=STAGES[stage];
+  const type=st.enemies[Math.floor(Math.random()*st.enemies.length)];
+  const configs={
+    cone:{w:22,h:28,color:'#FF6F00',label:'⚠',pts:10,y:GROUND-28},
+    runner:{w:20,h:36,color:'#E53935',label:'R',pts:15,y:GROUND-36,speed:1.5},
+    hurdle:{w:36,h:20,color:'#7B1FA2',label:'H',pts:20,y:GROUND-20},
+    ball:{w:20,h:20,color:'#F57F17',label:'B',pts:25,y:GROUND-40,bouncy:true},
+  };
+  const c=configs[type];
+  enemies.push({x:W+20,y:c.y,w:c.w,h:c.h,color:c.color,label:c.label,pts:c.pts,type,vy:c.bouncy?-4:0,speed:c.speed||0});
+}
+
+function spawnItem(){
+  const types=[
+    {type:'shield',color:'#00E676',label:'S',effect:'🛡️ 무적 5초!',y:GROUND-80},
+    {type:'star',color:'#FFD700',label:'*',effect:'⭐ +50점!',y:GROUND-90},
+    {type:'slow',color:'#29B6F6',label:'~',effect:'⚡ 속도 느려짐!',y:GROUND-70},
+    {type:'life',color:'#FF4081',label:'♥',effect:'❤️ 목숨 +1!',y:GROUND-80},
+  ];
+  const t=types[Math.floor(Math.random()*types.length)];
+  items.push({x:W+20,y:t.y,w:20,h:20,color:t.color,label:t.label,type:t.type,effect:t.effect,floatT:0});
+}
+
+function showHint(text){
+  const h=document.getElementById('item-hint');
+  h.textContent=text;h.style.opacity='1';
+  setTimeout(()=>h.style.opacity='0',1500);
+}
+
+function addParticles(x,y,color,n=6){
+  for(let i=0;i<n;i++){
+    particles.push({x,y,vx:(Math.random()-0.5)*4,vy:(Math.random()-2)*3,life:1,color,r:3+Math.random()*3});
+  }
+}
+
+function hitPlayer(){
+  if(player.invincible>0||shieldTimer>0) return;
+  lives--;
+  player.invincible=120;
+  addParticles(player.x+player.w/2,player.y+player.h/2,'#FF5252',10);
+  updateHUD();
+  if(lives<=0) gameOver();
+}
+
+function applyItem(item){
+  addParticles(item.x+10,item.y+10,item.color,8);
+  showHint(item.effect);
+  if(item.type==='shield'){shieldTimer=300;}
+  else if(item.type==='star'){score+=50;updateHUD();}
+  else if(item.type==='slow'){STAGES[stage].speed=Math.max(1.5,STAGES[stage].speed-1.5);setTimeout(()=>{if(STAGES[stage])STAGES[stage].speed+=1.5;},3000);}
+  else if(item.type==='life'){lives=Math.min(5,lives+1);updateHUD();}
+}
+
+function updateHUD(){
+  document.getElementById('score-display').textContent=String(Math.round(score)).padStart(6,'0');
+  document.getElementById('stage-display').textContent=STAGES[stage]?STAGES[stage].name:'CLEAR!';
+  const h=document.getElementById('lives-display');
+  h.textContent='❤️'.repeat(Math.max(0,lives));
+  const sh=document.getElementById('shield-display');
+  sh.style.display=shieldTimer>0?'block':'none';
+  document.getElementById('hi-display').textContent='HI:'+String(Math.round(hiScore)).padStart(4,'0');
+}
+
+function gameOver(){
+  gameRunning=false;
+  if(score>hiScore) hiScore=score;
+  updateHUD();
+  setTimeout(()=>{
+    showOverlay(
+      `<div style="font-size:48px;margin-bottom:8px">💀</div><h2 style="color:#fff;font-size:20px;font-weight:500;margin-bottom:8px;font-family:'Noto Sans KR',sans-serif">게임 오버!</h2><p style="color:#aaa;font-size:13px;margin-bottom:16px;font-family:'Noto Sans KR',sans-serif">점수: <span style="color:#FFD700;font-size:18px">${Math.round(score)}</span><br>스테이지 ${stage+1}까지 도달!</p>`,
+      '<button class="ov-btn" style="background:#185FA5;color:#fff;border:none;border-radius:8px;padding:14px 32px;font-size:16px;cursor:pointer;width:100%;max-width:200px;pointer-events:all;font-family:\'Noto Sans KR\',sans-serif;touch-action:manipulation" onclick="startGame()">다시 도전!</button>'
+    );
+  },600);
+}
+
+function stageClear(){
+  if(stage>=STAGES.length-1){
+    gameRunning=false;
+    if(score>hiScore) hiScore=score;
+    updateHUD();
+    setTimeout(()=>{
+      showOverlay(
+        `<div style="font-size:48px;margin-bottom:8px">🏆</div><h2 style="color:#FFD700;font-size:20px;font-weight:500;margin-bottom:8px;font-family:'Noto Sans KR',sans-serif">전체 클리어!</h2><p style="color:#aaa;font-size:13px;margin-bottom:16px;font-family:'Noto Sans KR',sans-serif">최종 점수: <span style="color:#FFD700;font-size:20px">${Math.round(score)}</span><br>안전왕이 되었어요!</p>`,
+        '<button class="ov-btn" style="background:#185FA5;color:#fff;border:none;border-radius:8px;padding:14px 32px;font-size:16px;cursor:pointer;width:100%;max-width:200px;pointer-events:all;font-family:\'Noto Sans KR\',sans-serif;touch-action:manipulation" onclick="startGame()">다시 도전!</button>'
+      );
+    },600);
+    return;
+  }
+  stage++;
+  stageTimer=0;
+  enemies=[];items=[];
+  showStageBanner(STAGES[stage]);
+  score+=200;
+  updateHUD();
+}
+
+function drawRoundRect(x,y,w,h,r,color){
+  ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();
+}
+
+function drawPlayer(p){
+  const blink=p.invincible>0&&Math.floor(p.blinkT/6)%2===0;
+  if(blink) return;
+  p.runT++;
+  if(p.onGround&&p.runT%8===0) p.runFrame=(p.runFrame+1)%4;
+  const legOff=[0,3,0,-3][p.runFrame];
+  ctx.fillStyle='#1565C0';
+  ctx.fillRect(p.x+4,p.y+p.h-12,7,12);
+  ctx.fillRect(p.x+p.w-11,p.y+p.h-12+legOff,7,12);
+  ctx.fillStyle='#FF8F00';
+  ctx.fillRect(p.x+4,p.y+p.h-4,8,4);
+  ctx.fillRect(p.x+p.w-12,p.y+p.h-4+legOff,8,4);
+  ctx.fillStyle=shieldTimer>0?'#00E676':p.color;
+  drawRoundRect(p.x+2,p.y,p.w-4,p.h-12,4,shieldTimer>0?'#00E676':p.color);
+  ctx.fillStyle='#FFE0B2';
+  ctx.beginPath();ctx.arc(p.x+p.w/2,p.y+8,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#0D47A1';
+  ctx.fillRect(p.x+2,p.y-6,p.w-4,8);
+  if(shieldTimer>0){
+    ctx.strokeStyle='rgba(0,230,118,0.5)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(p.x+p.w/2,p.y+p.h/2,p.w*0.8,0,Math.PI*2);ctx.stroke();
+  }
+}
+
+function drawEnemy(e){
+  if(e.type==='cone'){
+    ctx.fillStyle=e.color;ctx.beginPath();
+    ctx.moveTo(e.x+e.w/2,e.y);ctx.lineTo(e.x+e.w,e.y+e.h);ctx.lineTo(e.x,e.y+e.h);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('⚠',e.x+e.w/2,e.y+e.h-4);
+  } else if(e.type==='runner'){
+    ctx.fillStyle='#C62828';ctx.fillRect(e.x,e.y,e.w,e.h-10);
+    ctx.fillStyle='#FFCCBC';ctx.beginPath();ctx.arc(e.x+e.w/2,e.y+6,6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#FF5252';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('적',e.x+e.w/2,e.y+e.h/2+4);
+  } else if(e.type==='hurdle'){
+    ctx.fillStyle=e.color;ctx.fillRect(e.x,e.y,e.w,4);
+    ctx.fillRect(e.x+2,e.y,3,e.h);ctx.fillRect(e.x+e.w-5,e.y,3,e.h);
+  } else if(e.type==='ball'){
+    ctx.fillStyle=e.color;ctx.beginPath();ctx.arc(e.x+e.w/2,e.y+e.h/2,e.w/2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('⚡',e.x+e.w/2,e.y+e.h/2+4);
+  }
+}
+
+function drawItem(it){
+  it.floatT+=0.05;
+  const fy=it.y+Math.sin(it.floatT)*4;
+  ctx.fillStyle=it.color;ctx.beginPath();ctx.arc(it.x+10,fy+10,11,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 11px monospace';ctx.textAlign='center';
+  ctx.fillText(it.label,it.x+10,fy+14);
+}
+
+function drawBG(){
+  const st=STAGES[stage]||STAGES[STAGES.length-1];
+  ctx.fillStyle=st.bg;ctx.fillRect(0,0,W,GROUND);
+  const t=Date.now()/1000;
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  [[40,30],[120,50],[220,25],[300,45]].forEach(([x,y])=>{
+    const ox=(x+t*20)%W;
+    ctx.beginPath();ctx.ellipse(ox,y,20,6,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(ox+15,y-5,12,5,0,0,Math.PI*2);ctx.fill();
+  });
+  const gx=((scrollX*0.3)%W);
+  ctx.fillStyle=st.ground;
+  ctx.fillRect(0,GROUND,W,H-GROUND);
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  for(let i=0;i<5;i++){
+    const lx=(i*80-gx%80+W)%W;
+    ctx.fillRect(lx,GROUND+2,40,3);
+  }
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fillRect(0,GROUND,W,2);
+}
+
+function aabb(a,b){
+  return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+}
+
+function loop(){
+  if(!gameRunning){raf=requestAnimationFrame(loop);return;}
+  ctx.clearRect(0,0,W,H+64);
+  drawBG();
+
+  const st=STAGES[stage];
+  stageTimer++;
+  if(stageTimer>600+stage*200&&stageTimer%(600+stage*200)===0){
+    stageClear();return;
+  }
+
+  if(shieldTimer>0){shieldTimer--;updateHUD();}
+  if(player.invincible>0){player.invincible--;player.blinkT++;}
+
+  if(keys.left) player.x=Math.max(0,player.x-3);
+  if(keys.right) player.x=Math.min(W-player.w,player.x+3);
+  player.vy+=0.45;
+  player.y+=player.vy;
+  if(player.y>=GROUND-player.h){player.y=GROUND-player.h;player.vy=0;player.onGround=true;}
+  else player.onGround=false;
+
+  if(Math.random()<st.enemyRate) spawnEnemy();
+  if(Math.random()<st.itemRate) spawnItem();
+  scrollX+=st.speed;
+
+  enemies=enemies.filter(e=>{
+    e.x-=st.speed+(e.speed||0);
+    if(e.type==='ball'){e.vy+=0.4;e.y+=e.vy;if(e.y>=GROUND-e.h){e.y=GROUND-e.h;e.vy*=-0.7;}}
+    if(e.type==='runner'){e.x-=e.speed;}
+    if(e.x+e.w<0) return false;
+    if(aabb(player,e)){hitPlayer();return false;}
+    drawEnemy(e);
+    return true;
+  });
+
+  items=items.filter(it=>{
+    it.x-=st.speed*0.7;
+    if(it.x+it.w<0) return false;
+    if(aabb(player,it)){applyItem(it);return false;}
+    drawItem(it);
+    return true;
+  });
+
+  particles=particles.filter(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.life-=0.04;
+    if(p.life<=0) return false;
+    ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+    return true;
+  });
+
+  drawPlayer(player);
+
+  score+=0.05*st.speed;
+  if(stageTimer%60===0) updateHUD();
+
+  raf=requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
