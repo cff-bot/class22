@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+  body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; overflow-x: hidden; }
+
+  #setup { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; padding: 24px; }
+  #setup h1 { font-size: 2rem; font-weight: 800; color: #f0c040; letter-spacing: -1px; }
+
+  .section-label { font-size: 0.85rem; color: #aaa; margin-bottom: 4px; text-align: center; }
+  .btn-row { display: flex; gap: 10px; justify-content: center; }
+  .sel-btn { padding: 12px 28px; font-size: 1rem; font-weight: 700; border: 2px solid #444; background: #16213e; color: #eee; border-radius: 12px; cursor: pointer; transition: all 0.15s; }
+  .sel-btn.active { border-color: #f0c040; background: #f0c040; color: #1a1a2e; }
+
+  .diff-cards { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .diff-card { width: 130px; padding: 16px 12px; border-radius: 14px; border: 2px solid #333; background: #16213e; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .diff-card.active { border-color: #f0c040; }
+  .diff-card .diff-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .diff-card .diff-name { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+  .diff-card .diff-desc { font-size: 0.75rem; color: #888; line-height: 1.4; }
+  .diff-card.active .diff-desc { color: #aaa; }
+
+  .player-names { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 300px; }
+  .pname-input { padding: 11px 14px; font-size: 0.95rem; border-radius: 10px; border: 1.5px solid #333; background: #16213e; color: #eee; outline: none; }
+  .pname-input:focus { border-color: #f0c040; }
+  .start-btn { padding: 15px 48px; font-size: 1.1rem; font-weight: 800; background: #f0c040; color: #1a1a2e; border: none; border-radius: 14px; cursor: pointer; }
+
+  #game { display: none; flex-direction: column; min-height: 100vh; }
+  .scoreboard { display: flex; background: #16213e; border-bottom: 1px solid #333; }
+  .score-cell { flex: 1; padding: 8px 6px; text-align: center; border-right: 1px solid #333; }
+  .score-cell:last-child { border-right: none; }
+  .score-cell.active-turn { background: #f0c040; color: #1a1a2e; }
+  .score-name { font-size: 0.7rem; font-weight: 600; opacity: 0.8; }
+  .score-val { font-size: 1.3rem; font-weight: 800; }
+  .turn-banner { text-align: center; padding: 8px; background: #0f3460; font-size: 0.9rem; color: #f0c040; font-weight: 700; }
+
+  .grid-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; overflow: auto; }
+  .grid { display: grid; gap: 6px; }
+
+  .tile { display: flex; align-items: center; justify-content: center; font-weight: 800; border-radius: 10px; cursor: pointer; transition: transform 0.1s, background 0.2s; user-select: none; -webkit-user-select: none; border: 2px solid transparent; }
+  .tile:active { transform: scale(0.91); }
+  .tile.hidden { background: #16213e; border-color: #333; color: transparent; }
+  .tile.revealed { background: #0f3460; border-color: #f0c040; }
+  .tile.matched-p1 { background: #922b21; border-color: #e74c3c; color: #fff; cursor: default; }
+  .tile.matched-p2 { background: #1a6b3a; border-color: #27ae60; color: #fff; cursor: default; }
+  .tile.matched-p3 { background: #6c3483; border-color: #9b59b6; color: #fff; cursor: default; }
+
+  .info-bar { padding: 8px 14px; text-align: center; font-size: 0.82rem; color: #aaa; min-height: 34px; }
+  .info-bar .combo { color: #f0c040; font-weight: 700; }
+  .bottom-bar { padding: 8px 14px 16px; display: flex; justify-content: center; gap: 10px; }
+  .action-btn { padding: 9px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; border: 1.5px solid #444; background: #16213e; color: #eee; cursor: pointer; }
+
+  #result { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 18px; padding: 24px; text-align: center; }
+  #result h2 { font-size: 1.8rem; font-weight: 800; color: #f0c040; }
+  .final-scores { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 300px; }
+  .final-row { display: flex; justify-content: space-between; align-items: center; background: #16213e; border-radius: 12px; padding: 12px 18px; }
+  .final-row.winner { border: 2px solid #f0c040; }
+  .final-row .fname { font-size: 1rem; font-weight: 700; }
+  .final-row .fscore { font-size: 1.2rem; font-weight: 800; color: #f0c040; }
+  .replay-btn { padding: 13px 38px; font-size: 1rem; font-weight: 800; background: #f0c040; color: #1a1a2e; border: none; border-radius: 14px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div id="setup">
+  <h1>🔢 넘버 배틀</h1>
+
+  <div>
+    <div class="section-label">인원수</div>
+    <div class="btn-row">
+      <button class="sel-btn active" onclick="setCount(2)">2명</button>
+      <button class="sel-btn" onclick="setCount(3)">3명</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">난이도</div>
+    <div class="diff-cards">
+      <div class="diff-card active" id="diff-easy" onclick="setDiff('easy')">
+        <div class="diff-icon">🟢</div>
+        <div class="diff-name">초급</div>
+        <div class="diff-desc">4×4 (16장)<br>합이 10인 쌍</div>
+      </div>
+      <div class="diff-card" id="diff-mid" onclick="setDiff('mid')">
+        <div class="diff-icon">🟡</div>
+        <div class="diff-name">중급</div>
+        <div class="diff-desc">4×6 (24장)<br>합이 15인 쌍</div>
+      </div>
+      <div class="diff-card" id="diff-hard" onclick="setDiff('hard')">
+        <div class="diff-icon">🔴</div>
+        <div class="diff-name">고급</div>
+        <div class="diff-desc">5×6 (30장)<br>곱이 24인 쌍</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="player-names" id="name-inputs"></div>
+  <button class="start-btn" onclick="startGame()">게임 시작!</button>
+</div>
+
+<div id="game">
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="turn-banner" id="turn-banner"></div>
+  <div class="grid-area"><div class="grid" id="grid"></div></div>
+  <div class="info-bar" id="info-bar"></div>
+  <div class="bottom-bar">
+    <button class="action-btn" onclick="startGame()">다시 시작</button>
+    <button class="action-btn" onclick="goSetup()">설정으로</button>
+  </div>
+</div>
+
+<div id="result">
+  <h2 id="result-title"></h2>
+  <div class="final-scores" id="final-scores"></div>
+  <button class="replay-btn" onclick="startGame()">한 판 더!</button>
+  <button class="action-btn" onclick="goSetup()">설정으로</button>
+</div>
+
+<script>
+let numPlayers = 2;
+let difficulty = 'easy';
+let playerNames = [];
+let scores, combos, currentPlayer, flipped, matched, tiles, locked;
+
+const DIFF_CONFIG = {
+  easy: {
+    cols: 4, target: 10,
+    label: '합이 10',
+    makePairs: () => {
+      // pairs: (1,9),(2,8),(3,7),(4,6),(5,5),(1,9),(2,8),(3,7) → 16 tiles
+      return [[1,9],[2,8],[3,7],[4,6],[5,5],[1,9],[2,8],[3,7]];
+    }
+  },
+  mid: {
+    cols: 6, target: 15,
+    label: '합이 15',
+    makePairs: () => {
+      // 12 pairs → 24 tiles, sums to 15
+      return [[1,14],[2,13],[3,12],[4,11],[5,10],[6,9],[7,8],[1,14],[2,13],[3,12],[4,11],[6,9]];
+    }
+  },
+  hard: {
+    cols: 6, target: 24,
+    label: '곱이 24',
+    makePairs: () => {
+      // 15 pairs → 30 tiles, products = 24
+      return [[1,24],[2,12],[3,8],[4,6],[1,24],[2,12],[3,8],[4,6],[2,12],[3,8],[4,6],[1,24],[3,8],[4,6],[2,12]];
+    }
+  }
+};
+
+function setCount(n) {
+  numPlayers = n;
+  document.querySelectorAll('.sel-btn').forEach((b,i) => b.classList.toggle('active', i === n-2));
+  renderNameInputs();
+}
+
+function setDiff(d) {
+  difficulty = d;
+  document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('diff-'+d).classList.add('active');
+}
+
+function renderNameInputs() {
+  const c = document.getElementById('name-inputs');
+  const defaults = ['1P','2P','3P'];
+  c.innerHTML = '';
+  for(let i=0;i<numPlayers;i++){
+    const inp = document.createElement('input');
+    inp.className = 'pname-input';
+    inp.placeholder = defaults[i] + ' 이름';
+    inp.value = playerNames[i] || '';
+    inp.oninput = e => { playerNames[i] = e.target.value; };
+    c.appendChild(inp);
+  }
+}
+
+function startGame() {
+  const inputs = document.querySelectorAll('.pname-input');
+  const defaults = ['1P','2P','3P'];
+  playerNames = [];
+  for(let i=0;i<numPlayers;i++){
+    const v = inputs[i] ? inputs[i].value.trim() : '';
+    playerNames.push(v || defaults[i]);
+  }
+
+  scores = Array(numPlayers).fill(0);
+  combos = Array(numPlayers).fill(0);
+  currentPlayer = 0;
+  flipped = [];
+  matched = [];
+  locked = false;
+
+  const cfg = DIFF_CONFIG[difficulty];
+  const pairs = cfg.makePairs();
+  tiles = pairs.flat();
+  shuffle(tiles);
+
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+
+  renderScoreboard();
+  renderGrid();
+  updateTurnBanner();
+  document.getElementById('info-bar').innerHTML = DIFF_CONFIG[difficulty].label + ' 쌍을 찾아봐!';
+}
+
+function shuffle(arr) {
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+}
+
+function renderScoreboard() {
+  const sb = document.getElementById('scoreboard');
+  sb.innerHTML = '';
+  playerNames.forEach((name,i) => {
+    const cell = document.createElement('div');
+    cell.className = 'score-cell' + (i===currentPlayer?' active-turn':'');
+    cell.id = 'score-cell-'+i;
+    cell.innerHTML = `<div class="score-name">${name}</div><div class="score-val" id="score-val-${i}">${scores[i]}</div>`;
+    sb.appendChild(cell);
+  });
+}
+
+function updateTurnBanner() {
+  document.getElementById('turn-banner').textContent = playerNames[currentPlayer] + '의 차례';
+}
+
+function tileSize() {
+  const cfg = DIFF_CONFIG[difficulty];
+  if(difficulty === 'easy') return 68;
+  if(difficulty === 'mid') return 60;
+  return 54;
+}
+
+function renderGrid() {
+  const cfg = DIFF_CONFIG[difficulty];
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const sz = tileSize();
+  grid.style.gridTemplateColumns = `repeat(${cfg.cols}, ${sz}px)`;
+  const fontSize = difficulty === 'hard' ? '1.1rem' : '1.3rem';
+  tiles.forEach((val,idx) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile hidden';
+    tile.id = 'tile-'+idx;
+    tile.style.width = sz+'px';
+    tile.style.height = sz+'px';
+    tile.style.fontSize = fontSize;
+    tile.textContent = val;
+    tile.onclick = () => onTileClick(idx);
+    grid.appendChild(tile);
+  });
+}
+
+function onTileClick(idx) {
+  if(locked) return;
+  if(matched.includes(idx)) return;
+  if(flipped.includes(idx)) return;
+  if(flipped.length >= 2) return;
+  flipped.push(idx);
+  document.getElementById('tile-'+idx).className = 'tile revealed';
+  if(flipped.length === 2) {
+    locked = true;
+    setTimeout(checkMatch, 750);
+  }
+}
+
+function checkMatch() {
+  const [a,b] = flipped;
+  const cfg = DIFF_CONFIG[difficulty];
+  const isMatch = difficulty === 'hard'
+    ? tiles[a] * tiles[b] === cfg.target
+    : tiles[a] + tiles[b] === cfg.target;
+
+  if(isMatch) {
+    combos[currentPlayer]++;
+    const bonus = combos[currentPlayer] > 1 ? combos[currentPlayer]-1 : 0;
+    const gained = 1 + bonus;
+    scores[currentPlayer] += gained;
+    matched.push(a,b);
+    const cls = ['matched-p1','matched-p2','matched-p3'][currentPlayer];
+    document.getElementById('tile-'+a).className = 'tile '+cls;
+    document.getElementById('tile-'+b).className = 'tile '+cls;
+    document.getElementById('score-val-'+currentPlayer).textContent = scores[currentPlayer];
+
+    const op = difficulty === 'hard' ? '×' : '+';
+    let msg = `✅ ${tiles[a]} ${op} ${tiles[b]} = ${cfg.target}! <span class="combo">+${gained}점`;
+    if(bonus > 0) msg += ` (콤보 ×${combos[currentPlayer]}!)`;
+    msg += '</span>';
+    document.getElementById('info-bar').innerHTML = msg;
+
+    flipped = [];
+    locked = false;
+    if(matched.length === tiles.length) { setTimeout(showResult, 500); return; }
+    renderScoreboard();
+    updateTurnBanner();
+  } else {
+    combos[currentPlayer] = 0;
+    const op = difficulty === 'hard' ? '×' : '+';
+    const result = difficulty === 'hard' ? tiles[a]*tiles[b] : tiles[a]+tiles[b];
+    document.getElementById('info-bar').innerHTML = `❌ ${tiles[a]} ${op} ${tiles[b]} = ${result}... 다시 뒤집혀!`;
+    setTimeout(() => {
+      document.getElementById('tile-'+a).className = 'tile hidden';
+      document.getElementById('tile-'+b).className = 'tile hidden';
+      flipped = [];
+      currentPlayer = (currentPlayer+1) % numPlayers;
+      locked = false;
+      renderScoreboard();
+      updateTurnBanner();
+      document.getElementById('info-bar').innerHTML = playerNames[currentPlayer] + ', 기억해봐!';
+    }, 950);
+  }
+}
+
+function showResult() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('result').style.display = 'flex';
+  const maxScore = Math.max(...scores);
+  const winners = playerNames.filter((_,i)=>scores[i]===maxScore);
+  document.getElementById('result-title').textContent = winners.length===1 ? `🏆 ${winners[0]} 승리!` : `🏆 ${winners.join(' & ')} 동점!`;
+  const ranked = playerNames.map((n,i)=>({n,s:scores[i]})).sort((a,b)=>b.s-a.s);
+  const fs = document.getElementById('final-scores');
+  fs.innerHTML = '';
+  ranked.forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'final-row'+(i===0?' winner':'');
+    row.innerHTML = `<span class="fname">${['🥇','🥈','🥉'][i]} ${r.n}</span><span class="fscore">${r.s}점</span>`;
+    fs.appendChild(row);
+  });
+}
+
+function goSetup() {
+  document.getElementById('game').style.display='none';
+  document.getElementById('result').style.display='none';
+  document.getElementById('setup').style.display='flex';
+  renderNameInputs();
+}
+
+renderNameInputs();
+</script>
+</body>
+</html>
