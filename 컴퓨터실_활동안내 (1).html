@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>컴퓨터실 활동 안내</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --step1: #4A90D9;
+      --step2: #7B68C8;
+      --step3: #48B872;
+      --step4: #E8A020;
+      --step5: #E05A5A;
+      --bg: #F4F7FB;
+      --card: #ffffff;
+      --text: #2c3e50;
+      --sub: #6c7a89;
+      --border-radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      padding: 20px 16px 40px;
+      line-height: 1.7;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      padding: 28px 20px 24px;
+      background: linear-gradient(135deg, #4A90D9, #7B68C8);
+      border-radius: var(--border-radius);
+      color: white;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(74,144,217,0.25);
+    }
+
+    .header .emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+    .header h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+    .header p { font-size: 0.95rem; opacity: 0.9; }
+
+    /* 목차 */
+    .toc {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .toc h2 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: var(--sub); letter-spacing: 0.05em; }
+    .toc-list { display: flex; flex-direction: column; gap: 8px; }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .toc-item:nth-child(1) { background: #EBF4FF; color: var(--step1); }
+    .toc-item:nth-child(2) { background: #F0EEFF; color: var(--step2); }
+    .toc-item:nth-child(3) { background: #E8F8EE; color: var(--step3); }
+    .toc-item:nth-child(4) { background: #FFF4E0; color: var(--step4); }
+    .toc-item:nth-child(5) { background: #FFECEC; color: var(--step5); }
+    .toc-badge {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 900;
+      color: white;
+      flex-shrink: 0;
+    }
+    .toc-item:nth-child(1) .toc-badge { background: var(--step1); }
+    .toc-item:nth-child(2) .toc-badge { background: var(--step2); }
+    .toc-item:nth-child(3) .toc-badge { background: var(--step3); }
+    .toc-item:nth-child(4) .toc-badge { background: var(--step4); }
+    .toc-item:nth-child(5) .toc-badge { background: var(--step5); }
+
+    /* 스텝 카드 */
+    .step-card {
+      background: white;
+      border-radius: var(--border-radius);
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px 16px;
+      color: white;
+    }
+    .step-card:nth-child(1) .step-header { background: var(--step1); }
+    .step-card:nth-child(2) .step-header { background: var(--step2); }
+    .step-card:nth-child(3) .step-header { background: var(--step3); }
+    .step-card:nth-child(4) .step-header { background: var(--step4); }
+    .step-card:nth-child(5) .step-header { background: var(--step5); }
+
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 900;
+      flex-shrink: 0;
+    }
+    .step-title-wrap { flex: 1; }
+    .step-title { font-size: 1.1rem; font-weight: 800; }
+    .step-sub { font-size: 0.82rem; opacity: 0.88; margin-top: 2px; }
+    .step-emoji { font-size: 1.8rem; }
+
+    .step-body { padding: 20px; }
+
+    /* 개념 박스 */
+    .concept-box {
+      background: #F8FAFF;
+      border-left: 4px solid;
+      border-radius: 0 10px 10px 0;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+    }
+    .step-card:nth-child(1) .concept-box { border-color: var(--step1); }
+    .step-card:nth-child(2) .concept-box { border-color: var(--step2); }
+    .step-card:nth-child(3) .concept-box { border-color: var(--step3); }
+    .step-card:nth-child(4) .concept-box { border-color: var(--step4); }
+    .step-card:nth-child(5) .concept-box { border-color: var(--step5); }
+
+    .concept-box .concept-title {
+      font-weight: 700;
+      font-size: 0.88rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      opacity: 0.7;
+      text-transform: uppercase;
+    }
+
+    /* 액션 리스트 */
+    .action-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .action-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #F4F7FB;
+      border-radius: 10px;
+      font-size: 0.95rem;
+    }
+    .action-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-card:nth-child(1) .action-num { background: var(--step1); }
+    .step-card:nth-child(2) .action-num { background: var(--step2); }
+    .step-card:nth-child(3) .action-num { background: var(--step3); }
+    .step-card:nth-child(4) .action-num { background: var(--step4); }
+    .step-card:nth-child(5) .action-num { background: var(--step5); }
+
+    .action-item strong { font-weight: 700; }
+    .action-item .action-detail { color: var(--sub); font-size: 0.88rem; margin-top: 3px; }
+
+    /* 키워드 태그 */
+    .keyword-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .keyword {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: white;
+    }
+    .step-card:nth-child(1) .keyword { background: var(--step1); }
+    .step-card:nth-child(2) .keyword { background: var(--step2); }
+    .step-card:nth-child(3) .keyword { background: var(--step3); }
+    .step-card:nth-child(4) .keyword { background: var(--step4); }
+    .step-card:nth-child(5) .keyword { background: var(--step5); }
+
+    /* 예시 글 박스 */
+    .text-sample {
+      background: #FAFFF9;
+      border: 1.5px solid #C3E8CC;
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 0.93rem;
+      line-height: 1.85;
+      color: #2d4a35;
+      margin: 14px 0;
+    }
+    .text-sample .sample-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--step3);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 팁 박스 */
+    .tip-box {
+      background: #FFFBEA;
+      border: 1.5px solid #FFE07A;
+      border-radius: 10px;
+      padding: 12px 15px;
+      font-size: 0.88rem;
+      color: #7a5a00;
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .tip-box .tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* 타자 레벨 표 */
+    .level-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
+    .level-table th, .level-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    .level-table th { background: #FFF4E0; font-weight: 700; color: var(--step4); }
+    .level-table tr:last-child td { border-bottom: none; }
+    .level-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: white;
+    }
+    .lv1 { background: #48B872; }
+    .lv2 { background: #4A90D9; }
+    .lv3 { background: #7B68C8; }
+    .lv4 { background: #E05A5A; }
+
+    /* 완료 체크 */
+    .done-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #F0FFF4;
+      border-radius: 10px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--step3);
+      border: 1.5px dashed #48B872;
+    }
+    .done-wrap input[type="checkbox"] {
+      width: 20px; height: 20px;
+      accent-color: var(--step3);
+      cursor: pointer;
+    }
+
+    /* 마지막 메시지 */
+    .footer-msg {
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(135deg, #48B872, #4A90D9);
+      border-radius: var(--border-radius);
+      color: white;
+      margin-top: 8px;
+    }
+    .footer-msg .big { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+    .footer-msg .small { font-size: 0.9rem; opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <div class="header">
+    <span class="emoji">💻</span>
+    <h1>컴퓨터실 활동 순서</h1>
+    <p>순서대로 차근차근 따라 해 보세요!</p>
+  </div>
+
+  <!-- 목차 -->
+  <div class="toc">
+    <h2>📋 오늘의 활동</h2>
+    <div class="toc-list">
+      <div class="toc-item"><div class="toc-badge">1</div> 계정이란? — 인터넷 주소와 @의 비밀</div>
+      <div class="toc-item"><div class="toc-badge">2</div> 브라우저란? — 인터넷 창 사용법</div>
+      <div class="toc-item"><div class="toc-badge">3</div> 구글 문서로 글 쓰기</div>
+      <div class="toc-item"><div class="toc-badge">4</div> 한컴 타자 연습</div>
+      <div class="toc-item"><div class="toc-badge">5</div> 워드크러시로 마무리!</div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title-wrap">
+        <div class="step-title">계정이란? — 인터넷 주소와 @의 비밀</div>
+        <div class="step-sub">내 계정을 기억하고 정보를 지켜요</div>
+      </div>
+      <div class="step-emoji">🔑</div>
+    </div>
+    <div class="step-body">
+
+      <div class="concept-box">
+        <div class="concept-title">📌 핵심 개념</div>
+        <p>인터넷에서 나를 구별해 주는 <strong>주소</strong>가 바로 계정(이메일)이에요.<br>
+        이메일 주소는 항상 <strong>이름 @ 회사주소</strong> 구조예요.</p>
+      </div>
+
+      <ul class="action-list">
+        <li class="action-item">
+          <div class="action-num">①</div>
+          <div>
+            <div><strong>@ 기호의 의미</strong></div>
+            <div class="action-detail">
+              예: <strong>hong123 @ gmail.com</strong><br>
+              • <strong>hong123</strong> = 내 이름(아이디)<br>
+              • <strong>@</strong> = "~에 있는" (at의 줄임)<br>
+              • <strong>gmail.com</strong> = 구글이 운영하는 주소 (도메인)
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">②</div>
+          <div>
+            <div><strong>회사마다 도메인이 달라요</strong></div>
+            <div class="action-detail">
+              구글: @gmail.com &nbsp;|&nbsp; 네이버: @naver.com &nbsp;|&nbsp; 다음: @daum.net<br>
+              학교: @edu.gyeonggi.kr 처럼 기관마다 다른 주소를 써요
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">③</div>
+          <div>
+            <div><strong>IP주소 vs 도메인</strong></div>
+            <div class="action-detail">
+              컴퓨터끼리는 숫자 주소(IP)로 찾아요: 예) 142.250.196.78<br>
+              사람이 외우기 불편하니까 → <strong>google.com</strong>처럼 이름으로 바꾼 게 도메인이에요
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">④</div>
+          <div>
+            <div><strong>인터넷 vs 와이파이</strong></div>
+            <div class="action-detail">
+              <strong>인터넷</strong>: 세계의 컴퓨터가 연결된 거대한 통신망<br>
+              <strong>와이파이</strong>: 인터넷에 무선으로 접속하는 방법 중 하나<br>
+              → 와이파이가 없어도 인터넷은 있어요 (LTE, 유선 등)
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">⑤</div>
+          <div>
+            <div><strong>🔒 정보 보호가 중요한 이유</strong></div>
+            <div class="action-detail">
+              계정 = 나의 인터넷 집 열쇠. 비밀번호를 친구에게도 알려주면 안 돼요!<br>
+              학교 컴퓨터에서는 작업이 끝나면 반드시 <strong>로그아웃</strong>해요.
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="keyword-wrap">
+        <span class="keyword">계정</span>
+        <span class="keyword">이메일</span>
+        <span class="keyword">@ (at)</span>
+        <span class="keyword">도메인</span>
+        <span class="keyword">IP주소</span>
+        <span class="keyword">인터넷</span>
+        <span class="keyword">와이파이</span>
+      </div>
+
+      <div class="done-wrap">
+        <input type="checkbox" id="done1">
+        <label for="done1">위 내용을 읽고 이해했어요 ✅</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title-wrap">
+        <div class="step-title">브라우저란? — 인터넷 창 사용법</div>
+        <div class="step-sub">크롬으로 안전하게 인터넷 사용하기</div>
+      </div>
+      <div class="step-emoji">🌐</div>
+    </div>
+    <div class="step-body">
+
+      <div class="concept-box">
+        <div class="concept-title">📌 핵심 개념</div>
+        <p><strong>브라우저</strong>는 인터넷 세상을 보여주는 창문이에요.<br>
+        마치 TV 리모컨처럼 인터넷을 탐색할 수 있게 해줘요.</p>
+      </div>
+
+      <ul class="action-list">
+        <li class="action-item">
+          <div class="action-num">①</div>
+          <div>
+            <div><strong>브라우저 종류</strong></div>
+            <div class="action-detail">
+              🔵 <strong>크롬(Chrome)</strong> — 구글 / 학교에서 주로 사용<br>
+              🟠 <strong>엣지(Edge)</strong> — 마이크로소프트 / 윈도우 기본<br>
+              🦊 <strong>파이어폭스(Firefox)</strong> — 모질라<br>
+              🧭 <strong>사파리(Safari)</strong> — 애플 전용
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">②</div>
+          <div>
+            <div><strong>게스트 모드로 로그인하는 이유</strong></div>
+            <div class="action-detail">
+              학교 컴퓨터는 여러 사람이 함께 써요.<br>
+              게스트 모드 = 내 정보를 저장하지 않고 사용 → 끄면 기록이 사라져요.<br>
+              크롬에서만 가능한 이유: 구글 계정과 연동된 기능이기 때문이에요.
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">③</div>
+          <div>
+            <div><strong>탭(Tab) 사용하기</strong></div>
+            <div class="action-detail">
+              탭 = 브라우저 안의 여러 창<br>
+              새 탭 추가: 상단의 <strong>＋ 버튼</strong> 클릭 또는 <strong>Ctrl + T</strong><br>
+              탭 닫기: 탭의 <strong>✕ 버튼</strong> 클릭 또는 <strong>Ctrl + W</strong>
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">④</div>
+          <div>
+            <div><strong>검색창에서 검색하기</strong></div>
+            <div class="action-detail">
+              상단 주소창에 검색어를 입력하고 <strong>Enter</strong>를 눌러요.<br>
+              주소창 = 검색창 — 주소를 직접 입력하거나 검색어를 써도 돼요!
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="tip-box">
+        <div class="tip-icon">💡</div>
+        <div>크롬을 쓰는 이유: 구글 문서, 구글 드라이브 등과 연결이 잘 되고, 학교에서 가장 많이 사용해요. 게스트 모드도 크롬에만 있어요!</div>
+      </div>
+
+      <div class="done-wrap">
+        <input type="checkbox" id="done2">
+        <label for="done2">브라우저로 새 탭을 열어봤어요 ✅</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title-wrap">
+        <div class="step-title">구글 문서로 글 쓰기</div>
+        <div class="step-sub">아래 예시 글을 구글 문서에 그대로 써 보세요</div>
+      </div>
+      <div class="step-emoji">✍️</div>
+    </div>
+    <div class="step-body">
+
+      <div class="concept-box">
+        <div class="concept-title">📌 자동 저장이란?</div>
+        <p>구글 문서는 <strong>클라우드(인터넷 저장소)</strong>에 저장돼요.<br>
+        Ctrl+S를 누르지 않아도 입력할 때마다 자동으로 저장돼요.<br>
+        클라우드 = 인터넷 어딘가에 있는 나의 창고. 어떤 컴퓨터에서도 열 수 있어요!</p>
+      </div>
+
+      <ul class="action-list">
+        <li class="action-item">
+          <div class="action-num">①</div>
+          <div>
+            <strong>구글 문서 열기</strong>
+            <div class="action-detail">
+              주소창에 <strong>docs.new</strong> 를 입력하고 Enter<br>
+              (또는 선생님이 드라이브에 올려둔 파일 클릭)
+            </div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">②</div>
+          <div>
+            <strong>제목 입력하기</strong>
+            <div class="action-detail">왼쪽 상단 "제목 없는 문서"를 클릭하고 자신의 이름을 써요</div>
+          </div>
+        </li>
+        <li class="action-item">
+          <div class="action-num">③</div>
+          <div>
+            <strong>아래 예시 글을 보고 직접 입력해요</strong>
+            <div class="action-detail">그대로 따라 써도 되고, 조금 바꿔서 써도 돼요</div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="text-sample">
+        <div class="sample-label">📄 예시 글 — 이 내용을 구글 문서에 입력해 보세요</div>
+        <p>
+          봄이 되면 우리 학교 운동장 한쪽에 있는 벚나무에 꽃이 피기 시작한다. 처음에는 작은 분홍빛 꽃봉오리가 조심스럽게 고개를 내밀더니, 며칠이 지나지 않아 나무 전체가 하얀 꽃으로 뒤덮인다. 멀리서 보면 마치 솜사탕을 얹어 놓은 것처럼 풍성하고 부드러워 보인다.<br><br>
+          쉬는 시간이 되면 친구들이 하나둘 벚나무 아래로 모여든다. 꽃잎을 손바닥 위에 올려 보기도 하고, 바람에 날리는 꽃잎을 잡으려고 깔깔대며 뛰어다니기도 한다. 꽃잎이 눈처럼 쏟아질 때면 운동장이 마치 하얀 담요를 덮은 것 같아 발을 딛기가 아까울 정도다. 어떤 친구는 꽃잎을 모아 책 사이에 끼워 두겠다며 주머니에 조심조심 넣기도 했다.<br><br>
+          나는 그 벚나무 아래에 서서 하늘을 올려다보는 것을 좋아한다. 파란 하늘과 하얀 꽃잎이 어우러지는 순간이 너무 아름답기 때문이다. 바람이 살짝 불 때마다 꽃잎들이 빙글빙글 돌면서 내려오는데, 그 모습을 보고 있으면 시간이 멈춘 것처럼 느껴진다. 눈을 감으면 달콤한 꽃향기가 코끝에 살며시 스며든다.<br><br>
+          선생님께서는 벚꽃이 피는 기간은 겨우 일주일에서 열흘 남짓이라고 하셨다. 그 짧은 시간 동안만 볼 수 있기 때문에 더 특별하게 느껴지는 것 같다. 꽃이 지고 나면 초록빛 잎이 무성하게 자라 여름이 왔음을 알려 준다. 나는 매년 이 벚꽃이 피기를 기다리게 된다.<br><br>
+          올해는 친구들과 함께 벚나무 아래에서 사진을 찍었다. 꽃잎이 날리는 순간을 담으려고 몇 번이나 다시 찍기도 했다. 사진 속 우리 모두의 얼굴에는 웃음이 가득했다. 이 봄날의 기억은 아마 오랫동안 내 마음속에 따뜻하게 남아 있을 것 같다.
+        </p>
+      </div>
+
+      <div class="tip-box">
+        <div class="tip-icon">⌨️</div>
+        <div>한글 입력이 안 될 때: 키보드 오른쪽 <strong>한/영 키</strong>를 눌러보세요. 또는 <strong>Shift + Space</strong>로 전환돼요.</div>
+      </div>
+
+      <div class="done-wrap">
+        <input type="checkbox" id="done3">
+        <label for="done3">글 입력을 완료하고 자동 저장된 것을 확인했어요 ✅</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title-wrap">
+        <div class="step-title">한컴 타자 연습</div>
+        <div class="step-sub">내 수준에 맞게 골라서 연습해요</div>
+      </div>
+      <div class="step-emoji">⌨️</div>
+    </div>
+    <div class="step-body">
+
+      <div class="concept-box">
+        <div class="concept-title">📌 접속 방법</div>
+        <p>주소창에 <strong>hancomtaja.com</strong> 을 입력하고 Enter<br>
+        또는 검색창에 <strong>"인터넷 한컴타자"</strong> 검색 → 노란색 사이트 클릭</p>
+      </div>
+
+      <table class="level-table">
+        <thead>
+          <tr>
+            <th>내 수준</th>
+            <th>선택할 메뉴</th>
+            <th>설명</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="level-badge lv1">입문</span></td>
+            <td><strong>자리연습</strong></td>
+            <td>손가락 위치를 배워요</td>
+          </tr>
+          <tr>
+            <td><span class="level-badge lv2">초급</span></td>
+            <td><strong>낱말연습</strong></td>
+            <td>짧은 단어 치기</td>
+          </tr>
+          <tr>
+            <td><span class="level-badge lv3">중급</span></td>
+            <td><strong>짧은글 연습</strong></td>
+            <td>문장 단위로 연습</td>
+          </tr>
+          <tr>
+            <td><span class="level-badge lv4">고급</span></td>
+            <td><strong>긴글 연습</strong></td>
+            <td>긴 문단 연습</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tip-box">
+        <div class="tip-icon">💡</div>
+        <div>처음에는 느려도 괜찮아요! 정확하게 치는 연습이 먼저예요. 속도는 나중에 자연스럽게 빨라져요.</div>
+      </div>
+
+      <div class="done-wrap">
+        <input type="checkbox" id="done4">
+        <label for="done4">타자 연습을 10분 이상 했어요 ✅</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title-wrap">
+        <div class="step-title">워드크러시로 마무리!</div>
+        <div class="step-sub">⏰ 수업 종료 5분 전에만 시작해요</div>
+      </div>
+      <div class="step-emoji">🎮</div>
+    </div>
+    <div class="step-body">
+
+      <div class="concept-box">
+        <div class="concept-title">📌 접속 방법</div>
+        <p>주소창에 <strong>hancomtaja.com</strong> 입력 → <strong>오락실</strong> 클릭 → <strong>워드크러시</strong> 선택</p>
+      </div>
+
+      <ul class="action-list">
+        <li class="action-item">
+          <div class="action-num">!</div>
+          <div>
+            <strong>⚠️ 주의사항</strong>
+            <div class="action-detail">
+              3~4단계가 끝나야 시작할 수 있어요.<br>
+              선생님이 "게임 시작해도 됩니다" 신호를 줄 때까지 기다려요.
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="tip-box">
+        <div class="tip-icon">🎯</div>
+        <div>워드크러시도 실제로 타자 연습이에요! 재미있게 하다 보면 자연스럽게 실력이 늘어요 😊</div>
+      </div>
+
+      <div class="done-wrap">
+        <input type="checkbox" id="done5">
+        <label for="done5">오늘 활동을 모두 완료했어요 🎉</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 마무리 메시지 -->
+  <div class="footer-msg">
+    <div class="big">🎉 수고했어요!</div>
+    <div class="small">오늘 배운 것들이 앞으로 컴퓨터를 쓸 때 많은 도움이 될 거예요.</div>
+  </div>
+
+</body>
+</html>
